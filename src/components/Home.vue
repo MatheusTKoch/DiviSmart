@@ -10,11 +10,21 @@ import Footer from './Footer.vue';
     <h1 class="message">Seu Guia Inteligente de Dividendos e Investimentos</h1>
     <div class="message">Acompanhe seus ganhos, visualize dividendos e maximize o retorno dos seus investimentos – tudo em um só lugar.</div>
     <img src="../assets/graph.png" alt="graph" class="grafico">
+    <button class="cadastro">Criar Conta</button>
     <Footer />
 </div>
 </template>
 
 <style scoped>
+button.cadastro {
+    background-color: transparent;
+    position: relative;
+    color: ghostwhite;
+    border-color: ghostwhite;
+    bottom: 30vh;
+    right: 35vh;
+}
+
 img.grafico {
     position: relative;
     left: 100vh;
