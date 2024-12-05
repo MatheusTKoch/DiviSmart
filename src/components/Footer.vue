@@ -14,21 +14,19 @@
 div.footer {
     position: relative;
     bottom: 0;
-    width: 100vh;
+    width: 100%;
     min-height: 5vh;
 }
 
 div.contact {
     color: whitesmoke;
     position: relative;
-    left: 20%;
+    left: 30%;
 }
 
-/* div.git {
-    position: relative;
-    height: 10vh;
-    left: 20vh;
-} */
+div.git {
+    object-position: 20% 2%;
+}
 
 div.marca {
     position: relative;
