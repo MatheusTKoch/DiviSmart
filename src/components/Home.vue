@@ -25,6 +25,13 @@ button.cadastro {
     right: 35vh;
 }
 
+button.cadastro:hover {
+    color: black;
+    border-color: black;
+    background-color: ghostwhite;
+    transition: 0.3s;
+}
+
 img.grafico {
     position: relative;
     left: 100vh;

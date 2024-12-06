@@ -19,6 +19,13 @@ button.login {
     border-color: ghostwhite;
 }
 
+button.login:hover {
+    color: black;
+    border-color: black;
+    background-color: ghostwhite;
+    transition: 0.3s;
+}
+
 div.titulo {
     color: ghostwhite;
     position: relative;
