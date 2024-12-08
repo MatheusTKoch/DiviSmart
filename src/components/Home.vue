@@ -8,7 +8,7 @@ import Footer from './Footer.vue';
         <h1 class="message">Seu Guia Inteligente de Dividendos e Investimentos</h1>
         <div class="message">Acompanhe seus ganhos, visualize dividendos e maximize o retorno dos seus investimentos – tudo em um só lugar.</div>
         <img src="../assets/graph.png" alt="graph" class="grafico">
-        <button class="cadastro">Criar Conta</button>
+        <button class="cadastro"><RouterLink to="/register">Criar Conta</RouterLink></button>
     <Footer />
 </template>
 
