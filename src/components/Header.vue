@@ -1,8 +1,7 @@
 <script setup lang="ts">
-const props = defineProps({
+defineProps({
     showLogin: Boolean 
 });
-
 </script>
 
 <template>

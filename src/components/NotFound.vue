@@ -15,7 +15,7 @@ import Header from './Header.vue';
 div.aviso {
     color: whitesmoke;
     text-align: center;
-    vertical-align: middle;
+    transform: translateY(30vh);
 }
 
 div.titulo {
