@@ -4,15 +4,12 @@ import Footer from './Footer.vue';
 </script>
 
 <template>
-<div class="background">
-    <Header showLogin>
-    </Header>
-    <h1 class="message">Seu Guia Inteligente de Dividendos e Investimentos</h1>
-    <div class="message">Acompanhe seus ganhos, visualize dividendos e maximize o retorno dos seus investimentos – tudo em um só lugar.</div>
-    <img src="../assets/graph.png" alt="graph" class="grafico">
-    <button class="cadastro">Criar Conta</button>
+    <Header showLogin></Header>
+        <h1 class="message">Seu Guia Inteligente de Dividendos e Investimentos</h1>
+        <div class="message">Acompanhe seus ganhos, visualize dividendos e maximize o retorno dos seus investimentos – tudo em um só lugar.</div>
+        <img src="../assets/graph.png" alt="graph" class="grafico">
+        <button class="cadastro">Criar Conta</button>
     <Footer />
-</div>
 </template>
 
 <style scoped>
@@ -60,13 +57,5 @@ div.message {
     top: 20vh;
     left: 20vh;
     font-size:calc(100% + 0.25vw);
-}
-
-div.background {
-    min-height: 100vh;
-    width: 100%;
-    margin: 0;
-    padding: 0;
-    background-image: linear-gradient(180deg, rgba(0,24,36,1) 0%, rgba(17,43,148,1) 10%, rgba(0,239,255,1) 100%);
 }
 </style>
