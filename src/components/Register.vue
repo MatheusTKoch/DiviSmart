@@ -1,5 +1,18 @@
 <script setup lang="ts">
 import Header from './Header.vue';
+
+function showHide() {
+    let element1 = (<HTMLInputElement>document.getElementById("password")).type;
+    if (element1 == "password") {
+        (<HTMLInputElement>document.getElementById("password")).type = "text";
+        (<HTMLInputElement>document.getElementById("password_confirm")).type = "text";
+    } else {
+        (<HTMLInputElement>document.getElementById("password")).type = "password";
+        (<HTMLInputElement>document.getElementById("password_confirm")).type = "password";
+    }
+}
+
+
 </script>
 
 <template>
@@ -10,9 +23,13 @@ import Header from './Header.vue';
         <label for="email">Email:</label>
         <input type="email" name="email">
         <label for="password">Digite sua senha:</label>
-        <input type="password" name="password">
+        <input type="password" name="password" id="password">
         <label for="password_confirm">Digite a senha novamente:</label>
-        <input type="password" name="password_confirm">
+        <input type="password" name="password_confirm" id="password_confirm">
+        <div class="pass">
+        <input type="checkbox" name="showPass" :onkeypress="showHide" :onclick="showHide">
+        <label for="showPass" class="passLabel">Mostrar Senha</label>
+        </div>
         </div>
         <button class="cadastro">Cadastrar</button>
         <p>Já é cadastrado? Faça o seu <RouterLink to="/login">login</RouterLink></p>
@@ -20,6 +37,19 @@ import Header from './Header.vue';
 </template>
 
 <style scoped>
+    a {
+        text-decoration: none;
+        color: darkblue;
+    }
+
+    div.pass {
+        display: inline-flex;
+    }
+
+    label.passLabel {
+        white-space: nowrap;
+    }
+
     form {
         color: whitesmoke;
         text-align: center;
@@ -47,5 +77,12 @@ import Header from './Header.vue';
     
     button.cadastro {
         margin: 10px;
+    }
+
+    button.cadastro:hover {
+        color: black;
+        border-color: black;
+        background-color: ghostwhite;
+        transition: 0.3s;
     }
 </style>

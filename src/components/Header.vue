@@ -6,12 +6,22 @@ defineProps({
 
 <template>
  <div class="header">
-    <div class="titulo">DiviSmart</div>
-    <button class="login" v-if="showLogin"><RouterLink to="/login">Login</RouterLink></button>
+    <div class="titulo"><RouterLink class="titulo1" to="/">DiviSmart</RouterLink></div>
+    <button class="login" v-if="showLogin"><RouterLink class="titulo2" to="/login">Login</RouterLink></button>
  </div>
 </template>
 
 <style scoped>
+a.titulo1 {
+    text-decoration: none;
+    color: whitesmoke;
+}
+
+a.titulo2 {
+    text-decoration: none;
+    color: inherit;
+}
+
 button.login {
     background-color: transparent;
     position: relative;
