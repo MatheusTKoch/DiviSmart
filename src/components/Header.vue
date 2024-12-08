@@ -1,11 +1,14 @@
 <script setup lang="ts">
+const props = defineProps({
+    showLogin: Boolean 
+});
 
 </script>
 
 <template>
  <div class="header">
     <div class="titulo">DiviSmart</div>
-    <button class="login">Login</button>
+    <button class="login" v-if="showLogin">Login</button>
  </div>
 </template>
 

@@ -5,7 +5,7 @@ import Footer from './Footer.vue';
 
 <template>
 <div class="background">
-    <Header >
+    <Header showLogin>
     </Header>
     <h1 class="message">Seu Guia Inteligente de Dividendos e Investimentos</h1>
     <div class="message">Acompanhe seus ganhos, visualize dividendos e maximize o retorno dos seus investimentos – tudo em um só lugar.</div>
