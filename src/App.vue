@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import Home from './components/Home.vue';
 import NotFound from './components/NotFound.vue';
+import Register from './components/Register.vue';
+import Login  from './components/Login.vue';
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
-import Register from './components/Register.vue';
+
 
 const route = useRoute();
 const rotaAtual = computed(() => route.name);
@@ -12,6 +14,7 @@ const rotaAtual = computed(() => route.name);
 <template>
   <div class="background">
     <NotFound v-if="rotaAtual === 'notFound'"></NotFound>
+    <Login v-else-if="rotaAtual == 'login'"></Login>
     <Register v-else-if="rotaAtual == 'register'"></Register>
     <Home v-else/>
   </div>

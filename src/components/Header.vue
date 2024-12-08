@@ -7,7 +7,7 @@ defineProps({
 <template>
  <div class="header">
     <div class="titulo">DiviSmart</div>
-    <button class="login" v-if="showLogin">Login</button>
+    <button class="login" v-if="showLogin"><RouterLink to="/login">Login</RouterLink></button>
  </div>
 </template>
 

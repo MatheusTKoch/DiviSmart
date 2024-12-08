@@ -5,17 +5,15 @@ import Header from './Header.vue';
 <template>
     <Header></Header>
     <form>
-        <p class="titulo">Cadastre-se</p>
+        <p class="titulo">Login</p>
         <div class="conteudo">
         <label for="email">Email:</label>
         <input type="email" name="email">
-        <label for="password">Digite sua senha:</label>
+        <label for="password">Senha:</label>
         <input type="password" name="password">
-        <label for="password_confirm">Digite a senha novamente:</label>
-        <input type="password" name="password_confirm">
         </div>
-        <button class="cadastro">Cadastrar</button>
-        <p>Já é cadastrado? Faça o seu <RouterLink to="/login">login</RouterLink></p>
+        <button class="cadastro">Login</button>
+        <p>Não é cadastrado? Faça o seu <RouterLink to="/register">cadastro</RouterLink></p>
     </form>
 </template>
 
