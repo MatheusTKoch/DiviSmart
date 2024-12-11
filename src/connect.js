@@ -1,4 +1,4 @@
-import mysql from 'mysql';
+import mysql from 'mysql2';
 
 const connection = mysql.createConnection({
     host: "localhost",
@@ -9,7 +9,7 @@ const connection = mysql.createConnection({
 
 connection.connect((err) => {
     if (err) {
-        console.log("Erro na conexao:" + err.message);
+        console.log("Erro na conexao: " + err.message);
     } else {
         console.log("Conexao ok");
     }
