@@ -1,4 +1,7 @@
 import mysql from 'mysql2';
+import dotEnv from 'dotenv';
+
+dotEnv.config();
 
 const connection = mysql.createConnection({
     host: "localhost",
