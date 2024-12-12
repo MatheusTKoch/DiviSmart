@@ -1,5 +1,31 @@
 <script setup lang="ts">
 import Header from './Header.vue';
+import mysql from 'mysql2';
+import dotEnv from 'dotenv';
+
+dotEnv.config();
+
+const connection = mysql.createConnection({
+    host: "localhost",
+    user: process.env.USER_DB,
+    password: process.env.PASSWORD_DB,
+    database: process.env.DATABASE_DB
+});
+
+connection.connect((err) => {
+    if (err) {
+        console.log("Erro na conexao: " + err.message);
+    } else {
+        console.log("Conexao ok");
+    }
+});
+
+let sql = `INSERT INTO users (email, password) VALUES (teste@teste.com.br, teste1234)`;
+
+function register() {
+    connection.query(sql);
+    connection.end();
+};
 
 function showHide() {
     let element1 = (<HTMLInputElement>document.getElementById("password")).type;
@@ -11,7 +37,6 @@ function showHide() {
         (<HTMLInputElement>document.getElementById("password_confirm")).type = "password";
     }
 }
-
 
 </script>
 
@@ -31,7 +56,7 @@ function showHide() {
         <label for="showPass" class="passLabel">Mostrar Senha</label>
         </div>
         </div>
-        <button class="cadastro">Cadastrar</button>
+        <button class="cadastro" @click="register">Cadastrar</button>
         <p>Já é cadastrado? Faça o seu <RouterLink to="/login">login</RouterLink></p>
     </form>
 </template>
