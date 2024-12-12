@@ -1,31 +1,11 @@
 <script setup lang="ts">
+import { ref } from 'vue';
 import Header from './Header.vue';
-import mysql from 'mysql2';
-import dotEnv from 'dotenv';
 
-dotEnv.config();
-
-const connection = mysql.createConnection({
-    host: "localhost",
-    user: process.env.USER_DB,
-    password: process.env.PASSWORD_DB,
-    database: process.env.DATABASE_DB
-});
-
-connection.connect((err) => {
-    if (err) {
-        console.log("Erro na conexao: " + err.message);
-    } else {
-        console.log("Conexao ok");
-    }
-});
-
-let sql = `INSERT INTO users (email, password) VALUES (teste@teste.com.br, teste1234)`;
-
-function register() {
-    connection.query(sql);
-    connection.end();
-};
+let maxPass = ref(false);
+let minPass = ref(false);
+let numLetter = ref(false)
+let like = ref(false);
 
 function showHide() {
     let element1 = (<HTMLInputElement>document.getElementById("password")).type;
@@ -38,6 +18,7 @@ function showHide() {
     }
 }
 
+
 </script>
 
 <template>
@@ -46,17 +27,21 @@ function showHide() {
         <p class="titulo">Cadastre-se</p>
         <div class="conteudo">
         <label for="email">Email:</label>
-        <input type="email" name="email">
+        <input type="email" name="email" required>
         <label for="password">Digite sua senha:</label>
-        <input type="password" name="password" id="password">
+        <input type="password" name="password" id="password" required>
+        <p class="alert" v-show="maxPass">- Senha deve ter no máximo 20 caracteres.</p>
+        <p class="alert" v-show="minPass">- Senha deve ter no mínimo 8 caracteres.</p>
+        <p class="alert" v-show="numLetter">- Senha deve ter pelo menos um número e letra maiúscula</p>
         <label for="password_confirm">Digite a senha novamente:</label>
-        <input type="password" name="password_confirm" id="password_confirm">
+        <p class="alert" v-show="like">- As senhas devem ser iguais</p>
+        <input type="password" name="password_confirm" id="password_confirm" required>
         <div class="pass">
         <input type="checkbox" name="showPass" :onkeypress="showHide" :onclick="showHide">
         <label for="showPass" class="passLabel">Mostrar Senha</label>
         </div>
         </div>
-        <button class="cadastro" @click="register">Cadastrar</button>
+        <button class="cadastro">Cadastrar</button>
         <p>Já é cadastrado? Faça o seu <RouterLink to="/login">login</RouterLink></p>
     </form>
 </template>
@@ -109,5 +94,10 @@ function showHide() {
         border-color: black;
         background-color: ghostwhite;
         transition: 0.3s;
+    }
+
+    p.alert {
+        color: red;
+        font-size: small;
     }
 </style>

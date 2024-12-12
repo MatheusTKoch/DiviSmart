@@ -17,9 +17,9 @@ function showHide() {
         <p class="titulo">Login</p>
         <div class="conteudo">
         <label for="email">Email:</label>
-        <input type="email" name="email">
+        <input type="email" name="email" required>
         <label for="password">Senha:</label>
-        <input type="password" name="password" id="password">
+        <input type="password" name="password" id="password" required>
         <div class="pass">
         <input type="checkbox" name="showPass" :onkeypress="showHide" :onclick="showHide">
         <label for="showPass" class="passLabel">Mostrar Senha</label>
