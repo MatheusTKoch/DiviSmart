@@ -1,13 +1,54 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import { Sequelize, DataTypes } from 'sequelize';
+import { configDotenv } from 'dotenv';
 import Header from './Header.vue';
 
 let maxPass = ref(false);
 let minPass = ref(false);
 let numLetter = ref(false)
 let like = ref(false);
+let email = ref('');
 let senha1 = ref('');
 let senha2 = ref('');
+
+function registrar() {
+    const sequelize = new Sequelize(
+        process.env.DATABASE_DB!,
+        process.env.USER_DB!,
+        process.env.PASSWORD_DB!,
+    {
+        host: 'localhost',
+        dialect: 'mysql'
+    });
+
+    sequelize.authenticate().then(() => {
+    console.log('Connection has been established successfully.');
+    }).catch((error) => {
+    console.error('Unable to connect to the database: ', error);
+    });
+
+    const User = sequelize.define("users", {
+    Email: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    Password: {
+        type: DataTypes.STRING,
+        allowNull: false
+    }
+    });
+
+    sequelize.sync().then(() => {
+    console.log("Tabela users criada!");
+    User.create({
+        Email: email.value,
+        Password: senha1.value
+    })
+    }).catch((error) => {
+    console.error("Erro ao criar tabela: ", error);
+    });
+}
 
 function validarCadastrar() {
     if (senha1.value.length > 20) {
@@ -46,12 +87,11 @@ function showHide() {
     }
 }
 
-
 </script>
 
 <template>
     <Header></Header>
-    <form>
+    <form @submit="registrar">
         <p class="titulo">Cadastre-se</p>
         <div class="conteudo">
         <label for="email">Email:</label>
