@@ -6,6 +6,34 @@ let maxPass = ref(false);
 let minPass = ref(false);
 let numLetter = ref(false)
 let like = ref(false);
+let senha1 = ref('');
+let senha2 = ref('');
+
+function validarCadastrar() {
+    if (senha1.value.length > 20) {
+        maxPass.value = true;
+    } else {
+        maxPass.value = false;
+    }
+    
+    if (senha1.value.length < 8) {
+        minPass.value = true;
+    } else {
+        minPass.value = false;
+    } 
+    
+    if (!senha1.value.match(/\d/) || !senha1.value.match(/[A-Z]/)) {
+        numLetter.value = true;
+    } else {
+        numLetter.value = false;
+    } 
+    
+    if (senha1.value != senha2.value) {
+        like.value = true;
+    } else {
+        like.value = false;
+    }
+}
 
 function showHide() {
     let element1 = (<HTMLInputElement>document.getElementById("password")).type;
@@ -29,13 +57,13 @@ function showHide() {
         <label for="email">Email:</label>
         <input type="email" name="email" required>
         <label for="password">Digite sua senha:</label>
-        <input type="password" name="password" id="password" required>
+        <input type="password" name="password" id="password" v-on:keyup="validarCadastrar" v-model="senha1" required>
         <p class="alert" v-show="maxPass">- Senha deve ter no máximo 20 caracteres.</p>
         <p class="alert" v-show="minPass">- Senha deve ter no mínimo 8 caracteres.</p>
         <p class="alert" v-show="numLetter">- Senha deve ter pelo menos um número e letra maiúscula</p>
         <label for="password_confirm">Digite a senha novamente:</label>
         <p class="alert" v-show="like">- As senhas devem ser iguais</p>
-        <input type="password" name="password_confirm" id="password_confirm" required>
+        <input type="password" name="password_confirm" id="password_confirm" v-on:keyup="validarCadastrar" v-model="senha2" required>
         <div class="pass">
         <input type="checkbox" name="showPass" :onkeypress="showHide" :onclick="showHide">
         <label for="showPass" class="passLabel">Mostrar Senha</label>
