@@ -1,5 +1,6 @@
-import dbConfig from '../config/db.config';
+import dbConfig from '../config/db.config.js';
 import { Sequelize } from 'sequelize';
+import usersModel from '../models/users.model.js';
 
 const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
   host: dbConfig.HOST,
@@ -12,3 +13,12 @@ const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
     idle: dbConfig.pool.idle
   }
 });
+
+const db = {};
+
+db.Sequelize = Sequelize;
+db.sequelize = sequelize;
+
+db.users = usersModel(sequelize, Sequelize);
+
+export default db;
