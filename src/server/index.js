@@ -19,6 +19,6 @@ const db = {};
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
-db.users = usersModel(sequelize, Sequelize);
+db.users = usersModel(db.sequelize, db.Sequelize);
 
 export default db;

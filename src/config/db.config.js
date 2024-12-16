@@ -1,11 +1,7 @@
-import dotEnv from 'dotenv';
-
-dotEnv.config();
-
-db = {
-    USER: import.meta.env.USER_DB,
-    PASSWORD: import.meta.env.PASSWORD_DB,
-    DB: import.meta.env.DATABASE_DB,
+const db = {
+    USER: process.env.VITE_USER_DB,
+    PASSWORD: process.env.VITE_PASSWORD_DB,
+    DB: process.env.VITE_DATABASE_DB,
     HOST: "localhost",
     dialect: "mysql",
     pool: {
