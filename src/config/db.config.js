@@ -1,7 +1,11 @@
+import dotenv from 'dotenv';
+
+dotenv.config();
+
 const db = {
-    USER: process.env.VITE_USER_DB,
-    PASSWORD: process.env.VITE_PASSWORD_DB,
-    DB: process.env.VITE_DATABASE_DB,
+    USER: import.meta.env.VITE_USER_DB,
+    PASSWORD: import.meta.env.VITE_PASSWORD_DB,
+    DB: import.meta.env.VITE_DATABASE_DB,
     HOST: "localhost",
     dialect: "mysql",
     pool: {
