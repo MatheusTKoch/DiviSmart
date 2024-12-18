@@ -1,6 +1,5 @@
 import express from 'express';
 import cors from 'cors';
-import db from './server/index.js';
 
 const app = express();
 
@@ -20,8 +19,3 @@ app.listen(PORT, () => {
     console.log(`Server rodando na porta ${PORT}.`);
 });
 
-db.sequelize.sync({force: true}).then(() => {
-    console.log('Db sincronizada');
-}).catch((err) => {
-    console.log('Erro ao sincronizar db: ' + err.message );
-});

@@ -1,7 +1,13 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import Header from './Header.vue';
+import db from '../server/index.ts';
 
+db.sequelize.sync({force: true}).then(() => {
+    console.log('Db sincronizada');
+}).catch((err: { message: string; }) => {
+    console.log('Erro ao sincronizar db: ' + err.message );
+});
 
 let maxPass = ref(false);
 let minPass = ref(false);
