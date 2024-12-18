@@ -1,6 +1,5 @@
 import express from 'express';
 import cors from 'cors';
-import usersModel from './models/users.model.js';
 
 const app = express();
 

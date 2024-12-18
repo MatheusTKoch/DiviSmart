@@ -1,7 +1,6 @@
-import { DataTypes, Sequelize } from 'sequelize';
+import { DataTypes } from 'sequelize';
 import index from '../server/index.js';
 
-export default (sequelize, Sequelize) => {
     const User = index.sequelize.define("users", {
         Email: {
             type: DataTypes.STRING,
@@ -14,4 +13,5 @@ export default (sequelize, Sequelize) => {
         })
     
     return User;
-}
+
+    export default User;

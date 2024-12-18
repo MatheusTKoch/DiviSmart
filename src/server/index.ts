@@ -14,6 +14,13 @@ const sequelize = new Sequelize(
   }
 });
 
+function conectDatabase() {
+  db.sequelize.authenticate().then(() => {
+    console.log("Conectado no banco com sucesso!");
+  }).catch((err: string) => {
+    console.log("Erro ao conectar com banco: " + err);
+  });
+}
 const db:any = {};
 
 db.Sequelize = Sequelize;
