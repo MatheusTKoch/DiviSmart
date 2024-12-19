@@ -41,7 +41,7 @@ function register() {
     if (maxPass.value == true || minPass.value == true || numLetter.value == true || like.value == true) {
         alert("Verifique os campos informados e tente novamente!");
     } else {
-        axios.get('http://localhost:8081/users').then(response =>
+        axios.get('http://localhost:8080/users').then(response =>
         console.log(response.data)).catch((err) =>
         console.log("Erro na requisicao: " + err));
     };

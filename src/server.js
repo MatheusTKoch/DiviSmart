@@ -1,15 +1,17 @@
 import express from 'express';
 import cors from 'cors';
+import db from './server/index.js';
 
 const app = express();
 
-app.use(cors({origin:"http://localhost:8081"}));
+app.use(cors({origin:"http://localhost:5173"}));
 
 app.use(express.json());
 
 app.use(express.urlencoded({extended: true}));
 
 app.get("/", (req, res) => {
+    db.connect((err) => {console.log(err)});
     res.json({mess:"Teste com sucesso"});
 });
 
