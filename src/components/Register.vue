@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import Header from './Header.vue';
-
-
+import axios from 'axios';
 
 let maxPass = ref(false);
 let minPass = ref(false);
@@ -38,6 +37,16 @@ function validarCadastrar() {
     }
 }
 
+function register() {
+    if (maxPass.value == true || minPass.value == true || numLetter.value == true || like.value == true) {
+        alert("Verifique os campos informados e tente novamente!");
+    } else {
+        axios.get('http://localhost:8081/users').then(response =>
+        console.log(response.data)).catch((err) =>
+        console.log("Erro na requisicao: " + err));
+    };
+}
+
 function showHide() {
     let element1 = (<HTMLInputElement>document.getElementById("password")).type;
     if (element1 == "password") {
@@ -53,7 +62,7 @@ function showHide() {
 
 <template>
     <Header></Header>
-    <form>
+    <form id="register_form">
         <p class="titulo">Cadastre-se</p>
         <div class="conteudo">
         <label for="email">Email:</label>
@@ -67,7 +76,7 @@ function showHide() {
         <p class="alert" v-show="like">- As senhas devem ser iguais</p>
         <input type="password" name="password_confirm" id="password_confirm" v-on:keyup="validarCadastrar" v-model="senha2" required>
         <div class="pass">
-        <input type="checkbox" name="showPass" :onkeypress="showHide" :onclick="showHide">
+        <input type="checkbox" name="showPass" :onkeypress="showHide" :onclick="register">
         <label for="showPass" class="passLabel">Mostrar Senha</label>
         </div>
         </div>
