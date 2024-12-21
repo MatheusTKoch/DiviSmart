@@ -41,9 +41,9 @@ function register() {
     if (maxPass.value == true || minPass.value == true || numLetter.value == true || like.value == true) {
         alert("Verifique os campos informados e tente novamente!");
     } else {
-        axios.postForm('/users', {
+        axios.post('/users', {
             email: email.value,
-            senha: senha1.value
+            password: senha1.value
         }).catch(err => {console.log(err)});
     };
 }
@@ -67,7 +67,7 @@ function showHide() {
         <p class="titulo">Cadastre-se</p>
         <div class="conteudo">
         <label for="email">Email:</label>
-        <input type="email" name="email" required>
+        <input type="email" name="email" v-model="email" required>
         <label for="password">Digite sua senha:</label>
         <input type="password" name="password" id="password" v-on:keyup="validarCadastrar" v-model="senha1" required>
         <p class="alert" v-show="maxPass">- Senha deve ter no máximo 20 caracteres.</p>
