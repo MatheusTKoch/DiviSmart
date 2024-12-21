@@ -41,9 +41,10 @@ function register() {
     if (maxPass.value == true || minPass.value == true || numLetter.value == true || like.value == true) {
         alert("Verifique os campos informados e tente novamente!");
     } else {
-        axios.get('http://localhost:8080/users').then(response =>
-        console.log(response.data)).catch((err) =>
-        console.log("Erro na requisicao: " + err));
+        axios.postForm('/users', {
+            email: email.value,
+            senha: senha1.value
+        }).catch(err => {console.log(err)});
     };
 }
 
@@ -62,7 +63,7 @@ function showHide() {
 
 <template>
     <Header></Header>
-    <form id="register_form">
+    <form id="register_form" @submit="register" method="post">
         <p class="titulo">Cadastre-se</p>
         <div class="conteudo">
         <label for="email">Email:</label>
@@ -76,7 +77,7 @@ function showHide() {
         <p class="alert" v-show="like">- As senhas devem ser iguais</p>
         <input type="password" name="password_confirm" id="password_confirm" v-on:keyup="validarCadastrar" v-model="senha2" required>
         <div class="pass">
-        <input type="checkbox" name="showPass" :onkeypress="showHide" :onclick="register">
+        <input type="checkbox" name="showPass" :onkeypress="showHide" :onclick="showHide">
         <label for="showPass" class="passLabel">Mostrar Senha</label>
         </div>
         </div>

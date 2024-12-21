@@ -25,17 +25,14 @@ app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
 app.get("/", (req, res) => {
-    db.connect((err) => {console.log(err)});
     res.json({teste: 'teste'});
 });
 
 app.post("/users", (req, res) => {
-    usersModel.create({
-        Email,
-        Password
-    })
+    res.json({email: req.body})
 }).get("/users", (req, res) => {
-    res.json({teste:"teste"});
+    db.connect((err) => {console.log(err)});
+    res.json({teste: "teste"});
 })
 
 const PORT = process.env.VITE_PORT;
