@@ -3,6 +3,7 @@ import Home from './components/Home.vue';
 import NotFound from './components/NotFound.vue';
 import Register from './components/Register.vue';
 import Login  from './components/Login.vue';
+import Menu from './components/Menu.vue';
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 
@@ -16,6 +17,7 @@ const rotaAtual = computed(() => route.name);
     <NotFound v-if="rotaAtual === 'notFound'"></NotFound>
     <Login v-else-if="rotaAtual == 'login'"></Login>
     <Register v-else-if="rotaAtual == 'register'"></Register>
+    <Menu v-else-if="rotaAtual == 'menu'"></Menu>
     <Home v-else/>
   </div>
 </template>
