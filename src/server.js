@@ -27,9 +27,17 @@ app.get("/", (req, res) => {
 });
 
 app.post("/users", (req, res) => {
-    const data = req.body.email;
-    db.connect((err) => {console.log(err)});
-    res.status(200).json({data});
+    let data = {email: req.body.email, senha: req.body.senha};
+    const sql = 'INSERT INTO USERS (email, password) values ("' + data.email + '", "' + data.senha + '")';
+    db.connect((err) => {
+        if (err) throw err;
+        db.query(sql, 
+            (err) => {
+                console.log(err)
+            })
+    });
+    
+    res.status(200).send(JSON.stringify());
 }).get("/users", (req, res) => {
     db.connect((err) => {console.log(err)});
     res.json({teste: "teste"});

@@ -41,9 +41,10 @@ function register() {
     if (maxPass.value == true || minPass.value == true || numLetter.value == true || like.value == true) {
         alert("Verifique os campos informados e tente novamente!");
     } else {
-        axios.post('/users', {
-            email: email.value,
-            password: senha1.value
+        axios.post('http://localhost:8080/users', {email: email.value, senha: senha1.value}, {
+            headers: {
+                'Content-Type': 'x-www-form-urlencoded'
+            }
         }).catch(err => {console.log(err)});
     };
 }
