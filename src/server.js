@@ -1,4 +1,5 @@
 import express from 'express';
+import bodyParser from 'body-parser';
 import cors from 'cors';
 import mysql from 'mysql2';
 import dotenv from 'dotenv';
@@ -19,8 +20,8 @@ const db = mysql.createConnection({
 const app = express();
 
 app.use(cors({origin:"http://localhost:5173"}));
-app.use(express.urlencoded({extended: true}));
-app.use(express.json());
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.json());
 
 app.get("/", (req, res) => {
     res.json({teste: 'teste'});
@@ -36,7 +37,6 @@ app.post("/users", (req, res) => {
                 console.log(err)
             })
     });
-    
     res.status(200).send(JSON.stringify());
 }).get("/users", (req, res) => {
     db.connect((err) => {console.log(err)});

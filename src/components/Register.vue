@@ -41,9 +41,12 @@ function register() {
     if (maxPass.value == true || minPass.value == true || numLetter.value == true || like.value == true) {
         alert("Verifique os campos informados e tente novamente!");
     } else {
-        axios.post('http://localhost:8080/users', {email: email, senha: senha1}, {
+        let dados = new URLSearchParams();
+        dados.append('email', email.value);
+        dados.append('senha', senha1.value);
+        axios.post('http://localhost:8080/users', dados, {
             headers: {
-                'Content-Type': 'x-www-form-urlencoded'
+                'Content-Type': 'application/x-www-form-urlencoded'
             }
         }).catch(err => {console.log(err)});
     };
