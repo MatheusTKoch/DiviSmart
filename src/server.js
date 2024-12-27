@@ -31,13 +31,10 @@ app.post("/users", (req, res) => {
     let data = {email: req.body.email, senha: req.body.senha};
     const sql = 'INSERT INTO USERS (email, password) values ("' + data.email + '", "' + data.senha + '")';
     db.connect((err) => {
-        if (err) throw err;
-        db.query(sql, 
-            (err) => {
-                console.log(err)
-            })
+        if (err) {console.log(err)}
+        db.query(sql, (err) => {console.log(err)})
     });
-    res.status(200).send(JSON.stringify());
+    res.status(200).redirect('http://localhost:5173/menu');
 }).get("/users", (req, res) => {
     db.connect((err) => {console.log(err)});
     res.json({teste: "teste"});

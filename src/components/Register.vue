@@ -37,18 +37,18 @@ function validarCadastrar() {
     }
 }
 
-function register() {
+async function register() {
     if (maxPass.value == true || minPass.value == true || numLetter.value == true || like.value == true) {
         alert("Verifique os campos informados e tente novamente!");
     } else {
         let dados = new URLSearchParams();
         dados.append('email', email.value);
         dados.append('senha', senha1.value);
-        axios.post('http://localhost:8080/users', dados, {
+        await axios.post('http://localhost:8080/users', dados, {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
             }
-        }).catch(err => {console.log(err)});
+        }).then(res => {console.log(res)}).catch(err => {console.log(err)});
     };
 }
 
@@ -67,7 +67,7 @@ function showHide() {
 
 <template>
     <Header></Header>
-    <form id="register_form" @submit="register" method="post">
+    <form id="register_form" :onsubmit="register" method="post">
         <p class="titulo">Cadastre-se</p>
         <div class="conteudo">
         <label for="email">Email:</label>
