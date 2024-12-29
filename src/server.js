@@ -36,8 +36,15 @@ app.post("/users", (req, res) => {
     });
     res.status(200).redirect('http://localhost:5173/menu');
 }).get("/users", (req, res) => {
-    db.connect((err) => {console.log(err)});
-    res.json({teste: "teste"});
+    const sql = 'SELECT * FROM USERS';
+    let dados = null;
+    db.connect((err) => {
+        if (err) {console.log(err)};
+        db.query(sql, [true], (err, res, fields) => {
+            if (err) { console.error(err.message) }
+            console.log(res)
+    })});
+    res.status(200); 
 })
 
 const PORT = process.env.VITE_PORT;

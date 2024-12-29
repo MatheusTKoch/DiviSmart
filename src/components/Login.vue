@@ -1,5 +1,10 @@
 <script setup lang="ts">
+import { ref } from 'vue';
 import Header from './Header.vue';
+import axios from 'axios';
+
+let email = ref('');
+let senha = ref('');
 
 function showHide() {
     let element = (<HTMLInputElement>document.getElementById("password")).type;
@@ -7,6 +12,14 @@ function showHide() {
         (<HTMLInputElement>document.getElementById("password")).type = "text";
     } else {
         (<HTMLInputElement>document.getElementById("password")).type = "password";
+    }
+}
+
+async function login() {
+    if(email.value === '' || senha.value === '') {
+        alert("Verifique os campos informados e tente novamente!");
+    } else {
+        await axios.get('http://localhost:8080/users').then(res => console.log(res)).catch(err => console.log(err));
     }
 }
 </script>
@@ -17,11 +30,11 @@ function showHide() {
         <p class="titulo">Login</p>
         <div class="conteudo">
         <label for="email">Email:</label>
-        <input type="email" name="email" required>
+        <input type="email" name="email" v-model="email" required>
         <label for="password">Senha:</label>
-        <input type="password" name="password" id="password" required>
+        <input type="password" name="password" id="password" v-model="senha" required>
         <div class="pass">
-        <input type="checkbox" name="showPass" :onkeypress="showHide" :onclick="showHide">
+        <input type="checkbox" name="showPass" :onkeypress="showHide" :onclick="login">
         <label for="showPass" class="passLabel">Mostrar Senha</label>
         </div>
         </div>
