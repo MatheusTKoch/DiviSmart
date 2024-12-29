@@ -44,7 +44,7 @@ async function register() {
         let dados = new URLSearchParams();
         dados.append('email', email.value);
         dados.append('senha', senha.value);
-        await axios.post('http://localhost:8080/users_register', dados).then(res => console.log(res)).catch(err => console.log(err));
+        await axios.post('http://localhost:8080/users_register', dados).then(res => console.log(res)).catch(err => console.log(err.message));
     };
 }
 

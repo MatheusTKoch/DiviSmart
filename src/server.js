@@ -23,18 +23,35 @@ app.use(cors({origin:"http://localhost:5173"}));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
-app.get("/", (req, res) => {
-    res.json({teste: 'teste'});
-});
-
 app.post("/users_register", (req, res) => {
     let data = {email: req.body.email, senha: req.body.senha};
-    const sql = 'INSERT INTO USERS (email, password) values ("' + data.email + '", "' + data.senha + '")';
+    let email_existe = false;
+    const sql_email = 'SELECT * FROM USERS WHERE email = "' + req.body.email + '"';
+    const sql_registro = 'INSERT INTO USERS (email, password) values ("' + data.email + '", "' + data.senha + '")';
+
     db.connect((err) => {
-        if (err) {console.log(err)}
-        db.query(sql, (err) => {console.log(err)})
+        if (err) {
+            console.log(err)
+        }
+        db.query(sql_email, (err, res) => {
+                if (err) { 
+                    console.log(err);
+                } else if (res == undefined || res.length == 0) {
+                    db.query(sql_registro, (err) => {
+                        console.log(err);
+                    });
+                } else {
+                    email_existe = true;
+                    console.log('email ja existe!');
+                }
+            });
     });
-    res.status(200);
+    if (email_existe) {
+        res.status(400).send({message: 'O email informado já foi utilizado!'});
+    } else {
+        res.status(200);
+    }
+    
 });
 
 app.post("/users_login", (req, res) => {
@@ -43,7 +60,7 @@ app.post("/users_login", (req, res) => {
     db.connect((err) => {
         if (err) {console.log(err)};
         db.query(sql_email, [true], (err, res) => {
-            if (err) { console.error(err.message) }
+            if (err) { console.error(err) }
             console.log(res)
     })});
     res.status(200); 
