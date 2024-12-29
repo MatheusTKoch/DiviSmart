@@ -56,12 +56,28 @@ app.post("/users_register", (req, res) => {
 
 app.post("/users_login", (req, res) => {
     const sql_email = 'SELECT * FROM USERS WHERE email = "' + req.body.email + '"';
-    let dados = null;
+    const sql_senha = 'SELECT * FROM USERS WHERE password = "' + req.body.senha + '"';
+    let retorno = '';
     db.connect((err) => {
-        if (err) {console.log(err)};
-        db.query(sql_email, [true], (err, res) => {
-            if (err) { console.error(err) }
-            console.log(res)
+        if (err) {
+            console.log(err)
+        };
+        db.query(sql_email, (err, res) => {
+            if (err) { 
+                console.error(err) 
+            } else if (res == undefined || res.length == 0) {
+                console.log('Email nao encontrado!');
+            } else {
+                db.query(sql_senha, (err, res) => {
+                    if (err) {
+                        console.log(err);
+                    } else if (res == undefined || res.length == 0) {
+                        console.log('senha incorreta!')     
+                    } else {
+                        console.log('sucess!')
+                    }
+                });
+            }
     })});
     res.status(200); 
 })

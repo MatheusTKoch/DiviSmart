@@ -21,7 +21,7 @@ async function login() {
     } else {
         let dados = new URLSearchParams();
         dados.append('email', email.value);
-        dados.append('senha', email.value);
+        dados.append('senha', senha.value);
         await axios.post('http://localhost:8080/users_login', dados).then(res => console.log(res)).catch(err => console.log(err));
     }
 }
@@ -29,7 +29,7 @@ async function login() {
 
 <template>
     <Header></Header>
-    <form>
+    <form method="post">
         <p class="titulo">Login</p>
         <div class="conteudo">
         <label for="email">Email:</label>
@@ -41,7 +41,7 @@ async function login() {
         <label for="showPass" class="passLabel">Mostrar Senha</label>
         </div>
         </div>
-        <button class="login">Login</button>
+        <button class="login" :onclick="login">Login</button>
         <p>Não é cadastrado? Faça o seu <RouterLink to="/register">cadastro</RouterLink></p>
     </form>
 </template>
