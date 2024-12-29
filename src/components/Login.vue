@@ -19,7 +19,10 @@ async function login() {
     if(email.value === '' || senha.value === '') {
         alert("Verifique os campos informados e tente novamente!");
     } else {
-        await axios.get('http://localhost:8080/users').then(res => console.log(res)).catch(err => console.log(err));
+        let dados = new URLSearchParams();
+        dados.append('email', email.value);
+        dados.append('senha', email.value);
+        await axios.post('http://localhost:8080/users_login', dados).then(res => console.log(res)).catch(err => console.log(err));
     }
 }
 </script>

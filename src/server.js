@@ -27,20 +27,22 @@ app.get("/", (req, res) => {
     res.json({teste: 'teste'});
 });
 
-app.post("/users", (req, res) => {
+app.post("/users_register", (req, res) => {
     let data = {email: req.body.email, senha: req.body.senha};
     const sql = 'INSERT INTO USERS (email, password) values ("' + data.email + '", "' + data.senha + '")';
     db.connect((err) => {
         if (err) {console.log(err)}
         db.query(sql, (err) => {console.log(err)})
     });
-    res.status(200).redirect('http://localhost:5173/menu');
-}).get("/users", (req, res) => {
-    const sql = 'SELECT * FROM USERS';
+    res.status(200);
+});
+
+app.post("/users_login", (req, res) => {
+    const sql_email = 'SELECT * FROM USERS WHERE email = "' + req.body.email + '"';
     let dados = null;
     db.connect((err) => {
         if (err) {console.log(err)};
-        db.query(sql, [true], (err, res, fields) => {
+        db.query(sql_email, [true], (err, res) => {
             if (err) { console.error(err.message) }
             console.log(res)
     })});

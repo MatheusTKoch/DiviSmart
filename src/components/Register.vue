@@ -8,29 +8,29 @@ let minPass = ref(false);
 let numLetter = ref(false)
 let like = ref(false);
 let email = ref('');
-let senha1 = ref('');
+let senha = ref('');
 let senha2 = ref('');
 
 function validarCadastrar() {
-    if (senha1.value.length > 20) {
+    if (senha.value.length > 20) {
         maxPass.value = true;
     } else {
         maxPass.value = false;
     }
     
-    if (senha1.value.length < 8) {
+    if (senha.value.length < 8) {
         minPass.value = true;
     } else {
         minPass.value = false;
     } 
     
-    if (!senha1.value.match(/\d/) || !senha1.value.match(/[A-Z]/)) {
+    if (!senha.value.match(/\d/) || !senha.value.match(/[A-Z]/)) {
         numLetter.value = true;
     } else {
         numLetter.value = false;
     } 
     
-    if (senha1.value != senha2.value) {
+    if (senha.value != senha2.value) {
         like.value = true;
     } else {
         like.value = false;
@@ -43,12 +43,8 @@ async function register() {
     } else {
         let dados = new URLSearchParams();
         dados.append('email', email.value);
-        dados.append('senha', senha1.value);
-        await axios.post('http://localhost:8080/users', dados, {
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            }
-        }).then(res => {console.log(res)}).catch(err => {console.log(err)});
+        dados.append('senha', senha.value);
+        await axios.post('http://localhost:8080/users_register', dados).then(res => console.log(res)).catch(err => console.log(err));
     };
 }
 
@@ -67,25 +63,25 @@ function showHide() {
 
 <template>
     <Header></Header>
-    <form id="register_form" :onsubmit="register" method="post">
+    <form id="register_form" method="post">
         <p class="titulo">Cadastre-se</p>
         <div class="conteudo">
         <label for="email">Email:</label>
         <input type="email" name="email" v-model="email" required>
         <label for="password">Digite sua senha:</label>
-        <input type="password" name="password" id="password" v-on:keyup="validarCadastrar" v-model="senha1" required>
+        <input type="password" name="senha" id="password" v-on:keyup="validarCadastrar" v-model="senha" required>
         <p class="alert" v-show="maxPass">- Senha deve ter no máximo 20 caracteres.</p>
         <p class="alert" v-show="minPass">- Senha deve ter no mínimo 8 caracteres.</p>
         <p class="alert" v-show="numLetter">- Senha deve ter pelo menos um número e letra maiúscula</p>
         <label for="password_confirm">Digite a senha novamente:</label>
         <p class="alert" v-show="like">- As senhas devem ser iguais</p>
-        <input type="password" name="password_confirm" id="password_confirm" v-on:keyup="validarCadastrar" v-model="senha2" required>
+        <input type="password" id="password_confirm" v-on:keyup="validarCadastrar" v-model="senha2" required>
         <div class="pass">
-        <input type="checkbox" name="showPass" :onkeypress="showHide" :onclick="showHide">
+        <input type="checkbox" id="showPass" :onkeypress="showHide" :onclick="showHide">
         <label for="showPass" class="passLabel">Mostrar Senha</label>
         </div>
         </div>
-        <button class="cadastro">Cadastrar</button>
+        <button class="cadastro" type="submit" :onclick="register">Cadastrar</button>
         <p>Já é cadastrado? Faça o seu <RouterLink to="/login">login</RouterLink></p>
     </form>
 </template>
