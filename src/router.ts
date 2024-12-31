@@ -11,6 +11,9 @@ const routes = [
     {path: '/register', name: 'register', component: RegisterView},
     {path: '/login', name: 'login', component: LoginView},
     {path: '/menu', name: 'menu', component: MenuView},
+    {path: '/menu/carteira', name: 'carteira', component: MenuView},
+    {path: '/dividendos', name: 'dividendos', component: MenuView},
+    {path: '/menu/relatorios', name: 'relatorios', component: MenuView},
     {path: '/not-found', name:'notFound', component: NotFoundView},
     {path: '/:catchAll(.*)*', redirect: '/not-found'}
 ];

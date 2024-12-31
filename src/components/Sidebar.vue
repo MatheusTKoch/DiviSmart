@@ -5,9 +5,9 @@
 <template>
 <div class="sidebar">
     <ul class="lista">
-        <li>Carteira</li>
-        <li>Dividendos</li>
-        <li>Relatórios</li>
+        <li><RouterLink to="menu/carteira">Carteira</RouterLink></li>
+        <li><RouterLink to="menu/dividendos">Dividendos</RouterLink></li>
+        <li><RouterLink to="menu/relatorios">Relatórios</RouterLink></li>
     </ul>
 </div>
 </template>
