@@ -4,20 +4,26 @@ import NotFound from './components/NotFound.vue';
 import Register from './components/Register.vue';
 import Login  from './components/Login.vue';
 import Menu from './components/Menu.vue';
+import Carteira from './components/Carteira.vue';
+import Dividendos from './components/Dividendos.vue';
+import Relatorios from './components/Relatorios.vue';
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 
 
 const route = useRoute();
-const rotaAtual = computed(() => route.name);
+const rotaAtual = computed(() => route.fullPath);
 </script>
 
 <template>
   <div class="background">
-    <NotFound v-if="rotaAtual === 'notFound'"></NotFound>
-    <Login v-else-if="rotaAtual == 'login'"></Login>
-    <Register v-else-if="rotaAtual == 'register'"></Register>
-    <Menu v-else-if="rotaAtual == 'menu'"></Menu>
+    <NotFound v-if="rotaAtual === '/notFound'"></NotFound>
+    <Login v-else-if="rotaAtual == '/login'"></Login>
+    <Register v-else-if="rotaAtual == '/register'"></Register>
+    <Menu v-else-if="rotaAtual == '/menu'"></Menu>
+    <Carteira v-else-if="rotaAtual == '/menu/carteira'"></Carteira>
+    <Dividendos v-else-if="rotaAtual == '/menu/dividendos'"></Dividendos>
+    <Relatorios v-else-if="rotaAtual == '/menu/relatorios'"></Relatorios>
     <Home v-else/>
   </div>
 </template>
