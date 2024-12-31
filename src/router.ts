@@ -1,4 +1,4 @@
-import { createWebHistory, createRouter, RouteComponent } from "vue-router";
+import { createWebHistory, createRouter } from "vue-router";
 
 import HomeView from './components/Home.vue';
 import NotFoundView from './components/NotFound.vue';
