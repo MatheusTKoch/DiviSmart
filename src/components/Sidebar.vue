@@ -13,17 +13,23 @@
 </template>
 
 <style scoped>
+a {
+    text-decoration: none;
+    color: whitesmoke;
+}
+
+a:hover {
+    color: blue;
+}
+
 div.sidebar {
-    position: absolute;
-    top: 20%;
+    position: relative;
     width: 14vw;
-    border-right: 2px solid black;
+    border-right: 1px solid black;
     height: 100vh;
-    z-index: 1;
 }
 
 ul.lista {
-    position: relative;
     min-width: 10vw;
     text-align: left;
     padding-top: 2vh;

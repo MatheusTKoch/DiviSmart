@@ -4,7 +4,7 @@ import Sidebar from './Sidebar.vue';
 </script>
 
 <template>
-    <Header></Header>
+    <Header showBorder></Header>
     <Sidebar></Sidebar>
 </template>
 

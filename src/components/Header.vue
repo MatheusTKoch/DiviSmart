@@ -1,6 +1,7 @@
 <script setup lang="ts">
 defineProps({
-    showLogin: Boolean 
+    showLogin: Boolean,
+    showBorder: Boolean
 });
 </script>
 
@@ -8,6 +9,7 @@ defineProps({
  <div class="header">
     <div class="titulo"><RouterLink class="titulo1" to="/">DiviSmart</RouterLink></div>
     <button class="login" v-if="showLogin"><RouterLink class="titulo2" to="/login">Login</RouterLink></button>
+    <div class="border" v-else-if="showBorder"></div>
  </div>
 </template>
 
@@ -53,5 +55,10 @@ div.header {
     width: 100%;
     min-height: 5vh;
     display: inline;
+}
+
+div.border {
+    border-bottom: 1px black solid;
+    padding: 2vh;
 }
 </style>
