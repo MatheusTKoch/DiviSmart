@@ -66,7 +66,7 @@ function showHide() {
 </script>
 
 <template>
-    <Header></Header>    
+    <Header></Header> 
         <p class="titulo">Cadastre-se</p>
         <div class="conteudo">
         <label for="email">Email:</label>
@@ -94,18 +94,14 @@ function showHide() {
         color: darkblue;
     }
 
-    div.pass {
-        display: inline-flex;
-    }
-
-    label.passLabel {
-        white-space: nowrap;
-    }
-
-    form {
+    p {
         color: whitesmoke;
         text-align: center;
-        transform: translateY(50%);
+    }
+
+    div.pass {
+        display: inline-flex;
+        transform: translateX(50%);
     }
 
     input {
@@ -117,6 +113,7 @@ function showHide() {
     }
 
     label {
+        color: whitesmoke;
         display: block;
         text-align: center;
         font-size: large;
@@ -124,11 +121,15 @@ function showHide() {
     }
 
     p.titulo {
-        font-size: xx-large
+        color: whitesmoke;
+        text-align: center;
+        font-size: xx-large;
+        padding: 5%;
     }
     
     button.cadastro {
         margin: 10px;
+        justify-content: center;
     }
 
     button.cadastro:hover {
@@ -141,5 +142,6 @@ function showHide() {
     p.alert {
         color: red;
         font-size: small;
+        text-align: center;
     }
 </style>
