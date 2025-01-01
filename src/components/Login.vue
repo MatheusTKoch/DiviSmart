@@ -37,7 +37,7 @@ async function login() {
         <label for="password">Senha:</label>
         <input type="password" name="password" id="password" v-model="senha" required>
         <div class="pass">
-        <input type="checkbox" name="showPass" :onkeypress="showHide" :onclick="login">
+        <input type="checkbox" name="showPass" :onkeypress="showHide" :onclick="showHide"> 
         <label for="showPass" class="passLabel">Mostrar Senha</label>
         </div>
         </div>

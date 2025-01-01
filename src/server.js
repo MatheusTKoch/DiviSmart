@@ -23,6 +23,10 @@ app.use(cors({origin:"http://localhost:5173"}));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
+app.use((req, res, next) => {
+    res.status(404).redirect('http://localhost:5173/not-found');
+})
+
 app.post("/users_register", (req, res) => {
     let data = {email: req.body.email, senha: req.body.senha};
     let email_existe = false;
@@ -65,22 +69,23 @@ app.post("/users_login", (req, res) => {
         db.query(sql_email, (err, res) => {
             if (err) { 
                 console.error(err) 
-            } else if (res == undefined || res.length == 0) {
+            } else if (res == undefined || res.length != 0) {
                 console.log('Email nao encontrado!');
             } else {
                 db.query(sql_senha, (err, res) => {
                     if (err) {
-                        console.log(err);
-                    } else if (res == undefined || res.length == 0) {
-                        console.log('senha incorreta!')     
+                        retorno = err.message;
+                    } 
+                     if (res == undefined || res.length == 0) {
+                        retorno = 'senha incorreta!';   
                     } else {
-                        console.log('sucess!')
+                        retorno = 'sucess!';
                     }
                 });
             }
     })});
-    res.status(200); 
-})
+    res.status(200).send(retorno).redirect('http://localhost:5173/menu'); 
+});
 
 const PORT = process.env.VITE_PORT;
 
