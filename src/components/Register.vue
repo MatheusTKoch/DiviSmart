@@ -44,7 +44,11 @@ async function register() {
         let dados = new URLSearchParams();
         dados.append('email', email.value);
         dados.append('senha', senha.value);
-        await axios.post('http://localhost:8080/users_register', dados).then(res => console.log(res)).catch(err => console.log(err.message));
+        await axios.post('http://localhost:8080/users_register', dados).then((res) => {
+            console.log(res)
+        }).catch((err) => {
+            console.log(err.message)
+        });
     };
 }
 
@@ -62,8 +66,7 @@ function showHide() {
 </script>
 
 <template>
-    <Header></Header>
-    <form id="register_form" method="post">
+    <Header></Header>    
         <p class="titulo">Cadastre-se</p>
         <div class="conteudo">
         <label for="email">Email:</label>
@@ -83,7 +86,6 @@ function showHide() {
         </div>
         <button class="cadastro" type="submit" :onclick="register">Cadastrar</button>
         <p>Já é cadastrado? Faça o seu <RouterLink to="/login">login</RouterLink></p>
-    </form>
 </template>
 
 <style scoped>
