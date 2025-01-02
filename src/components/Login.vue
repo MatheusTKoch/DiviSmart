@@ -54,18 +54,21 @@ async function login() {
         color: darkblue;
     }
 
+    p {
+        color: whitesmoke;
+        text-align: center;
+    }
+
     div.pass {
         display: inline-flex;
     }
 
-    label.passLabel {
-        white-space: nowrap;
+    div.conteudo {
+        text-align: center;
     }
 
-    form {
-        color: whitesmoke;
-        text-align: center;
-        transform: translateY(50%);
+    label.passLabel {
+        white-space: nowrap;
     }
 
     input {
@@ -77,6 +80,7 @@ async function login() {
     }
 
     label {
+        color: whitesmoke;
         display: block;
         text-align: center;
         font-size: large;
@@ -84,7 +88,9 @@ async function login() {
     }
 
     p.titulo {
-        font-size: xx-large
+        color: whitesmoke;
+        font-size: xx-large;
+        padding: 5%;
     }
     
     button.login {

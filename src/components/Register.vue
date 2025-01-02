@@ -101,7 +101,10 @@ function showHide() {
 
     div.pass {
         display: inline-flex;
-        transform: translateX(50%);
+    }
+
+    div.conteudo {
+        text-align: center;
     }
 
     input {
@@ -120,6 +123,10 @@ function showHide() {
         padding: 4px;
     }
 
+    label.passLabel {
+        white-space: nowrap;
+    }
+    
     p.titulo {
         color: whitesmoke;
         text-align: center;
@@ -128,8 +135,8 @@ function showHide() {
     }
     
     button.cadastro {
+        display: absolute;
         margin: 10px;
-        justify-content: center;
     }
 
     button.cadastro:hover {
