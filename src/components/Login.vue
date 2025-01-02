@@ -34,17 +34,19 @@ async function login() {
 <template>
     <Header></Header>
         <p class="titulo">Login</p>
-        <div class="conteudo">
-        <label for="email">Email:</label>
-        <input type="email" name="email" v-model="email" required>
-        <label for="password">Senha:</label>
-        <input type="password" name="password" id="password" v-model="senha" required>
-        <div class="pass">
-        <input type="checkbox" name="showPass" :onkeypress="showHide" :onclick="showHide"> 
-        <label for="showPass" class="passLabel">Mostrar Senha</label>
+            <div class="conteudo">
+                <label for="email">Email:</label>
+                <input type="email" name="email" v-model="email" required>
+                <label for="password">Senha:</label>
+                <input type="password" name="password" id="password" v-model="senha" required>
+            <div class="pass">
+                <input type="checkbox" name="showPass" :onkeypress="showHide" :onclick="showHide"> 
+                <label for="showPass" class="passLabel">Mostrar Senha</label>
+            </div>
         </div>
+        <div class="registro">
+            <button class="login" type="button" :onclick="login">Login</button>
         </div>
-        <button class="login" :onclick="login">Login</button>
         <p>Não é cadastrado? Faça o seu <RouterLink to="/register">cadastro</RouterLink></p>
 </template>
 
@@ -65,6 +67,11 @@ async function login() {
 
     div.conteudo {
         text-align: center;
+    }
+
+    div.registro {
+        display: flex;
+        justify-content: center;
     }
 
     label.passLabel {

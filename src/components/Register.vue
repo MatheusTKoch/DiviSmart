@@ -69,22 +69,26 @@ function showHide() {
     <Header></Header> 
         <p class="titulo">Cadastre-se</p>
         <div class="conteudo">
-        <label for="email">Email:</label>
-        <input type="email" name="email" v-model="email" required>
-        <label for="password">Digite sua senha:</label>
-        <input type="password" name="senha" id="password" v-on:keyup="validarCadastrar" v-model="senha" required>
-        <p class="alert" v-show="maxPass">- Senha deve ter no máximo 20 caracteres.</p>
-        <p class="alert" v-show="minPass">- Senha deve ter no mínimo 8 caracteres.</p>
-        <p class="alert" v-show="numLetter">- Senha deve ter pelo menos um número e letra maiúscula</p>
-        <label for="password_confirm">Digite a senha novamente:</label>
-        <p class="alert" v-show="like">- As senhas devem ser iguais</p>
-        <input type="password" id="password_confirm" v-on:keyup="validarCadastrar" v-model="senha2" required>
-        <div class="pass">
-        <input type="checkbox" id="showPass" :onkeypress="showHide" :onclick="showHide">
-        <label for="showPass" class="passLabel">Mostrar Senha</label>
+            <label for="email">Email:</label>
+            <input type="email" name="email" v-model="email" required>
+            <label for="password">Digite sua senha:</label>
+            <input type="password" name="senha" id="password" v-on:keyup="validarCadastrar" v-model="senha" required>
+            <p class="alert" v-show="maxPass">- Senha deve ter no máximo 20 caracteres.</p>
+            <p class="alert" v-show="minPass">- Senha deve ter no mínimo 8 caracteres.</p>
+            <p class="alert" v-show="numLetter">- Senha deve ter pelo menos um número e letra maiúscula</p>
+            <label for="password_confirm">Digite a senha novamente:</label>
+            <p class="alert" v-show="like">- As senhas devem ser iguais</p>
+            <input type="password" id="password_confirm" v-on:keyup="validarCadastrar" v-model="senha2" required>
+            <div class="pass">
+                <input type="checkbox" id="showPass" :onkeypress="showHide" :onclick="showHide">
+                <label for="showPass" class="passLabel">Mostrar Senha</label>
+            </div>
         </div>
+        <div class="registro">
+            <button class="cadastro" type="button" :onclick="register">Cadastrar</button>
         </div>
-        <button class="cadastro" type="submit" :onclick="register">Cadastrar</button>
+        
+        
         <p>Já é cadastrado? Faça o seu <RouterLink to="/login">login</RouterLink></p>
 </template>
 
@@ -105,6 +109,11 @@ function showHide() {
 
     div.conteudo {
         text-align: center;
+    }
+
+    div.registro {
+        display: flex;
+        justify-content: center;
     }
 
     input {
@@ -135,7 +144,6 @@ function showHide() {
     }
     
     button.cadastro {
-        display: absolute;
         margin: 10px;
     }
 
