@@ -38,7 +38,7 @@ function validarCadastrar() {
 }
 
 async function register() {
-    if (maxPass.value == true || minPass.value == true || numLetter.value == true || like.value == true) {
+    if (maxPass.value == true || minPass.value == true || numLetter.value == true || like.value == true || email.value == '' || senha.value == '') {
         alert("Verifique os campos informados e tente novamente!");
     } else {
         let dados = new URLSearchParams();
@@ -78,14 +78,15 @@ function showHide() {
             <p class="alert" v-show="numLetter">- Senha deve ter pelo menos um número e letra maiúscula</p>
             <label for="password_confirm">Digite a senha novamente:</label>
             <p class="alert" v-show="like">- As senhas devem ser iguais</p>
-            <input type="password" id="password_confirm" v-on:keyup="validarCadastrar" v-model="senha2" required>
+            <input type="password" id="password_confirm" v-on:keyup="validarCadastrar" v-on:keypress.enter="register" v-model="senha2" required>
             <div class="pass">
                 <input type="checkbox" id="showPass" :onkeypress="showHide" :onclick="showHide">
                 <label for="showPass" class="passLabel">Mostrar Senha</label>
             </div>
         </div>
         <div class="registro">
-            <button class="cadastro" type="button" :onclick="register">Cadastrar</button>
+            <button class="cadastro"
+             type="button" :onclick="register">Cadastrar</button>
         </div>
         
         
@@ -134,6 +135,7 @@ function showHide() {
 
     label.passLabel {
         white-space: nowrap;
+        cursor: pointer;
     }
     
     p.titulo {

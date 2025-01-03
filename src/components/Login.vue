@@ -23,9 +23,9 @@ async function login() {
         dados.append('email', email.value);
         dados.append('senha', senha.value);
         await axios.post('http://localhost:8080/users_login', dados).then(res => {
-            console.log(res.request)
+            console.log(res);
         }).catch(err => {
-            console.log(err)
+            console.log(err);
         });
     }
 }
@@ -38,9 +38,9 @@ async function login() {
                 <label for="email">Email:</label>
                 <input type="email" name="email" v-model="email" required>
                 <label for="password">Senha:</label>
-                <input type="password" name="password" id="password" v-model="senha" required>
+                <input type="password" name="password" id="password" v-on:keypress.enter="login" v-model="senha" required>
             <div class="pass">
-                <input type="checkbox" name="showPass" :onkeypress="showHide" :onclick="showHide"> 
+                <input type="checkbox" id="showPass" name="showPass" :onkeypress="showHide" :onclick="showHide"> 
                 <label for="showPass" class="passLabel">Mostrar Senha</label>
             </div>
         </div>
@@ -76,6 +76,7 @@ async function login() {
 
     label.passLabel {
         white-space: nowrap;
+        cursor: pointer;
     }
 
     input {
