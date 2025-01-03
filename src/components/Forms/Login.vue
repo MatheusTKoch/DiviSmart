@@ -102,10 +102,13 @@ async function login() {
     }
     
     button.login {
+        background-color: transparent;
+        color: ghostwhite;
+        border-color: ghostwhite;
         margin: 10px;
     }
 
-    button.login:hover {
+    button.login:hover, button.login:focus {
         color: black;
         border-color: black;
         background-color: ghostwhite;

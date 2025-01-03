@@ -85,8 +85,7 @@ function showHide() {
             </div>
         </div>
         <div class="registro">
-            <button class="cadastro"
-             type="button" :onclick="register">Cadastrar</button>
+            <button class="cadastro" type="button" :onclick="register">Cadastrar</button>
         </div>
         
         
@@ -144,12 +143,15 @@ function showHide() {
         font-size: xx-large;
         padding: 5%;
     }
-    
+
     button.cadastro {
+        background-color: transparent;
+        color: ghostwhite;
+        border-color: ghostwhite;
         margin: 10px;
     }
 
-    button.cadastro:hover {
+    button.cadastro:hover, button.cadastro:focus {
         color: black;
         border-color: black;
         background-color: ghostwhite;
