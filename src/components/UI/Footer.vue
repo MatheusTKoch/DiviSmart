@@ -4,7 +4,7 @@
 
 <template>
     <div class="footer">
-        <a target="_blank" href="https://github.com/MatheusTKoch"><img src="../assets/github.png" alt="github" class="git"></a>
+        <a target="_blank" href="https://github.com/MatheusTKoch"><img src="../../assets/github.png" alt="github" class="git"></a>
         <div class="marca">DivSmart</div>
     </div>
 </template>

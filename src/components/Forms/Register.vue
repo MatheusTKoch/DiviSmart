@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import Header from './Header.vue';
+import Header from '../UI/Header.vue';
 import axios from 'axios';
 
 let maxPass = ref(false);
