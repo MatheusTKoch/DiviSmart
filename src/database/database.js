@@ -16,9 +16,10 @@ const db = mysql.createConnection({
 
 db.connect((err) => {
     if (err) throw err;
-    let sql = 'CREATE DATABASE divismart'
+    let sql = 'CREATE DATABASE IF NOT EXISTS divismart'
     db.query(sql, (err) => {
         if (err) throw err;
         console.log("Tabela criada!");
+        db.end();
     })
 });

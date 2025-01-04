@@ -16,9 +16,10 @@ const db = mysql.createConnection({
 
 db.connect((err) => {
     if (err) throw err;
-    let sql = 'CREATE TABLE users (UserID int NOT NULL AUTO_INCREMENT, Email varchar(50) NOT NULL, Password varchar(20) NOT NULL, PRIMARY KEY(UserID))'
+    let sql = 'CREATE TABLE IF NOT EXISTS users (UserID int NOT NULL AUTO_INCREMENT, Email varchar(50) NOT NULL, Password varchar(20) NOT NULL, PRIMARY KEY(UserID))'
     db.query(sql, (err) => {
         if (err) throw err;
         console.log("Tabela criada!");
+        db.end()
     })
 });
