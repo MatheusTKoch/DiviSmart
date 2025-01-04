@@ -65,22 +65,21 @@ app.post("/users_login", (req, res) => {
         db.query(sql_email, (err, res) => {
             if (err) { 
                 console.error(err) 
-            } else if (res == undefined || res.length != 0) {
-                console.log('Email nao encontrado!');
+            } else if (res[0] == undefined || res[0].length == 0) {
+                retorno = 'Email nao encontrado';
             } else {
                 db.query(sql_senha, (err, res) => {
                     if (err) {
                         retorno = err.message;
-                    } 
-                     if (res == undefined || res.length == 0) {
-                        retorno = 'senha incorreta!';   
+                    } else if (res[0] == undefined || res[0].length == 0) {
+                        retorno = 'Senha Incorreta!'; 
                     } else {
-                        retorno = 'sucess!';
+                        retorno = 'Sucess!';
                     }
                 });
             }
     })});
-    res.status(200).send(retorno); 
+    res.status(200).redirect('http://localhost:5173/menu'); 
 });
 
 const PORT = process.env.VITE_PORT;

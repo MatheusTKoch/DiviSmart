@@ -2,7 +2,9 @@
 import { ref } from 'vue';
 import Header from '../UI/Header.vue';
 import axios from 'axios';
+import { useRouter } from 'vue-router';
 
+const router = useRouter()
 let email = ref('');
 let senha = ref('');
 
@@ -24,6 +26,9 @@ async function login() {
         dados.append('senha', senha.value);
         await axios.post('http://localhost:8080/users_login', dados).then(res => {
             console.log(res);
+            if (res.request.responseURL == 'http://localhost:5173/menu') {
+                router.push('menu');
+            }
         }).catch(err => {
             console.log(err);
         });
