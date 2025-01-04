@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 import Header from '../UI/Header.vue';
 import axios from 'axios';
 
+const router =  useRouter();
 let maxPass = ref(false);
 let minPass = ref(false);
 let numLetter = ref(false)
@@ -46,6 +48,9 @@ async function register() {
         dados.append('senha', senha.value);
         await axios.post('http://localhost:8080/users_register', dados).then((res) => {
             console.log(res)
+            if (res.request.responseURL == 'http://localhost:5173/menu') {
+                router.push('menu');
+            }
         }).catch((err) => {
             console.log(err.message)
         });

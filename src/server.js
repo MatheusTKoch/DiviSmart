@@ -47,7 +47,7 @@ app.post("/users_register", (req, res) => {
                 }
             });
     });
-    if (email_existe) {
+    if (email_existe == true) {
         res.status(400).send({message: 'O email informado já foi utilizado!'});
     } else {
         res.status(200).redirect('http://localhost:5173/menu');
