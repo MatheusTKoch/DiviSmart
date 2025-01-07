@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import Header from '../UI/Header.vue';
 import Sidebar from '../UI/Sidebar.vue';
+import router from '../../router';
 </script>
 
 <template>
@@ -10,7 +11,7 @@ import Sidebar from '../UI/Sidebar.vue';
         <div class="texto-titulo">Bem vindo(a) ao DiviSmart!</div> 
         <div class="text">Inicie sua carteira para fazer o acompanhamento clicando no botão abaixo, e após tenha acesso
         a relatórios personalizados!</div>
-        <button class="carteira">Criar Carteira</button>
+        <button class="carteira" @click="router.push('menu/carteira')">Criar Carteira</button>
     </div>
 </template>
 
@@ -20,7 +21,7 @@ import Sidebar from '../UI/Sidebar.vue';
         margin-top: 2%;
     }
 
-    a:hover {
+    button.carteira:hover {
         color: black;
         border-color: black;
         background-color: ghostwhite;
