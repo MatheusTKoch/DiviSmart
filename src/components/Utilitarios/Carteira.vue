@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import Header from '../UI/Header.vue';
 import Sidebar from '../UI/Sidebar.vue';
+import Modal from '../UI/Modal.vue';
+import { ref } from 'vue';
+
+let showCarteira = ref(false);
 </script>
 
 <template>
@@ -8,9 +12,11 @@ import Sidebar from '../UI/Sidebar.vue';
     <Sidebar></Sidebar>
     <div class="conteudo">
         <div class="texto-titulo">Carteiras</div>
-        <button class="carteira">Adicionar Carteira</button>
+        <button class="carteira" @click="showCarteira = true">Adicionar Carteira</button>
         <div class="carteira-lista">Carteiras Cadastradas</div>
+        <Modal @mostrarModal="showCarteira = false" v-if="showCarteira"></Modal>
     </div>
+    
 </template>
 
 <style scoped>
