@@ -14,12 +14,21 @@ let showCarteira = ref(false);
         <div class="texto-titulo">Carteiras</div>
         <button class="carteira" @click="showCarteira = true">Adicionar Carteira</button>
         <div class="carteira-lista">Carteiras Cadastradas</div>
-        <Modal @mostrarModal="showCarteira = false" v-if="showCarteira"></Modal>
+        <div class="modal">
+            <Modal @mostrarModal="showCarteira = false" v-if="showCarteira"></Modal>
+        </div>
+        
     </div>
     
 </template>
 
 <style scoped>
+    div.modal {
+        position: relative;
+        bottom: 10%;
+        left: 40%;
+    }
+
     div.conteudo {
         position: absolute;
         top: 20%;

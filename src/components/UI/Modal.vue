@@ -26,7 +26,7 @@ div.conteudo {
 }   
 
 a.fechar {
-    left: 20%;
+    left: 15%;
     position: relative;
     color: ghostwhite;
     cursor: pointer;
@@ -41,6 +41,12 @@ div.titulo {
 }
 
 label {
+    padding-top: 10%;
+    display: block;
     font-size: large;
+}
+
+input {
+    padding-bottom: 2%;
 }
 </style>
