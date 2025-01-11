@@ -35,33 +35,49 @@ app.use(session({
   }));
 
 
-app.post("/users_register", (req, res) => {
-    let data = {email: req.body.email, senha: req.body.senha};
-    let email_existe = false;
-    const sql_email = 'SELECT * FROM USERS WHERE email = "' + req.body.email + '"';
-    const sql_registro = 'INSERT INTO USERS (email, password) values ("' + data.email + '", "' + data.senha + '")';
-
-    db.connect((err) => {
-        if (err) {
-            console.log(err)
-        }
-        db.query(sql_email, (err, res) => {
-                if (err) { 
-                    console.log(err);
-                } else if (res == undefined || res.length == 0) {
-                    db.query(sql_registro, (err) => {
-                        console.log(err);
-                    });
+  app.post("/users_register", async (req, res) => {
+    const queryDatabase = (query) => {
+        return new Promise((resolve, reject) => {
+            db.query(query, (err, result) => {
+                if (err) {
+                    reject(err);
                 } else {
-                    email_existe = true;
-                    console.log('email ja existe!');
+                    resolve(result);
                 }
             });
-    });
-    if (email_existe == true) {
-        res.status(400).send({message: 'O email informado já foi utilizado!'});
-    } else {
-        res.status(200).redirect('http://localhost:5173/menu');
+        });
+    };
+
+    try {
+        const { email, senha } = req.body;
+        const sql_email = `SELECT * FROM USERS WHERE email = "${email}"`;
+        const sql_registro = `INSERT INTO USERS (email, password) VALUES ("${email}", "${senha}")`;
+
+        const emailResult = await queryDatabase(sql_email);
+
+        if (emailResult && emailResult.length > 0) {
+            return res
+                .status(400)
+                .send("O email informado já foi utilizado!" );
+        }
+
+        const registroResult = await queryDatabase(sql_registro);
+
+        const sql_get_user = `SELECT * FROM USERS WHERE email = "${email}"`;
+        const userResult = await queryDatabase(sql_get_user);
+
+        if (userResult && userResult.length > 0) {
+            const userID = userResult[0].UserID;
+            req.session.usuario = userID;
+
+            console.log("Sucess! UserID:", userID);
+            res.status(200).redirect("http://localhost:5173/menu");
+        } else {
+            throw new Error("Erro ao obter o usuário!");
+        }
+    } catch (err) {
+        console.error("Erro ao registrar usuário:", err.message);
+        res.status(500).send("Erro interno no servidor");
     }
 });
 
@@ -104,7 +120,7 @@ app.post("/users_login", async (req, res) => {
     }
 });
 
-app.post("/carteira", (req, res) => {
+app.post("/carteira", async (req, res) => {
     let userID;
     const sql = 'INSERT INTO carteiras (nome, userId) values ("' + req.body.carteira + '", "' + userID +'")';
     res.status(200);

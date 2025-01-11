@@ -52,7 +52,7 @@ async function register() {
                 router.push('menu');
             }
         }).catch((err) => {
-            console.log(err.message)
+            console.log(err)
         });
     };
 }
