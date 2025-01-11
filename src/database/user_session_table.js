@@ -16,7 +16,7 @@ const db = mysql.createConnection({
 
 db.connect((err) => {
     if (err) throw err;
-    let sql = 'CREATE TABLE IF NOT EXISTS user_session (UserSessionID int NOT NULL AUTO_INCREMENT, Expires INT NOT NULL, SessionID varchar(50) NOT NULL, SessionData varchar(100) NOT NULL, userId INT NOT NULL, FOREIGN KEY (userId) REFERENCES users(UserID), PRIMARY KEY(UserSessionID))'
+    let sql = 'CREATE TABLE IF NOT EXISTS user_session (UserSessionID int NOT NULL AUTO_INCREMENT, Expires TIMESTAMP NOT NULL, SessionID varchar(50) NOT NULL, SessionData varchar(100) NOT NULL, userId INT NOT NULL, FOREIGN KEY (userId) REFERENCES users(UserID), PRIMARY KEY(UserSessionID))'
     db.query(sql, (err) => {
         if (err) throw err;
         console.log("Tabela criada!");

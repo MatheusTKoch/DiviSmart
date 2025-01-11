@@ -2,7 +2,7 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import mysql from 'mysql2';
-import session from 'express-session';
+import session, { Session } from 'express-session';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -111,11 +111,18 @@ app.post("/users_login", async (req, res) => {
 
         const userID = senhaResult[0].UserID;
         req.session.usuario = userID;
-        console.log("Sucess! UserID:", userID);
 
+        const sql_session = `INSERT INTO user_session (Expires, SessionID, SessionData, userId) values (${req.session.cookie.expires}, "${req.sessionID}", "${JSON.stringify(req.session)}", "${userID}")`;
+        const sessionResult = await queryDatabase(sql_session)
+        
+        if (!sessionResult || sessionResult.length === 0) {
+            return res.status(401).send("Erro ao gravar dados da sessao!");
+        }
+        console.log(req.session.cookie.expires)
+        console.log("Sucess! UserID:", userID);
         res.status(200).redirect("http://localhost:5173/menu");
     } catch (err) {
-        console.error("Erro ao autenticar usuário:", err.message);
+        console.error("Erro ao autenticar usuário:", err);
         res.status(500).send("Erro interno no servidor");
     }
 });
