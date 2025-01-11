@@ -4,28 +4,22 @@
 
 <template>
     <div class="footer">
-        <a target="_blank" href="https://github.com/MatheusTKoch"><img src="../../assets/github.png" alt="github" class="git"></a>
-        <div class="marca">DivSmart</div>
+            <a target="_blank" href="https://github.com/MatheusTKoch" class="git">
+                <img src="../../assets/github.png" alt="github">
+            </a>
     </div>
 </template>
 
 <style scoped>
 div.footer {
-    position: relative;
+    position: absolute;
     bottom: 0;
-    width: 100%;
+    width: 100vw;
     min-height: 5vh;
-    display: inline-flex;
 }
 
-div.git {
+a.git {
     position: relative;
-    left: 5%;
-}
-
-div.marca {
-    position: relative;
-    left: 80%;
-    color: whitesmoke;
+    left: 2%;
 }
 </style>
