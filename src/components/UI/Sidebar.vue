@@ -4,7 +4,7 @@ let carteira = false;
 let dividendos = false;
 let relatorios = false;
 
-function underlineSelect(element: String) {
+function underlineSelect(element: string) {
     if (element == 'menu') {
         menu = true;
         carteira = false;

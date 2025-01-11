@@ -12,10 +12,10 @@ let showCarteira = ref(false);
     <Sidebar></Sidebar>
     <div class="conteudo">
         <div class="texto-titulo">Carteiras</div>
-        <button class="carteira" @click="showCarteira = true">Adicionar Carteira</button>
+        <button class="carteira" @click="showCarteira = true" :disabled="showCarteira">Adicionar Carteira</button>
         <div class="carteira-lista">Carteiras Cadastradas</div>
         <div class="modal">
-            <Modal @mostrarModal="showCarteira = false" v-if="showCarteira"></Modal>
+            <Modal @mostrarModal="showCarteira = false && $emit('mostraModal')" v-if="showCarteira"></Modal>
         </div>
         
     </div>
@@ -45,6 +45,8 @@ let showCarteira = ref(false);
 
     div.carteira-lista {
         font-size: large;
+        white-space: nowrap;
+        padding: 10%;
     }
 
     button.carteira {
