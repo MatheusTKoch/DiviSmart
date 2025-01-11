@@ -19,6 +19,7 @@ const db = mysql.createConnection({
   });
 
 const app = express();
+const cookie_life = 20 * 3600000;
 
 app.use(cors({origin:"http://localhost:5173"}));
 app.use(bodyParser.urlencoded({extended: true}));
@@ -27,7 +28,10 @@ app.use(session({
     secret: process.env.VITE_SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: true }
+    cookie: { 
+        secure: true, 
+        maxAge: cookie_life
+    }
   }));
 
 
@@ -64,7 +68,6 @@ app.post("/users_register", (req, res) => {
 app.post("/users_login", (req, res) => {
     const sql_email = 'SELECT * FROM USERS WHERE email = "' + req.body.email + '"';
     const sql_senha = 'SELECT * FROM USERS WHERE password = "' + req.body.senha + '"';
-    let retorno = '';
     db.connect((err) => {
         if (err) {
             console.log(err)
@@ -73,24 +76,27 @@ app.post("/users_login", (req, res) => {
             if (err) { 
                 console.error(err) 
             } else if (res[0] == undefined || res[0].length == 0) {
-                retorno = 'Email nao encontrado';
+                return 'Email nao encontrado';
             } else {
                 db.query(sql_senha, (err, res) => {
                     if (err) {
-                        retorno = err.message;
+                        return err.message;
                     } else if (res[0] == undefined || res[0].length == 0) {
-                        retorno = 'Senha Incorreta!'; 
+                        return 'Senha Incorreta!'; 
                     } else {
-                        retorno = 'Sucess!';
+                        req.session.usuario = res[0].UserID;
+                        return'Sucess!';
                     }
                 });
             }
     })});
+    console.log(req.session, req.sessionID)
     res.status(200).redirect('http://localhost:5173/menu'); 
 });
 
 app.post("/carteira", (req, res) => {
-    const sql = 'SELECT * FROM USERS WHERE email = "' + req.body.email + '"';
+    let userID;
+    const sql = 'INSERT INTO carteiras (nome, userId) values ("' + req.body.carteira + '", "' + userID +'")';
     res.status(200);
 });
 
