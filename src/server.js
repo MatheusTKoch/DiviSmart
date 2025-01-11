@@ -82,6 +82,11 @@ app.post("/users_login", (req, res) => {
     res.status(200).redirect('http://localhost:5173/menu'); 
 });
 
+app.post("/carteira", (req, res) => {
+    const sql = 'SELECT * FROM USERS WHERE email = "' + req.body.email + '"';
+    res.status(200);
+});
+
 const PORT = process.env.VITE_PORT;
 
 app.listen(PORT, () => {

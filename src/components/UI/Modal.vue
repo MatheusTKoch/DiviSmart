@@ -1,20 +1,53 @@
 <script setup lang="ts">
+import axios from 'axios';
+import {ref} from 'vue';
 
+let nomeCarteira = ref('');
+let showAlert = ref(false);
+
+function validarCarteira() {
+    if(nomeCarteira.value == '') {
+        showAlert.value = true;
+    } else {
+        showAlert.value = false;
+    }
+}
+
+function cadastroCarteira() {
+    if(nomeCarteira.value == '') {
+        alert('Por favor informe um nome para cadastro da carteira!');
+    } else {
+        let dados = new URLSearchParams()
+        dados.append('carteira', nomeCarteira.value);
+        axios.post('http://localhost:8080/carteira', dados).then((res) => {
+            console.log(res);
+        }).catch((err) => {
+            console.log(err);
+        })
+    }
+}
 </script>
 
 <template>
         <div class="conteudo">
             <div class="titulo">Cadastro de Carteiras<a class="fechar" @click="$emit('mostrarModal')">X</a></div>
             <label for="nomeCarteira">Nome da Carteira: </label>
-            <input type="text" id="nomeCarteira">
+            <input type="text" id="nomeCarteira" v-model="nomeCarteira" v-on:keyup="validarCarteira">
+            <p class="alert" v-if="showAlert">Por favor informe um nome para cadastro da carteira</p>
             <div class="botoes">
-                <button class="cadastrar">Cadastrar</button>
+                <button class="cadastrar" @click="cadastroCarteira">Cadastrar</button>
                 <button @click="$emit('mostrarModal')" class="voltar">Voltar</button>
             </div>
         </div>
 </template>
 
 <style scoped>
+p.alert {
+    color: red;
+    font-size: small;
+    text-align: center;
+}
+
 button.cadastrar {
     margin-right: 4%;
 }
