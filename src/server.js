@@ -65,43 +65,44 @@ app.post("/users_register", (req, res) => {
     }
 });
 
-app.post("/users_login", (req, res) => {
-    async function pesquisaUser(data, result) {
-        const sql_email = 'SELECT * FROM USERS WHERE email = "' + req.body.email + '"';
-        const sql_senha = 'SELECT * FROM USERS WHERE password = "' + req.body.senha + '"';
-
-        db.query(sql_email, (err, res) => {
-                            if (err) { 
-                                console.error(err) 
-                            } else if (res[0] == undefined || res[0].length == 0) {
-                                return 'Email nao encontrado';
-                            } else {
-                                db.query(sql_senha, (err, res) => {
-                                    if (err) {
-                                        return err.message;
-                                    } else if (res[0] == undefined || res[0].length == 0) {
-                                        console.log('Senha Incorreta!'); 
-                                    } else {
-                                        req.session.usuario = res[0].UserID;
-                                        return 'Sucess!';
-                                    }
-                                })
-                            }  
-                        });
-                return res[0];
-            }  
-            
-            
-        db.connect((err) => {
-            if(err) {
-                console.log(err);
-            }
-            
-            pesquisaUser().then(res => {console.log(res[0])});
+app.post("/users_login", async (req, res) => {
+    const queryDatabase = (query) => {
+        return new Promise((resolve, reject) => {
+            db.query(query, (err, result) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(result);
+                }
+            });
         });
-        
-        res.status(200).redirect('http://localhost:5173/menu'); 
-    });
+    };
+
+    try {
+        const sql_email = `SELECT * FROM USERS WHERE email = "${req.body.email}"`;
+        const emailResult = await queryDatabase(sql_email);
+
+        if (!emailResult || emailResult.length === 0) {
+            return res.status(404).send("Email não encontrado");
+        }
+
+        const sql_senha = `SELECT * FROM USERS WHERE password = "${req.body.senha}"`;
+        const senhaResult = await queryDatabase(sql_senha);
+
+        if (!senhaResult || senhaResult.length === 0) {
+            return res.status(401).send("Senha incorreta!");
+        }
+
+        const userID = senhaResult[0].UserID;
+        req.session.usuario = userID;
+        console.log("Sucess! UserID:", userID);
+
+        res.status(200).redirect("http://localhost:5173/menu");
+    } catch (err) {
+        console.error("Erro ao autenticar usuário:", err.message);
+        res.status(500).send("Erro interno no servidor");
+    }
+});
 
 app.post("/carteira", (req, res) => {
     let userID;
