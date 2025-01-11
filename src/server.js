@@ -2,6 +2,7 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import mysql from 'mysql2';
+import session from 'express-session';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -22,6 +23,12 @@ const app = express();
 app.use(cors({origin:"http://localhost:5173"}));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
+app.use(session({
+    secret: process.env.VITE_SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: { secure: true }
+  }));
 
 
 app.post("/users_register", (req, res) => {
