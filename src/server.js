@@ -66,33 +66,42 @@ app.post("/users_register", (req, res) => {
 });
 
 app.post("/users_login", (req, res) => {
-    const sql_email = 'SELECT * FROM USERS WHERE email = "' + req.body.email + '"';
-    const sql_senha = 'SELECT * FROM USERS WHERE password = "' + req.body.senha + '"';
-    db.connect((err) => {
-        if (err) {
-            console.log(err)
-        };
+    async function pesquisaUser(data, result) {
+        const sql_email = 'SELECT * FROM USERS WHERE email = "' + req.body.email + '"';
+        const sql_senha = 'SELECT * FROM USERS WHERE password = "' + req.body.senha + '"';
+
         db.query(sql_email, (err, res) => {
-            if (err) { 
-                console.error(err) 
-            } else if (res[0] == undefined || res[0].length == 0) {
-                return 'Email nao encontrado';
-            } else {
-                db.query(sql_senha, (err, res) => {
-                    if (err) {
-                        return err.message;
-                    } else if (res[0] == undefined || res[0].length == 0) {
-                        return 'Senha Incorreta!'; 
-                    } else {
-                        req.session.usuario = res[0].UserID;
-                        return'Sucess!';
-                    }
-                });
+                            if (err) { 
+                                console.error(err) 
+                            } else if (res[0] == undefined || res[0].length == 0) {
+                                return 'Email nao encontrado';
+                            } else {
+                                db.query(sql_senha, (err, res) => {
+                                    if (err) {
+                                        return err.message;
+                                    } else if (res[0] == undefined || res[0].length == 0) {
+                                        console.log('Senha Incorreta!'); 
+                                    } else {
+                                        req.session.usuario = res[0].UserID;
+                                        return 'Sucess!';
+                                    }
+                                })
+                            }  
+                        });
+                return res[0];
+            }  
+            
+            
+        db.connect((err) => {
+            if(err) {
+                console.log(err);
             }
-    })});
-    console.log(req.session, req.sessionID)
-    res.status(200).redirect('http://localhost:5173/menu'); 
-});
+            
+            pesquisaUser().then(res => {console.log(res[0])});
+        });
+        
+        res.status(200).redirect('http://localhost:5173/menu'); 
+    });
 
 app.post("/carteira", (req, res) => {
     let userID;
