@@ -102,7 +102,7 @@ app.post("/users_login", async (req, res) => {
         const userID = senhaResult[0].UserID;
         req.session.usuario = userID;
 
-        const sql_session = `INSERT INTO user_session (Expires, SessionID, SessionData, userId) values (str_to_date("${(req.session.cookie.expires).toLocaleString('pt-BR').replaceAll('/', '-').replaceAll(',', '')}", '%d-%m-%Y h:%i:%s'), "${req.sessionID}", '${JSON.stringify(req.session)}', "${userID}")`;
+        const sql_session = `INSERT INTO user_session (Expires, SessionID, SessionData, userId) values ('${(req.session.cookie.expires).toLocaleString('sv-SE').replaceAll('/', '-').replaceAll(',', '')}', "${req.sessionID}", '${JSON.stringify(req.session)}', "${userID}")`;
         const sessionResult = await queryDatabase(sql_session)
         
         if (!sessionResult || sessionResult.length === 0) {
@@ -118,7 +118,6 @@ app.post("/users_login", async (req, res) => {
 });
 
 app.post("/carteira", async (req, res) => {
-    let userID;
     const sql = 'INSERT INTO carteiras (nome, userId) values ("' + req.body.carteira + '", "' + userID +'")';
     res.status(200);
 });
