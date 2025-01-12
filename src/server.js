@@ -2,7 +2,7 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import mysql from 'mysql2';
-import session, { Session } from 'express-session';
+import session from 'express-session';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -34,19 +34,20 @@ app.use(session({
     }
   }));
 
+  const queryDatabase = (query) => {
+    return new Promise((resolve, reject) => {
+        db.query(query, (err, result) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(result);
+            }
+        });
+    });
+};
+
 
   app.post("/users_register", async (req, res) => {
-    const queryDatabase = (query) => {
-        return new Promise((resolve, reject) => {
-            db.query(query, (err, result) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(result);
-                }
-            });
-        });
-    };
 
     try {
         const { email, senha } = req.body;
@@ -82,17 +83,6 @@ app.use(session({
 });
 
 app.post("/users_login", async (req, res) => {
-    const queryDatabase = (query) => {
-        return new Promise((resolve, reject) => {
-            db.query(query, (err, result) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(result);
-                }
-            });
-        });
-    };
 
     try {
         const sql_email = `SELECT * FROM USERS WHERE email = "${req.body.email}"`;
@@ -112,7 +102,7 @@ app.post("/users_login", async (req, res) => {
         const userID = senhaResult[0].UserID;
         req.session.usuario = userID;
 
-        const sql_session = `INSERT INTO user_session (Expires, SessionID, SessionData, userId) values (${req.session.cookie.expires}, "${req.sessionID}", "${JSON.stringify(req.session)}", "${userID}")`;
+        const sql_session = `INSERT INTO user_session (Expires, SessionID, SessionData, userId) values (str_to_date("${(req.session.cookie.expires).toLocaleString('pt-BR').replaceAll('/', '-').replaceAll(',', '')}", '%d-%m-%Y h:%i:%s'), "${req.sessionID}", '${JSON.stringify(req.session)}', "${userID}")`;
         const sessionResult = await queryDatabase(sql_session)
         
         if (!sessionResult || sessionResult.length === 0) {

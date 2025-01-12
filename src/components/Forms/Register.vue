@@ -52,6 +52,7 @@ async function register() {
                 router.push('menu');
             }
         }).catch((err) => {
+            alert(err.response.data);
             console.log(err)
         });
     };
