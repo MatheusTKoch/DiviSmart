@@ -64,6 +64,10 @@ app.use(session({
 
         const registroResult = await queryDatabase(sql_registro);
 
+        if (!registroResult || registroResult.length == 0) {
+            return res.status(400).send("Erro ao inserir usuario, tente novamente!");
+        }
+
         const sql_get_user = `SELECT * FROM USERS WHERE email = "${email}"`;
         const userResult = await queryDatabase(sql_get_user);
 
@@ -118,8 +122,19 @@ app.post("/users_login", async (req, res) => {
 });
 
 app.post("/carteira", async (req, res) => {
-    const sql = 'INSERT INTO carteiras (nome, userId) values ("' + req.body.carteira + '", "' + userID +'")';
-    res.status(200);
+    try {
+        const sql_carteira = 'INSERT INTO carteiras (nome, userId) values ("' + req.body.carteira + '", "' + req.body.userID +'")';
+        const carteiraResult = await queryDatabase(sql_carteira);
+
+        if (!carteiraResult || carteiraResult.length === 0) {
+            return res.status(401).send("Erro ao gravar carteira");
+        }
+
+        res.status(200).send("fecharModal");
+    } catch (err) {
+        console.error("Erro ao cadastrar carteira: ", err);
+        res.status(500).send("Erro interno no servidor");
+    }
 });
 
 const PORT = process.env.VITE_PORT;

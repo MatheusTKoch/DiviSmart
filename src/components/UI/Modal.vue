@@ -19,6 +19,7 @@ function cadastroCarteira() {
     } else {
         let dados = new URLSearchParams()
         dados.append('carteira', nomeCarteira.value);
+        dados.append('userID', '1'); //Substituir por id que sera trazido do usuario logado
         axios.post('http://localhost:8080/carteira', dados).then((res) => {
             console.log(res);
         }).catch((err) => {
