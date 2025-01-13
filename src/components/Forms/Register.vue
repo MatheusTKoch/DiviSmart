@@ -51,6 +51,15 @@ async function register() {
             if (res.status == 200) {
                 router.push('menu');
             }
+
+            if(localStorage.getItem('usID') != res.data.userID) {
+                localStorage.clear();
+                localStorage.setItem('usID', res.data.userID);
+                localStorage.setItem('exp', res.data.exp);
+            } else {
+                localStorage.setItem('usID', res.data.userID);
+                localStorage.setItem('exp', res.data.exp);
+            }
         }).catch((err) => {
             alert(err.response.data);
             console.log(err)
