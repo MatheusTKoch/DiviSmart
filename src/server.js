@@ -76,7 +76,7 @@ app.use(session({
             req.session.usuario = userID;
 
             console.log("Sucess! UserID:", userID);
-            res.status(200).redirect("http://localhost:5173/menu");
+            res.send({userID: req.session.usuario, exp: req.session.cookie.expires}).status(200);
         } else {
             throw new Error("Erro ao obter o usuário!");
         }
@@ -112,9 +112,10 @@ app.post("/users_login", async (req, res) => {
         if (!sessionResult || sessionResult.length === 0) {
             return res.status(401).send("Erro ao gravar dados da sessao!");
         }
-        console.log(req.session.cookie.expires)
+
         console.log("Sucess! UserID:", userID);
-        res.status(200).redirect("http://localhost:5173/menu");
+        
+        res.send({userID: req.session.usuario, exp: req.session.cookie.expires}).status(200);
     } catch (err) {
         console.error("Erro ao autenticar usuário:", err);
         res.status(500).send("Erro interno no servidor");

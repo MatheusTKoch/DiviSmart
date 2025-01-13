@@ -48,7 +48,7 @@ async function register() {
         dados.append('senha', senha.value);
         await axios.post('http://localhost:8080/users_register', dados).then((res) => {
             console.log(res)
-            if (res.request.responseURL == 'http://localhost:5173/menu') {
+            if (res.status == 200) {
                 router.push('menu');
             }
         }).catch((err) => {

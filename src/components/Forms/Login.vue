@@ -26,8 +26,11 @@ async function login() {
         dados.append('senha', senha.value);
         await axios.post('http://localhost:8080/users_login', dados).then(res => {
             console.log(res);
-            if (res.request.responseURL == 'http://localhost:5173/menu') {
+            if (res.status == 200) {
                 router.push('menu');
+            }
+            if(localStorage.getItem('userID') == null) {
+                // localStorage.setItem('userID')
             }
         }).catch(err => {
             alert(err.response.data);
