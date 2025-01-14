@@ -5,12 +5,24 @@ import Header from '../UI/Header.vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
 
+onMounted(() => {
+    verifyUser();
+})
+
 const router = useRouter()
 let email = ref('');
 let senha = ref('');
 
 function verifyUser() {
-
+    axios.post('http://localhost:8080/session', {
+        usID: localStorage.getItem('usID'),
+        sID: localStorage.getItem('sID'),
+        exp: localStorage.getItem('exp')
+    }).then((res) => {
+        console.log(res);
+    }).catch((err) => {
+        console.log(err);
+    });
 }
 
 function showHide() {
@@ -39,14 +51,14 @@ async function login() {
                 localStorage.clear();
                 localStorage.setItem('usID', res.data.usID);
                 localStorage.setItem('exp', res.data.exp);
-                localStorage.setItem('sId', res.data.sID);
+                localStorage.setItem('sID', res.data.sID);
             } else if (localStorage.getItem('usID') == res.data.usID){
                 localStorage.setItem('exp', res.data.exp);
-                localStorage.setItem('sId', res.data.sID);
+                localStorage.setItem('sID', res.data.sID);
             } else {
                 localStorage.setItem('usID', res.data.usID);
                 localStorage.setItem('exp', res.data.exp);
-                localStorage.setItem('sId', res.data.sID);
+                localStorage.setItem('sID', res.data.sID);
             }
         }).catch(err => {
             alert(err.response.data);

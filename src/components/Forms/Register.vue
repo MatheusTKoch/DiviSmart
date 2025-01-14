@@ -56,11 +56,11 @@ async function register() {
                 localStorage.clear();
                 localStorage.setItem('usID', res.data.usID);
                 localStorage.setItem('exp', res.data.exp);
-                localStorage.setItem('sId', res.data.sID);
+                localStorage.setItem('sID', res.data.sID);
             }  else {
                 localStorage.setItem('usID', res.data.usID);
                 localStorage.setItem('exp', res.data.exp);
-                localStorage.setItem('sId', res.data.sID);
+                localStorage.setItem('sID', res.data.sID);
             }
         }).catch((err) => {
             alert(err.response.data);

@@ -124,7 +124,7 @@ app.post("/users_login", async (req, res) => {
 
 app.post("/carteira", async (req, res) => {
     try {
-        const sql_carteira = 'INSERT INTO carteiras (nome, userId) values ("' + req.body.carteira + '", "' + req.body.userID +'")';
+        const sql_carteira = `INSERT INTO carteiras (nome, userId) values ("${req.body.carteira}", "${req.body.userID}")`;
         const carteiraResult = await queryDatabase(sql_carteira);
 
         if (!carteiraResult || carteiraResult.length === 0) {
@@ -136,6 +136,16 @@ app.post("/carteira", async (req, res) => {
         console.error("Erro ao cadastrar carteira: ", err);
         res.status(500).send("Erro interno no servidor");
     }
+});
+
+app.post("/session", async(req, res) => {
+    const sql_session = `SELECT * FROM USER_SESSION WHERE userId = ${req.body.usID} and sID = ${req.body.sID}`;
+    const sessionResult = await queryDatabase(sql_session);
+
+    if (!sessionResult || sessionResult.length === 0) {
+        return res.status(200).send("Sem dados na localStorage");
+    }
+    res.send({usID: 1}).status(200);
 });
 
 const PORT = process.env.VITE_PORT;
