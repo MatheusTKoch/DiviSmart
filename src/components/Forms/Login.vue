@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import { onMounted } from 'vue';
 import Header from '../UI/Header.vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
@@ -7,6 +8,10 @@ import { useRouter } from 'vue-router';
 const router = useRouter()
 let email = ref('');
 let senha = ref('');
+
+function verifyUser() {
+
+}
 
 function showHide() {
     let element = (<HTMLInputElement>document.getElementById("password")).type;
@@ -30,15 +35,18 @@ async function login() {
                 router.push('menu');
             }
 
-            if(localStorage.getItem('usID') != res.data.userID) {
+            if(localStorage.getItem('usID') != res.data.usID) {
                 localStorage.clear();
-                localStorage.setItem('usID', res.data.userID);
+                localStorage.setItem('usID', res.data.usID);
                 localStorage.setItem('exp', res.data.exp);
-            } else if (localStorage.getItem('usID') == res.data.userID){
+                localStorage.setItem('sId', res.data.sID);
+            } else if (localStorage.getItem('usID') == res.data.usID){
                 localStorage.setItem('exp', res.data.exp);
+                localStorage.setItem('sId', res.data.sID);
             } else {
-                localStorage.setItem('usID', res.data.userID);
+                localStorage.setItem('usID', res.data.usID);
                 localStorage.setItem('exp', res.data.exp);
+                localStorage.setItem('sId', res.data.sID);
             }
         }).catch(err => {
             alert(err.response.data);

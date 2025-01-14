@@ -76,7 +76,7 @@ app.use(session({
             req.session.usuario = userID;
 
             console.log("Sucess! UserID:", userID);
-            res.send({userID: req.session.usuario, exp: req.session.cookie.expires}).status(200);
+            res.send({usID: req.session.usuario, exp: req.session.cookie.expires, sID: req.sessionID}).status(200);
         } else {
             throw new Error("Erro ao obter o usuário!");
         }
@@ -115,7 +115,7 @@ app.post("/users_login", async (req, res) => {
 
         console.log("Sucess! UserID:", userID);
         
-        res.send({userID: req.session.usuario, exp: req.session.cookie.expires}).status(200);
+        res.send({usID: req.session.usuario, exp: req.session.cookie.expires, sID: req.sessionID}).status(200);
     } catch (err) {
         console.error("Erro ao autenticar usuário:", err);
         res.status(500).send("Erro interno no servidor");

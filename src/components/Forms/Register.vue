@@ -52,13 +52,15 @@ async function register() {
                 router.push('menu');
             }
 
-            if(localStorage.getItem('usID') != res.data.userID) {
+            if(localStorage.getItem('usID') != res.data.usID) {
                 localStorage.clear();
-                localStorage.setItem('usID', res.data.userID);
+                localStorage.setItem('usID', res.data.usID);
                 localStorage.setItem('exp', res.data.exp);
-            } else {
-                localStorage.setItem('usID', res.data.userID);
+                localStorage.setItem('sId', res.data.sID);
+            }  else {
+                localStorage.setItem('usID', res.data.usID);
                 localStorage.setItem('exp', res.data.exp);
+                localStorage.setItem('sId', res.data.sID);
             }
         }).catch((err) => {
             alert(err.response.data);
