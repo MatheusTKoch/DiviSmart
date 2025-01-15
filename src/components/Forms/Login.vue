@@ -19,6 +19,9 @@ function verifyUser() {
         sID: localStorage.getItem('sID'),
         exp: localStorage.getItem('exp')
     }).then((res) => {
+        if (res.status == 200) {
+            router.push('menu');
+        }
         console.log(res);
     }).catch((err) => {
         console.log(err);

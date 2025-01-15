@@ -1,15 +1,22 @@
 <script setup lang="ts">
 defineProps({
     showLogin: Boolean,
-    showBorder: Boolean
+    showPerfil: Boolean
 });
+
+function clearUser() {
+    localStorage.removeItem('usID');
+    localStorage.removeItem('exp');
+    localStorage.removeItem('sID');
+}
 </script>
 
 <template>
  <div class="header">
     <div class="titulo"><RouterLink class="titulo1" to="/">DiviSmart</RouterLink></div>
     <button class="login" v-if="showLogin"><RouterLink class="titulo2" to="/login">Login</RouterLink></button>
-    <div class="border" v-else-if="showBorder"></div>
+    <button class="login" v-if="showPerfil" @click="clearUser"><RouterLink class="titulo2" to="/login">Sair</RouterLink></button>
+    <div class="border" v-if="showPerfil"></div>
  </div>
 </template>
 
@@ -59,6 +66,6 @@ div.header {
 
 div.border {
     border-bottom: 1px black solid;
-    padding: 2vh;
+    padding: 0.5vh;
 }
 </style>

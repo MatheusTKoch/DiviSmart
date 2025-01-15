@@ -139,12 +139,15 @@ app.post("/carteira", async (req, res) => {
 });
 
 app.post("/session", async(req, res) => {
-    const sql_session = `SELECT * FROM USER_SESSION WHERE userId = ${req.body.usID} and sID = ${req.body.sID}`;
+    const sql_session = `SELECT * FROM USER_SESSION WHERE userId = ${req.body.usID} and SessionID = "${req.body.sID}"`;
     const sessionResult = await queryDatabase(sql_session);
 
     if (!sessionResult || sessionResult.length === 0) {
-        return res.status(200).send("Sem dados na localStorage");
+        return res.status(401).send("Sem dados na localStorage");
     }
+
+    console.log(req.body.exp)
+    console.log(sessionResult[0].Expires)
     res.send({usID: 1}).status(200);
 });
 

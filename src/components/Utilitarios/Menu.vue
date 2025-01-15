@@ -5,7 +5,7 @@ import router from '../../router';
 </script>
 
 <template>
-    <Header showBorder>Teste</Header>
+    <Header showPerfil></Header>
     <Sidebar></Sidebar>
     <div class="conteudo">
         <div class="texto-titulo">Bem vindo(a) ao DiviSmart!</div> 

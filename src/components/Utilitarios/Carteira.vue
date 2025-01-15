@@ -8,7 +8,7 @@ let showCarteira = ref(false);
 </script>
 
 <template>
-    <Header showBorder></Header>
+    <Header showPerfil></Header>
     <Sidebar></Sidebar>
     <div class="conteudo">
         <div class="texto-titulo">Carteiras</div>
