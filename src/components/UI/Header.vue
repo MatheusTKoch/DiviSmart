@@ -1,13 +1,31 @@
 <script setup lang="ts">
+import axios from 'axios';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+
 defineProps({
     showLogin: Boolean,
     showPerfil: Boolean
 });
 
 function clearUser() {
-    localStorage.removeItem('usID');
-    localStorage.removeItem('exp');
-    localStorage.removeItem('sID');
+    axios.post('http://localhost:8080/logout', {
+        usID: localStorage.getItem('usID'),
+        sID: localStorage.getItem('sID')
+    }).then((res) => {
+        if(res.status == 200) {
+            localStorage.removeItem('usID');
+            localStorage.removeItem('exp');
+            localStorage.removeItem('sID');
+
+            router.push('/login');
+        }
+        console.log(res);
+    }).catch((err) => {
+        console.log(err);
+    })
+    
 }
 </script>
 

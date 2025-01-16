@@ -153,6 +153,17 @@ app.post("/session", async(req, res) => {
     res.send({test: 'teste'}).status(200);
 });
 
+app.post("/logout", async(req, res) => {
+    const sql_logout = `DELETE FROM USER_SESSION WHERE userId = ${req.body.usID} and SessionID = "${req.body.sID}"`;
+    const logoutResult = await queryDatabase(sql_logout);
+
+    if(!logoutResult || logoutResult.length === 0) {
+        return res.status(404).send("Usuario nao localizado");
+    }
+
+    res.send('sucesso').status(200);
+})
+
 const PORT = process.env.VITE_PORT;
 
 app.listen(PORT, () => {
