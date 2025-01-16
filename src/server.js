@@ -19,7 +19,7 @@ const db = mysql.createConnection({
   });
 
 const app = express();
-const cookie_life = 20 * 3600000;
+const cookie_life = 10 * 3600000;
 
 app.use(cors({origin:"http://localhost:5173"}));
 app.use(bodyParser.urlencoded({extended: true}));
@@ -146,9 +146,11 @@ app.post("/session", async(req, res) => {
         return res.status(401).send("Sem dados na localStorage");
     }
 
-    console.log(req.body.exp)
-    console.log(sessionResult[0].Expires)
-    res.send({usID: 1}).status(200);
+    if (new Date().getTime() > new Date(req.body.exp).getTime()) {
+        return res.status(401).send("Sessao expirada");
+    }
+
+    res.send({test: 'teste'}).status(200);
 });
 
 const PORT = process.env.VITE_PORT;
