@@ -3,6 +3,7 @@ import axios from 'axios';
 import {ref} from 'vue';
 
 let nomeCarteira = ref('');
+let userID = ref();
 let showAlert = ref(false);
 
 function validarCarteira() {
@@ -18,8 +19,9 @@ function cadastroCarteira() {
         alert('Por favor informe um nome para cadastro da carteira!');
     } else {
         let dados = new URLSearchParams()
+        userID.value = localStorage.getItem('usID');
         dados.append('carteira', nomeCarteira.value);
-        dados.append('userID', '1'); //Substituir por id que sera trazido do usuario logado
+        dados.append('userID', userID.value);
         axios.post('http://localhost:8080/carteira', dados).then((res) => {
             console.log(res);
         }).catch((err) => {

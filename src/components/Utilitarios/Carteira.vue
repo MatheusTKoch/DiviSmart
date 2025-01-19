@@ -57,8 +57,10 @@ function loadCarteira() {
     <Header showPerfil></Header>
     <Sidebar></Sidebar>
     <div class="conteudo">
-        <div class="texto-titulo">Carteiras</div>
-        <button class="carteira" @click="showCarteira = true" :disabled="showCarteira">Adicionar Carteira</button>
+        <div class="titulos-carteira">
+            <div class="texto-titulo">Carteiras</div>
+            <button class="carteira" @click="showCarteira = true" :disabled="showCarteira">Adicionar Carteira</button>
+        </div>
         <div class="carteira-lista">Carteiras Cadastradas</div>
         <div>
             <ol v-for="cart in carteiras">
