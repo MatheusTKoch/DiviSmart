@@ -3,12 +3,12 @@ import Header from '../UI/Header.vue';
 import Sidebar from '../UI/Sidebar.vue';
 import Modal from '../UI/Modal.vue';
 import axios from 'axios';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
 let showCarteira = ref(false);
-let carteiras = ref('');
+let carteiras = ref();
 
 onMounted(() => {
     verifyUser();
@@ -42,7 +42,9 @@ function loadCarteira() {
         userID: localStorage.getItem('usID')
     }).then((res) => {
         console.log(res);
-        carteiras = res.data;
+        nextTick(() => {
+            carteiras.value = res.data;
+        })
         console.log(carteiras)
     }).catch((err) => {
         console.log(err);
@@ -59,8 +61,8 @@ function loadCarteira() {
         <button class="carteira" @click="showCarteira = true" :disabled="showCarteira">Adicionar Carteira</button>
         <div class="carteira-lista">Carteiras Cadastradas</div>
         <div>
-            <ol>
-                <li></li>
+            <ol v-for="cart in carteiras">
+                <li :class="cart.userId">{{ cart.Nome }}</li>
             </ol>
         </div>
         <div class="modal">
@@ -72,6 +74,12 @@ function loadCarteira() {
 </template>
 
 <style scoped>
+    li {
+        list-style-type: none;
+        cursor: pointer;
+        font-size: large;
+    }
+
     div.modal {
         position: relative;
         bottom: 10%;
@@ -96,6 +104,7 @@ function loadCarteira() {
         font-size: large;
         white-space: nowrap;
         padding: 10%;
+        text-decoration: underline;
     }
 
     button.carteira {
