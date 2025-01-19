@@ -90,12 +90,19 @@ async function login() {
             </div>
         </div>
         <div class="registro">
-            <button class="login" type="button" :onclick="login">Login</button>
+            <button class="login" type="button" :onclick="login">Login<svg class="login_icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF">
+                <path d="M480-120v-80h280v-560H480v-80h280q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H480Zm-80-160-55-58 102-102H120v-80h327L345-622l55-58 200 200-200 200Z"/></svg>
+            </button>
         </div>
         <p>Não é cadastrado? Faça o seu <RouterLink to="/register">cadastro</RouterLink></p>
 </template>
 
 <style scoped>
+    svg.login_icon {
+        position: relative;
+        top: 0.75vh;
+    }
+
     a {
         text-decoration: none;
         color: darkblue;
@@ -157,6 +164,11 @@ async function login() {
         color: black;
         border-color: black;
         background-color: ghostwhite;
+        transition: 0.3s;
+    }
+
+    button.login:hover svg.login_icon {
+        fill: black;
         transition: 0.3s;
     }
 </style>

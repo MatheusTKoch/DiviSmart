@@ -33,12 +33,21 @@ function clearUser() {
  <div class="header">
     <div class="titulo"><RouterLink class="titulo1" to="/">DiviSmart</RouterLink></div>
     <button class="login" v-if="showLogin"><RouterLink class="titulo2" to="/login">Login</RouterLink></button>
-    <button class="login" v-if="showPerfil" @click="clearUser"><RouterLink class="titulo2" to="/login">Sair</RouterLink></button>
+    <button class="login" v-if="showPerfil" @click="clearUser">
+        <RouterLink class="titulo2" to="/login">Sair<svg class="logout_icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF">
+            <path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h280v80H200Zm440-160-55-58 102-102H360v-80h327L585-622l55-58 200 200-200 200Z"/></svg>
+        </RouterLink>
+    </button>
     <div class="border" v-if="showPerfil"></div>
  </div>
 </template>
 
 <style scoped>
+svg.logout_icon {
+    position: relative;
+    top: 0.75vh;
+}
+
 a.titulo1 {
     text-decoration: none;
     color: whitesmoke;
@@ -62,6 +71,11 @@ button.login:hover {
     color: black;
     border-color: black;
     background-color: ghostwhite;
+    transition: 0.3s;
+}
+
+button.login:hover svg.logout_icon {
+    fill: black;
     transition: 0.3s;
 }
 
