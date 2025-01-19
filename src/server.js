@@ -122,6 +122,22 @@ app.post("/users_login", async (req, res) => {
     }
 });
 
+app.post("/carteira_load", async(req, res) => {
+    try {
+        const sql_pesquisa = `SELECT * FROM carteiras where userId = ${req.body.userID}`;
+        const pesquisa_result = await queryDatabase(sql_pesquisa);
+
+        if (!pesquisa_result || pesquisa_result.length === 0) {
+            return res.status(401).send("Erro ao carregar carteiras");
+        }
+
+        res.status(200).send(pesquisa_result);
+    } catch (err) {
+        console.error("Erro ao pesquisar carteiras: ", err);
+        res.status(500).send("Erro interno no servidor");
+    }
+});
+
 app.post("/carteira", async (req, res) => {
     try {
         const sql_carteira = `INSERT INTO carteiras (nome, userId) values ("${req.body.carteira}", "${req.body.userID}")`;

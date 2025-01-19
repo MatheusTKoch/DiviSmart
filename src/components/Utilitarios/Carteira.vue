@@ -8,9 +8,11 @@ import { useRouter } from 'vue-router';
 
 const router = useRouter();
 let showCarteira = ref(false);
+let carteiras = ref('');
 
 onMounted(() => {
     verifyUser();
+    loadCarteira();
 })
 
 function verifyUser() {
@@ -34,6 +36,19 @@ function verifyUser() {
         }
     });
 }
+
+function loadCarteira() {
+    axios.post('http://localhost:8080/carteira_load', {
+        userID: localStorage.getItem('usID')
+    }).then((res) => {
+        console.log(res);
+        carteiras = res.data;
+        console.log(carteiras)
+    }).catch((err) => {
+        console.log(err);
+    });
+}
+
 </script>
 
 <template>
@@ -43,6 +58,11 @@ function verifyUser() {
         <div class="texto-titulo">Carteiras</div>
         <button class="carteira" @click="showCarteira = true" :disabled="showCarteira">Adicionar Carteira</button>
         <div class="carteira-lista">Carteiras Cadastradas</div>
+        <div>
+            <ol>
+                <li></li>
+            </ol>
+        </div>
         <div class="modal">
             <Modal @mostrarModal="showCarteira = false && $emit('mostraModal')" v-if="showCarteira"></Modal>
         </div>
