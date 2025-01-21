@@ -9,7 +9,10 @@ let maxPass = ref(false);
 let minPass = ref(false);
 let numLetter = ref(false)
 let like = ref(false);
+let nameUndername = ref(false);
 let email = ref('');
+let nome = ref('');
+let sobrenome = ref('')
 let senha = ref('');
 let senha2 = ref('');
 
@@ -37,6 +40,12 @@ function validarCadastrar() {
     } else {
         like.value = false;
     }
+
+    if (nome.value == '' || sobrenome.value == '') {
+        nameUndername.value = true;
+    } else {
+        nameUndername.value = false;
+    }
 }
 
 async function register() {
@@ -46,6 +55,8 @@ async function register() {
         let dados = new URLSearchParams();
         dados.append('email', email.value);
         dados.append('senha', senha.value);
+        dados.append('nome', nome.value);
+        dados.append('sobrenome', sobrenome.value);
         await axios.post('http://localhost:8080/users_register', dados).then((res) => {
             console.log(res)
             if (res.status == 200) {
@@ -88,8 +99,13 @@ function showHide() {
         <div class="conteudo">
             <label for="email">Email:</label>
             <input type="email" name="email" v-model="email" required>
+            <label for="name">Nome:</label>
+            <input type="text" name="name" v-on:keyup="validarCadastrar" v-model="nome" required>
+            <label for="undername">Sobrenome:</label>
+            <input type="text" name="undername" v-on:keyup="validarCadastrar" v-model="sobrenome" required>
             <label for="password">Digite sua senha:</label>
             <input type="password" name="senha" id="password" v-on:keyup="validarCadastrar" v-model="senha" required>
+            <p class="alert" v-show="nameUndername">- Informe o nome e sobrenome nos campos acima</p>
             <p class="alert" v-show="maxPass">- Senha deve ter no máximo 20 caracteres.</p>
             <p class="alert" v-show="minPass">- Senha deve ter no mínimo 8 caracteres.</p>
             <p class="alert" v-show="numLetter">- Senha deve ter pelo menos um número e letra maiúscula</p>
@@ -165,7 +181,7 @@ function showHide() {
         color: whitesmoke;
         text-align: center;
         font-size: xx-large;
-        padding: 5%;
+        padding: 2%;
     }
 
     button.cadastro {

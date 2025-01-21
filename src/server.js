@@ -50,9 +50,9 @@ app.use(session({
   app.post("/users_register", async (req, res) => {
 
     try {
-        const { email, senha } = req.body;
+        const { email, nome, sobrenome, senha } = req.body;
         const sql_email = `SELECT * FROM USERS WHERE email = "${email}"`;
-        const sql_registro = `INSERT INTO USERS (email, password) VALUES ("${email}", "${senha}")`;
+        const sql_registro = `INSERT INTO USERS (email, nome, sobrenome, password) VALUES ("${email}", "${nome}", "${sobrenome}", "${senha}")`;
 
         const emailResult = await queryDatabase(sql_email);
 
