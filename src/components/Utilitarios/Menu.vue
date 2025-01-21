@@ -2,13 +2,16 @@
 import Header from '../UI/Header.vue';
 import Sidebar from '../UI/Sidebar.vue';
 import axios from 'axios';
-import { onMounted } from 'vue';
+import { nextTick, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
 onMounted(() => {
     verifyUser();
 })
+
+let nome = ref('');
+let horario = ref('');
 
 function verifyUser() {
     axios.post('http://localhost:8080/session', {
@@ -17,6 +20,8 @@ function verifyUser() {
         exp: localStorage.getItem('exp')
     }).then((res) => {
         console.log(res);
+        loadUser();
+        loadHorario();
     }).catch((err) => {
         console.log(err);
         if(err.response.data == 'Sessao expirada' && err.response.status == 401) {
@@ -31,13 +36,42 @@ function verifyUser() {
         }
     });
 }
+
+function loadUser() {
+    axios.post('http://localhost:8080/users_load', {
+        usID: localStorage.getItem('usID'),
+    }).then((res) => {
+        console.log(res);
+        nextTick(() => {
+            nome.value = res.data.Nome;
+        });
+    }).catch((err) => {
+        console.log(err);
+    })
+}
+
+function loadHorario() {
+    let hora = new Date().getHours();
+    
+    if (hora <= 12) {
+        horario.value = 'bom dia';
+    } 
+    
+    if (hora > 12 || hora <= 18) {
+        horario.value = 'boa tarde';
+    }  
+    
+    if (hora >= 19) {
+        horario.value = 'boa noite';
+    }
+}
 </script>
 
 <template>
     <Header showPerfil></Header>
     <Sidebar></Sidebar>
     <div class="conteudo">
-        <div class="texto-titulo">Bem vindo(a) ao DiviSmart!</div> 
+        <div class="texto-titulo">Olá {{ nome }}, {{ horario }}!</div> 
         <div class="text">Inicie sua carteira para fazer o acompanhamento clicando no botão abaixo, e após tenha acesso
         a relatórios personalizados!</div>
         <button class="carteira" @click="router.push('menu/carteira')">Criar Carteira</button>

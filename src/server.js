@@ -122,6 +122,24 @@ app.post("/users_login", async (req, res) => {
     }
 });
 
+app.post("/users_load", async(req, res) => {
+    try {
+        const sql_user = `SELECT * FROM USERS WHERE userId = ${req.body.usID}`;
+        const userResult = await queryDatabase(sql_user);
+
+        if (!userResult || userResult.length === 0) {
+            return res.status(401).send("Sem dados na localStorage");
+        }
+
+        
+        res.send({Nome: userResult[0].Nome}).status(200);
+        }
+    catch (err) {
+        console.error("Erro peqsuisar usuario: ", err);
+        res.status(500).send("Erro interno no servidor");
+    }
+});
+
 app.post("/carteira_load", async(req, res) => {
     try {
         const sql_pesquisa = `SELECT * FROM carteiras where userId = ${req.body.userID}`;
