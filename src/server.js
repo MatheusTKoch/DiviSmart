@@ -142,7 +142,7 @@ app.post("/users_load", async(req, res) => {
 
 app.post("/carteira_load", async(req, res) => {
     try {
-        const sql_pesquisa = `SELECT * FROM carteiras where userId = ${req.body.userID}`;
+        const sql_pesquisa = `SELECT * FROM carteiras where userId = ${req.body.userID} and deletedAt IS NULL`;
         const pesquisa_result = await queryDatabase(sql_pesquisa);
 
         if (!pesquisa_result || pesquisa_result.length === 0) {

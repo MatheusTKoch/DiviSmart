@@ -38,7 +38,7 @@ function cadastroCarteira() {
             <input type="text" id="nomeCarteira" v-model="nomeCarteira" v-on:keyup="validarCarteira">
             <p class="alert" v-if="showAlert">Por favor informe um nome para cadastro da carteira</p>
             <div class="botoes">
-                <button class="cadastrar" @click="cadastroCarteira">Cadastrar</button>
+                <button class="cadastrar" @click="cadastroCarteira(); $emit('mostrarModal')">Cadastrar</button>
                 <button @click="$emit('mostrarModal')" class="voltar">Voltar</button>
             </div>
         </div>

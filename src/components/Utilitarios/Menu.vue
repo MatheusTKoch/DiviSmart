@@ -81,7 +81,7 @@ function loadHorario() {
 <style scoped>
     button.carteira {
         font-size: large;
-        margin-top: 2%;
+        margin-top: 5%;
     }
 
     button.carteira:hover {
@@ -105,7 +105,8 @@ function loadHorario() {
 
     div.texto-titulo {
         position: relative;
-        font-size: x-large;
-        left: 35%;
+        font-size: xx-large;
+        left: 5%;
+        padding-bottom: 5vh;
     }
 </style>
