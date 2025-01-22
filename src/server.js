@@ -156,6 +156,36 @@ app.post("/carteira_load", async(req, res) => {
     }
 });
 
+app.post("/carteira_delete", async (req, res) => {
+    try {
+        const sql_carteira = `UPDATE carteiras SET deletedAt = now() WHERE carteiraId = ${req.body.carteiraID}`;
+        const carteira_result = await queryDatabase(sql_carteira);
+
+        if (!carteira_result || carteira_result.legth === 0) {
+            return res.status(401).send("Erro ao deletar carteiras");
+        }
+
+        const sql_acoes = `UPDATE ativos_acoes SET deletedAt = now() WHERE carteiraId = ${req.body.carteiraID}`;
+        const acoes_result = await queryDatabase(sql_acoes);
+
+        if (!acoes_result || acoes_result.legth === 0) {
+            return res.status(401).send("Erro ao deletar acoes");
+        }
+
+        const sql_fii = `UPDATE ativos_fii SET deletedAt = now() WHERE carteiraId = ${req.body.carteiraID}`;
+        const fii_result = await queryDatabase(sql_fii);
+
+        if (!fii_result || fii_result.legth === 0) {
+            return res.status(401).send("Erro ao deletar fiis");
+        }
+
+        return res.status(200).send("Carteira deletada!");
+    } catch (err) {
+        console.error("Erro ao deletar carteira: ", err);
+
+    }
+});
+
 app.post("/carteira", async (req, res) => {
     try {
         const sql_carteira = `INSERT INTO carteiras (nome, userId) values ("${req.body.carteira}", "${req.body.userID}")`;
