@@ -24,6 +24,7 @@ function cadastroCarteira() {
         dados.append('userID', userID.value);
         axios.post('http://localhost:8080/carteira', dados).then((res) => {
             console.log(res);
+            window.location.reload();
         }).catch((err) => {
             console.log(err);
         })
