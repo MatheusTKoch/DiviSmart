@@ -72,7 +72,7 @@ a {
 }
 
 a:hover {
-    color: black;
+    color: rgba(123, 104, 238, 1);
     transition: 0.3s;
 }
 
