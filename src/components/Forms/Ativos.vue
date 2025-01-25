@@ -29,11 +29,10 @@ function loadAtivos() {
 <div class="conteudo">
     <h2 class="titulo_carteira">Editar Carteira</h2>
     <div class="acoes">
-        <h2>Ações</h2>
-        <hr>
+        <h2 class="acoes">Ações<hr></h2>
         <div class="dados_acoes">
             <table>
-                <tr>
+                <tr class="titulo">
                     <th scope="col">Ticker</th>
                     <th scope="col">Valor Investido</th>
                     <th scope="col">Quantidade</th>
@@ -46,16 +45,16 @@ function loadAtivos() {
                     </th>
                     <th scope="row"><input type="text"></input></th>
                     <th scope="row"><input type="text"></input></th>
+                    <button class="salvar_acoes">Salvar</button>
                 </tr>
             </table>
         </div>
     </div>
     <div class="fiis">
-        <h2>Fundos Imobiliários</h2>
-        <hr>
+        <h2 class="fii">Fundos Imobiliários<hr></h2>
         <div class="dados_fiis">
             <table>
-                <tr>
+                <tr class="titulo">
                     <th scope="col">Ticker</th>
                     <th scope="col">Valor Investido</th>
                     <th scope="col">Quantidade</th>
@@ -68,6 +67,7 @@ function loadAtivos() {
                     </th>
                     <th scope="row"><input type="text"></input></th>
                     <th scope="row"><input type="text"></input></th>
+                    <button class="salvar_fii">Salvar</button>
                 </tr>
             </table>
         </div>
@@ -77,10 +77,25 @@ function loadAtivos() {
 </template>
 
 <style scoped>
+button.salvar_acoes, button.salvar_fii {
+    padding: 0.2vw;
+    font-size: large;
+    margin-left: 1vw;
+}
+
+tr.titulo {
+    font-size: large;
+}
+
+h2.titulo_carteira, h2.acoes, h2.fii {
+    transform: translateX(9vw);
+}
+
 div.conteudo {
     position: relative;
     text-align: center;
     width: 10vw;
+    transform: translateX(10vw);
 }
 
 div.return {
