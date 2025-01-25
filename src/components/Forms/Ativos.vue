@@ -32,14 +32,44 @@ function loadAtivos() {
         <h2>Ações</h2>
         <hr>
         <div class="dados_acoes">
-            
+            <table>
+                <tr>
+                    <th scope="col">Ticker</th>
+                    <th scope="col">Valor Investido</th>
+                    <th scope="col">Quantidade</th>
+                </tr>
+                <tr>
+                    <th scope="row">
+                    <select >
+                        <option v-for="ac in acoes" :value="ac.Ticker">{{ ac.Ticker }}</option>
+                    </select>
+                    </th>
+                    <th scope="row"><input type="text"></input></th>
+                    <th scope="row"><input type="text"></input></th>
+                </tr>
+            </table>
         </div>
     </div>
     <div class="fiis">
         <h2>Fundos Imobiliários</h2>
         <hr>
         <div class="dados_fiis">
-            
+            <table>
+                <tr>
+                    <th scope="col">Ticker</th>
+                    <th scope="col">Valor Investido</th>
+                    <th scope="col">Quantidade</th>
+                </tr>
+                <tr>
+                    <th scope="row">
+                    <select >
+                        <option v-for="fi in fii" :value="fi.Ticker">{{ fi.Ticker }}</option>
+                    </select>
+                    </th>
+                    <th scope="row"><input type="text"></input></th>
+                    <th scope="row"><input type="text"></input></th>
+                </tr>
+            </table>
         </div>
     </div>
 </div>
