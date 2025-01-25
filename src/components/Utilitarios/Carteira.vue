@@ -91,7 +91,7 @@ function deleteCarteira(num:number) {
                 <Modal @mostrarModal="showCarteira = false && $emit('mostraModal')" v-if="showCarteira"></Modal>
             </div>
         </div>
-        <Ativos v-else-if="editCarteira"></Ativos>
+        <Ativos @editarCarteira="editCarteira = false && $emit('editarCarteira')" v-else-if="editCarteira"></Ativos>
     </div>
     
 </template>
