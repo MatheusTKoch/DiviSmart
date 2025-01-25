@@ -202,6 +202,29 @@ app.post("/carteira", async (req, res) => {
     }
 });
 
+app.post("/ativos_load", async (req, res) => {
+    try {
+        const sql_acoes = `SELECT * FROM acoes`;
+        const acoesResult = await queryDatabase(sql_acoes);
+
+        if (!acoesResult || acoesResult.length === 0) {
+            return res.status(401).send("Erro ao selecionar ativos - acao");
+        }
+
+        const sql_fiis = `SELECT * FROM fundo_imobiliario`;
+        const fiiResult = await queryDatabase(sql_fiis);
+
+        if (!fiiResult || fiiResult.length === 0) {
+            return res.status(401).send("Erro ao selecionar ativos - fii");
+        }
+
+        res.status(200).send({acoes: acoesResult, fii: fiiResult});
+    } catch (err) {
+        console.error("Erro ao carregar ativos", err);
+        res.status(500).send("Erro interno no servidor")
+    }
+})
+
 app.post("/session", async(req, res) => {
     const sql_session = `SELECT * FROM USER_SESSION WHERE userId = ${req.body.usID} and SessionID = "${req.body.sID}"`;
     const sessionResult = await queryDatabase(sql_session);

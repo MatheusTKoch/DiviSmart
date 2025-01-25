@@ -1,9 +1,23 @@
 <script setup lang="ts">
-import { onMounted } from 'vue';
+import axios from 'axios';
+import { ref, onMounted } from 'vue';
+
+let acoes = ref();
+let fii = ref();
 
 onMounted(() => {
-    console.log('teste')
+    loadAtivos();
 })
+
+function loadAtivos() {
+    axios.post('http://localhost:8080/ativos_load').then((res) => {
+        console.log(res);
+        acoes.value = res.data.acoes;
+        fii.value = res.data.fii;
+    }).catch((err) => {
+        console.log(err);
+    })
+}
 </script>
 
 <template>
@@ -18,7 +32,7 @@ onMounted(() => {
         <h2>Ações</h2>
         <hr>
         <div class="dados_acoes">
-
+            
         </div>
     </div>
     <div class="fiis">
