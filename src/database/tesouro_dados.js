@@ -2,6 +2,7 @@ import mysql from 'mysql2';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import axios from 'axios';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -14,12 +15,50 @@ const db = mysql.createConnection({
     host: process.env.VITE_HOST_DB
 });
 
-db.connect((err) => {
-    if (err) throw err;
-    let sql = 'CREATE TABLE IF NOT EXISTS tesouro_direto (TesouroID int NOT NULL AUTO_INCREMENT, Descricao varchar(250) NOT NULL, InvestimentoMinimo float(15,2) NOT NULL, Vencimento Date NOT NULL, PRIMARY KEY(TesouroID))'
-    db.query(sql, (err) => {
-        if (err) throw err;
-        console.log("Tabela criada!");
-        db.end();
-    })
-});
+const TESOURO_URL = process.env.VITE_URL_TESOURO;
+
+async function extrairDados() {
+    try {
+      const response = await axios.get(TESOURO_URL);
+      const data = response.data;
+      
+      if (!data || !data.response || !data.response.TrsrBdTradgList) {
+        throw new Error("Estrutura do JSON inesperada.");
+      }
+  
+      const bonds = data.response.TrsrBdTradgList;
+
+      const extractedData = bonds.map((bond) => {
+        const { nm, mtrtyDt, minInvstmtAmt } = bond.TrsrBd;
+        return {
+          Nome: nm,
+          InvestimentoMinimo: minInvstmtAmt,
+          Vencimento: mtrtyDt.split("T")[0]
+        };
+      });
+  
+      console.log("Dados extraídos:", extractedData);
+
+      const insertQuery = `
+        INSERT INTO tesouro_direto (Descricao, InvestimentoMinimo, Vencimento)
+        VALUES (?, ?, ?);
+      `;
+  
+      for (const item of extractedData) {
+        await db.execute(insertQuery, [
+          item.Nome,
+          item.InvestimentoMinimo,
+          item.Vencimento
+        ]);
+      }
+      console.log("Dados inseridos no banco com sucesso!");
+  
+
+      await db.end();
+    } catch (error) {
+      console.error("Erro ao processar os dados:", error.message);
+    }
+  }
+  
+
+extrairDados();
