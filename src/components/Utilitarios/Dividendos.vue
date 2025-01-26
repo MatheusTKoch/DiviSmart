@@ -46,6 +46,7 @@ function verifyUser() {
         <input type="date" required>
         <label for="data_final">Data Final:</label>
         <input type="date" required>
+        <button class="pesquisa">Pesquisar</button>
     </div>  
 </template>
 
@@ -53,7 +54,7 @@ function verifyUser() {
 div.conteudo {
     position: absolute;
     top: 20%;
-    left: 40%;
+    left: 35%;
     color: ghostwhite;
 }
 
@@ -64,5 +65,16 @@ div.titulo_div {
 
 div.descricao {
     font-size: large;
+    transform: translateX(5vw);
+}
+
+label {
+    margin: 1vw;
+}
+
+button.pesquisa {
+    font-size: medium;
+    padding: 0.2vw;
+    margin-left: 1vw;
 }
 </style>
