@@ -20,6 +20,7 @@ defineProps({
 onMounted(() => {
     verifyUser();
     loadCarteira();
+    sessionStorage.removeItem('cID');
 })
 
 function verifyUser() {

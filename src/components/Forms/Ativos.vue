@@ -55,11 +55,15 @@ function loadDados() {
         console.log(err);
     })
 }
+
+function recarregar() {
+    window.location.reload();
+}
 </script>
 
 <template>
 <div class="return">
-    <svg @click="$emit('editarCarteira')" class="voltar_icon" xmlns="http://www.w3.org/2000/svg" height="40px" viewBox="0 -960 960 960" width="40px" fill="#FFFFFF">
+    <svg @click="recarregar()" class="voltar_icon" xmlns="http://www.w3.org/2000/svg" height="40px" viewBox="0 -960 960 960" width="40px" fill="#FFFFFF">
         <path d="m287-446.67 240 240L480-160 160-480l320-320 47 46.67-240 240h513v66.66H287Z"/>
     </svg>
 </div>
