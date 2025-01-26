@@ -2,14 +2,40 @@
 import Header from '../UI/Header.vue';
 import Sidebar from '../UI/Sidebar.vue';
 import axios from 'axios';
-import { onMounted } from 'vue';
+import { nextTick, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
+let carteiras = ref();
+let idCarteira = ref();
+let dataInicial = ref();
+let dataFinal = ref();
 
 onMounted(() => {
     verifyUser();
+    loadCarteira();
 })
+
+function loadCarteira() {
+    axios.post('http://localhost:8080/carteira_load', {
+        userID: localStorage.getItem('usID')
+    }).then((res) => {
+        console.log(res);
+        nextTick(() => {
+            carteiras.value = res.data;
+        })
+    }).catch((err) => {
+        console.log(err);
+    });
+}
+
+function carregarRelatorio() {
+    if (idCarteira.value == undefined || dataInicial.value == undefined || dataFinal.value == undefined) {
+        alert('Verifique os campos informados e tente novamente!');
+    }
+    console.log(idCarteira.value, dataFinal.value, dataInicial.value)
+    //carregar relatorio de dividendos de acordo com intervalo
+}
 
 function verifyUser() {
     axios.post('http://localhost:8080/session', {
@@ -41,12 +67,14 @@ function verifyUser() {
         <div class="titulo_div">Dividendos</div>
         <div class="descricao">Visualize os relatórios de acordo com o periodo desejado:</div>
         <label for="carteira">Carteira:</label>
-        <select name="carteira" required></select>
+        <select name="carteira" v-model="idCarteira" required>
+            <option v-for="cart in carteiras" :value="cart.CarteiraID" :v-model="cart.CarteiraID">{{ cart.Nome }}</option>
+        </select>
         <label for="data_inicial">Data Inicial:</label>
-        <input type="date" required>
+        <input type="date" v-model="dataInicial" required>
         <label for="data_final">Data Final:</label>
-        <input type="date" required>
-        <button class="pesquisa">Pesquisar</button>
+        <input type="date" v-model="dataFinal" required>
+        <button class="pesquisa" @click="carregarRelatorio()">Pesquisar</button>
     </div>  
 </template>
 
