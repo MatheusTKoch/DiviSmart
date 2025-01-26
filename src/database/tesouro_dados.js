@@ -19,46 +19,49 @@ const TESOURO_URL = process.env.VITE_URL_TESOURO;
 
 async function extrairDados() {
     try {
-      const response = await axios.get(TESOURO_URL);
-      const data = response.data;
+        const response = await axios.get(TESOURO_URL);
+        const data = response.data;
       
-      if (!data || !data.response || !data.response.TrsrBdTradgList) {
-        throw new Error("Estrutura do JSON inesperada.");
-      }
-  
-      const bonds = data.response.TrsrBdTradgList;
+        if (!data || !data.response || !data.response.TrsrBdTradgList) {
+            throw new Error("Estrutura do JSON inesperada.");
+        }
+        const bonds = data.response.TrsrBdTradgList;
 
-      const extractedData = bonds.map((bond) => {
-        const { nm, mtrtyDt, minInvstmtAmt } = bond.TrsrBd;
-        return {
-          Nome: nm,
-          InvestimentoMinimo: minInvstmtAmt,
-          Vencimento: mtrtyDt.split("T")[0]
-        };
-      });
-  
-      console.log("Dados extraídos:", extractedData);
+        const extractedData = bonds.map((bond) => {
+            const { nm, mtrtyDt, minInvstmtAmt, cd } = bond.TrsrBd;
 
-      const insertQuery = `
-        INSERT INTO tesouro_direto (Descricao, InvestimentoMinimo, Vencimento)
-        VALUES (?, ?, ?);
-      `;
-  
-      for (const item of extractedData) {
-        await db.execute(insertQuery, [
-          item.Nome,
-          item.InvestimentoMinimo,
-          item.Vencimento
-        ]);
-      }
+            return {
+                Nome: nm,
+                InvestimentoMinimo: minInvstmtAmt,
+                Vencimento: mtrtyDt.split("T")[0],
+                CodigoTitulo: cd || null,
+            };
+        });
+
+        console.log("Dados extraídos:", extractedData);
+
+        const insertQuery = `
+            INSERT INTO tesouro_direto 
+            (Descricao, InvestimentoMinimo, Vencimento, CodigoTitulo)
+            VALUES (?, ?, ?, ?);
+        `;
+
+        for (const item of extractedData) {
+            await db.execute(insertQuery, [
+                item.Nome,
+                item.InvestimentoMinimo,
+                item.Vencimento,
+                item.CodigoTitulo,
+            ]);
+        }
+
       console.log("Dados inseridos no banco com sucesso!");
-  
 
-      await db.end();
+        await db.end();
     } catch (error) {
-      console.error("Erro ao processar os dados:", error.message);
+        console.error("Erro ao processar os dados:", error.message);
     }
-  }
-  
+
+} 
 
 extrairDados();

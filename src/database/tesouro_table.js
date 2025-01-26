@@ -16,7 +16,7 @@ const db = mysql.createConnection({
 
 db.connect((err) => {
     if (err) throw err;
-    let sql = 'CREATE TABLE IF NOT EXISTS tesouro_direto (TesouroID int NOT NULL AUTO_INCREMENT, Descricao varchar(250) NOT NULL, InvestimentoMinimo float(15,2) NOT NULL, Vencimento Date NOT NULL, PRIMARY KEY(TesouroID))'
+    let sql = 'CREATE TABLE IF NOT EXISTS tesouro_direto (TesouroID int NOT NULL AUTO_INCREMENT, Descricao varchar(250) NOT NULL, InvestimentoMinimo float(15,2) NOT NULL, Vencimento Date NOT NULL, CodigoTitulo varchar(20), PRIMARY KEY(TesouroID))'
     db.query(sql, (err) => {
         if (err) throw err;
         console.log("Tabela criada!");
