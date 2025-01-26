@@ -1,15 +1,38 @@
 <script setup lang="ts">
 import axios from 'axios';
-import { ref, onMounted, nextTick } from 'vue';
+import { ref, onMounted } from 'vue';
 
 let acoes = ref();
 let fii = ref();
 let cartNome = ref('');
+let quantidadeAcao = ref();
+let valorInvestidoAcao = ref();
+let idAcao = ref();
 
 onMounted(() => {
     loadAtivos();
     loadDados();
 })
+
+function cadastroAcao() {
+    if (idAcao.value == '' || quantidadeAcao.value == '' || valorInvestidoAcao.value == '') {
+        alert('Verifique os campos informados e tente novamente!');
+    } else if (isNaN(quantidadeAcao.value) || isNaN(valorInvestidoAcao.value)) {
+        alert('O valor investido e quantidade devem ser informados somente com números, verifique e tente novamente!')
+    } else {
+        axios.post('http://localhost:8080/acoes_cadastro', {
+            quantidade: quantidadeAcao.value,
+            valorInvestido: valorInvestidoAcao.value,
+            cID: sessionStorage.getItem('cID'),
+            acaoID: idAcao.value
+        }).then((res) => {
+            console.log(res);
+        }).catch((err) => {
+            console.log(err);
+        })
+    }
+    
+}
 
 function loadAtivos() {
     axios.post('http://localhost:8080/ativos_load').then((res) => {
@@ -53,13 +76,13 @@ function loadDados() {
                 </tr>
                 <tr>
                     <th scope="row">
-                    <select >
-                        <option v-for="ac in acoes" :value="ac.Ticker">{{ ac.Ticker }}</option>
+                    <select v-model="idAcao">
+                        <option v-for="ac in acoes" :value="ac.AcaoID" :v-model="ac.AcaoID">{{ ac.Ticker }}</option>
                     </select>
                     </th>
-                    <th scope="row"><input type="text"></input></th>
-                    <th scope="row"><input type="text"></input></th>
-                    <button class="salvar_acoes">Salvar</button>
+                    <th scope="row"><input type="number" placeholder="R$" v-model="valorInvestidoAcao"></input></th>
+                    <th scope="row"><input type="number" v-model="quantidadeAcao"></input></th>
+                    <button class="salvar_acoes" @click="cadastroAcao()">Salvar</button>
                 </tr>
             </table>
         </div>

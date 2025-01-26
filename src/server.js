@@ -165,13 +165,13 @@ app.post("/carteira_name", async(req, res) => {
             return res.status(401).send("Erro ao carregar carteiras");
         }
 
-        console.log(pesquisa_result);
         res.status(200).send(pesquisa_result);
     }   catch (err) {
         console.error("Erro ao pesquisar carteiras: ", err);
         res.status(500).send("Erro interno no servidor");
     }
 })
+
 app.post("/carteira_delete", async (req, res) => {
     try {
         const sql_carteira = `UPDATE carteiras SET deletedAt = now() WHERE carteiraId = ${req.body.carteiraID}`;
@@ -198,9 +198,23 @@ app.post("/carteira_delete", async (req, res) => {
         return res.status(200).send("Carteira deletada!");
     } catch (err) {
         console.error("Erro ao deletar carteira: ", err);
-
+        res.status(500).send("Erro interno no servidor");
     }
 });
+
+app.post('/acoes_cadastro', async(req, res) => {
+    try {
+        const sql_cadastro = `INSERT INTO ativos_acoes (Quantidade, ValorInvestido, DataCadastro, carteiraID, acaoID) values (${req.body.quantidade}, ${req.body.valorInvestido}, now(), ${req.body.cID}, ${req.body.acaoID})`;
+        const cadastroResult = await queryDatabase(sql_cadastro);
+
+        if (!cadastroResult || cadastroResult.length === 0) {
+            return res.status(401).send("Erro ao cadstrar acao");
+        }
+    } catch (err) {
+        console.error("Erro ao deletar carteira: ", err);
+        res.status(500).send("Erro interno no servidor");
+    }
+})
 
 app.post("/carteira", async (req, res) => {
     try {
