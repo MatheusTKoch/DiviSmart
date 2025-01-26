@@ -156,6 +156,22 @@ app.post("/carteira_load", async(req, res) => {
     }
 });
 
+app.post("/carteira_name", async(req, res) => {
+    try {
+        const sql_pesquisa = `SELECT * FROM carteiras where userId = ${req.body.userID} and CarteiraID = ${req.body.cID} and deletedAt IS NULL`;
+        const pesquisa_result = await queryDatabase(sql_pesquisa);
+
+        if (!pesquisa_result || pesquisa_result.length === 0) {
+            return res.status(401).send("Erro ao carregar carteiras");
+        }
+
+        console.log(pesquisa_result);
+        res.status(200).send(pesquisa_result);
+    }   catch (err) {
+        console.error("Erro ao pesquisar carteiras: ", err);
+        res.status(500).send("Erro interno no servidor");
+    }
+})
 app.post("/carteira_delete", async (req, res) => {
     try {
         const sql_carteira = `UPDATE carteiras SET deletedAt = now() WHERE carteiraId = ${req.body.carteiraID}`;

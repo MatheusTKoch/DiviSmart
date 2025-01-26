@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import axios from 'axios';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, nextTick } from 'vue';
 
 let acoes = ref();
 let fii = ref();
+let cartNome = ref('');
 
 onMounted(() => {
     loadAtivos();
+    loadDados();
 })
 
 function loadAtivos() {
@@ -14,6 +16,18 @@ function loadAtivos() {
         console.log(res);
         acoes.value = res.data.acoes;
         fii.value = res.data.fii;
+    }).catch((err) => {
+        console.log(err);
+    })
+}
+
+function loadDados() {
+    axios.post('http://localhost:8080/carteira_name', {
+        userID: localStorage.getItem('usID'),
+        cID: sessionStorage.getItem('cID')
+    }).then((res) => {
+        console.log(res);
+        cartNome.value = res.data[0].Nome;
     }).catch((err) => {
         console.log(err);
     })
@@ -27,7 +41,7 @@ function loadAtivos() {
     </svg>
 </div>
 <div class="conteudo">
-    <h2 class="titulo_carteira">Editar Carteira</h2>
+    <h2 class="titulo_carteira">Editar Carteira - {{ cartNome }}</h2>
     <div class="acoes">
         <h2 class="acoes">Ações<hr></h2>
         <div class="dados_acoes">
