@@ -8,6 +8,9 @@ let cartNome = ref('');
 let quantidadeAcao = ref();
 let valorInvestidoAcao = ref();
 let idAcao = ref();
+let quantidadeFii = ref();
+let valoInvestidoFii = ref();
+let idFii = ref();
 
 onMounted(() => {
     loadAtivos();
@@ -15,7 +18,7 @@ onMounted(() => {
 })
 
 function cadastroAcao() {
-    if (idAcao.value == '' || quantidadeAcao.value == '' || valorInvestidoAcao.value == '') {
+    if (idAcao.value == undefined || quantidadeAcao.value == undefined || valorInvestidoAcao.value == undefined) {
         alert('Verifique os campos informados e tente novamente!');
     } else if (isNaN(quantidadeAcao.value) || isNaN(valorInvestidoAcao.value)) {
         alert('O valor investido e quantidade devem ser informados somente com números, verifique e tente novamente!')
@@ -32,6 +35,25 @@ function cadastroAcao() {
         })
     }
     
+}
+
+function cadastroFii() {
+    if (idFii.value == undefined || quantidadeFii.value == undefined || valoInvestidoFii.value == undefined) {
+        alert('Verifique os campos informados e tente novamente!');
+    } else if (isNaN(quantidadeFii.value) || isNaN(valoInvestidoFii.value)) {
+        alert('O valor investido e quantidade devem ser informados somente com números, verifique e tente novamente!')
+    } else {
+        axios.post('http://localhost:8080/fii_cadastro', {
+            quantidade: quantidadeFii.value,
+            valorInvestido: valoInvestidoFii.value,
+            cID: sessionStorage.getItem('cID'),
+            fiiID: idFii.value
+        }).then((res) => {
+            console.log(res);
+        }).catch((err) => {
+            console.log(err);
+        })
+    }
 }
 
 function loadAtivos() {
@@ -102,13 +124,13 @@ function recarregar() {
                 </tr>
                 <tr>
                     <th scope="row">
-                    <select >
-                        <option v-for="fi in fii" :value="fi.Ticker">{{ fi.Ticker }}</option>
+                    <select v-model="idFii">
+                        <option v-for="fi in fii" :value="fi.FundoImobiliarioID" :v-model="fi.FundoImobiliarioID" >{{ fi.Ticker }}</option>
                     </select>
                     </th>
-                    <th scope="row"><input type="text"></input></th>
-                    <th scope="row"><input type="text"></input></th>
-                    <button class="salvar_fii">Salvar</button>
+                    <th scope="row"><input type="number" placeholder="R$" v-model="valoInvestidoFii"></input></th>
+                    <th scope="row"><input type="number" v-model="quantidadeFii"></input></th>
+                    <button class="salvar_fii" @click="cadastroFii()">Salvar</button>
                 </tr>
             </table>
         </div>

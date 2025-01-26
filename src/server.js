@@ -216,6 +216,20 @@ app.post('/acoes_cadastro', async(req, res) => {
     }
 })
 
+app.post('/fii_cadastro', async(req, res) => {
+    try {
+        const sql_cadastro = `INSERT INTO ativos_fii (Quantidade, ValorInvestido, DataCadastro, carteiraID, fiiID) values (${req.body.quantidade}, ${req.body.valorInvestido}, now(), ${req.body.cID}, ${req.body.fiiID})`;
+        const cadastroResult = await queryDatabase(sql_cadastro);
+
+        if (!cadastroResult || cadastroResult.length === 0) {
+            return res.status(401).send("Erro ao cadstrar fii");
+        }
+    } catch (err) {
+        console.error("Erro ao deletar carteira: ", err);
+        res.status(500).send("Erro interno no servidor");
+    }
+})
+
 app.post("/carteira", async (req, res) => {
     try {
         const sql_carteira = `INSERT INTO carteiras (nome, userId) values ("${req.body.carteira}", "${req.body.userID}")`;
