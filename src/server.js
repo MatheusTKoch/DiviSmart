@@ -276,7 +276,14 @@ app.post("/ativos_load", async (req, res) => {
             return res.status(401).send("Erro ao selecionar ativos - fii");
         }
 
-        res.status(200).send({acoes: acoesResult, fii: fiiResult});
+        const sql_tesouro = `SELECT * FROM tesouro_direto`;
+        const tesouroResult = await queryDatabase(sql_tesouro);
+
+        if (!tesouroResult || tesouroResult.length === 0) {
+            return res.status(401).send("Erro ao selecionar ativos - tesouro");
+        }
+
+        res.status(200).send({acoes: acoesResult, fii: fiiResult, tesouro: tesouroResult});
     } catch (err) {
         console.error("Erro ao carregar ativos", err);
         res.status(500).send("Erro interno no servidor")

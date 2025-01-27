@@ -84,6 +84,7 @@ function loadAtivos() {
         console.log(res);
         acoes.value = res.data.acoes;
         fii.value = res.data.fii;
+        tesouro.value = res.data.tesouro;
     }).catch((err) => {
         console.log(err);
     })
@@ -195,8 +196,13 @@ tr.titulo {
     font-size: large;
 }
 
-h2.titulo_carteira, h2.acoes, h2.fii, h2.tesouro {
+ h2.acoes, h2.fii, h2.tesouro {
     transform: translateX(9vw);
+}
+
+h2.titulo_carteira {
+    white-space: nowrap;
+    transform: translateX(4vw);
 }
 
 div.conteudo {
@@ -213,11 +219,11 @@ div.return {
     margin-left: 5vh;
 }
 
-div.acoes {
+div.acoes, div.fiis, div.tesouros {
     left: 10vw;
 }
 
-div.fiis {
-    left: 10vw;
+div.dados_tesouro {
+    transform: translateX(-5vw);
 }
 </style>
