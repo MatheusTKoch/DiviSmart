@@ -86,6 +86,7 @@ function sendID(num: number) {
         <div v-if="!editCarteira">
             <div class="titulos-carteira">
                 <div class="texto-titulo">Carteiras</div>
+                <div class="subtexto-titulo">Visualize, edite ou exclua suas carteiras cadastradas!</div>
                 <button class="carteira" @click="showCarteira = true" :disabled="showCarteira">Adicionar Carteira</button>
             </div>
             <div class="carteira-lista">Carteiras Cadastradas</div>
@@ -141,9 +142,15 @@ function sendID(num: number) {
 
     div.texto-titulo {
         position: relative;
-        left: 150%;
+        left: 90%;
         font-size: x-large;
         margin-bottom: 2%;
+    }
+
+    div.subtexto-titulo {
+        transform: translateX(12vw);
+        font-size: large;
+        margin-bottom: 10%;  
     }
 
     div.carteira-lista {
