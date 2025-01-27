@@ -211,7 +211,7 @@ app.post('/acoes_cadastro', async(req, res) => {
             return res.status(401).send("Erro ao cadstrar acao");
         }
     } catch (err) {
-        console.error("Erro ao deletar carteira: ", err);
+        console.error("Erro ao cadastrar ativo: ", err);
         res.status(500).send("Erro interno no servidor");
     }
 })
@@ -225,7 +225,21 @@ app.post('/fii_cadastro', async(req, res) => {
             return res.status(401).send("Erro ao cadstrar fii");
         }
     } catch (err) {
-        console.error("Erro ao deletar carteira: ", err);
+        console.error("Erro ao cadastrar ativo: ", err);
+        res.status(500).send("Erro interno no servidor");
+    }
+})
+
+app.post('/tesouro_cadastro', async(req, res) => {
+    try {
+        const tesouro_cadastro = `INSERT INTO ativos_tesouro (Quantidade, ValorInvestido, DataCadastro, carteiraID, tesouroID) values (${req.body.quantidade}, ${req.body.valorInvestido}, now(), ${req.body.cID}, ${req.body.tesID})`;
+        const cadastroResult = await queryDatabase(tesouro_cadastro);
+
+        if (!cadastroResult || cadastroResult.length === 0) {
+            return res.status(401).send("Erro ao cadstrar tesouro");
+        }
+    } catch (err) {
+        console.error("Erro ao cadastrar ativo: ", err);
         res.status(500).send("Erro interno no servidor");
     }
 })

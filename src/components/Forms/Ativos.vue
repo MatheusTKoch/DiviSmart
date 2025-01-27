@@ -4,6 +4,7 @@ import { ref, onMounted } from 'vue';
 
 let acoes = ref();
 let fii = ref();
+let tesouro = ref();
 let cartNome = ref('');
 let quantidadeAcao = ref();
 let valorInvestidoAcao = ref();
@@ -11,6 +12,9 @@ let idAcao = ref();
 let quantidadeFii = ref();
 let valoInvestidoFii = ref();
 let idFii = ref();
+let idTesouro = ref();
+let quantidadeTesouro = ref();
+let valorInvestidoTesouro = ref();
 
 onMounted(() => {
     loadAtivos();
@@ -48,6 +52,25 @@ function cadastroFii() {
             valorInvestido: valoInvestidoFii.value,
             cID: sessionStorage.getItem('cID'),
             fiiID: idFii.value
+        }).then((res) => {
+            console.log(res);
+        }).catch((err) => {
+            console.log(err);
+        })
+    }
+}
+
+function cadastroTesouro() {
+    if (idTesouro.value == undefined || quantidadeTesouro.value == undefined || valorInvestidoTesouro.value == undefined) {
+        alert('Verifique os campos informados e tente novamente!');
+    } else if (isNaN(quantidadeTesouro.value) || isNaN(valorInvestidoTesouro.value)) {
+        alert('O valor investido e quantidade devem ser informados somente com números, verifique e tente novamente!')
+    } else {
+        axios.post('http://localhost:8080/tesouro_cadastro', {
+            quantidade: quantidadeTesouro.value,
+            valorInvestido: valorInvestidoTesouro.value,
+            cID: sessionStorage.getItem('cID'),
+            tesID: idTesouro.value
         }).then((res) => {
             console.log(res);
         }).catch((err) => {
@@ -135,12 +158,34 @@ function recarregar() {
             </table>
         </div>
     </div>
+    <div class="tesouros">
+        <h2 class="tesouro">Tesouro Direto<hr></h2>
+        <div class="dados_tesouro">
+            <table>
+                <tr class="titulo">
+                    <th scope="col">Ticker</th>
+                    <th scope="col">Valor Investido</th>
+                    <th scope="col">Quantidade</th>
+                </tr>
+                <tr>
+                    <th scope="row">
+                    <select v-model="idTesouro">
+                        <option v-for="tes in tesouro" :value="tes.TesouroID" :v-model="tes.TesouroID" >{{ tes.Descricao }}</option>
+                    </select>
+                    </th>
+                    <th scope="row"><input type="number" placeholder="R$" v-model="valorInvestidoTesouro"></input></th>
+                    <th scope="row"><input type="number" v-model="quantidadeTesouro"></input></th>
+                    <button class="salvar_tesouro" @click="cadastroTesouro()">Salvar</button>
+                </tr>
+            </table>
+        </div>
+    </div>
 </div>
 
 </template>
 
 <style scoped>
-button.salvar_acoes, button.salvar_fii {
+button.salvar_acoes, button.salvar_fii, button.salvar_tesouro {
     padding: 0.2vw;
     font-size: large;
     margin-left: 1vw;
@@ -150,7 +195,7 @@ tr.titulo {
     font-size: large;
 }
 
-h2.titulo_carteira, h2.acoes, h2.fii {
+h2.titulo_carteira, h2.acoes, h2.fii, h2.tesouro {
     transform: translateX(9vw);
 }
 
