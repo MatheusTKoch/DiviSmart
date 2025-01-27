@@ -35,5 +35,8 @@ div.background {
     margin: 0;
     padding: 0;
     background: linear-gradient(135deg, #055db6 10%, #8ecdd3, #6755d1);
+    background-repeat:no-repeat;
+    background-size:contain;
+    background-position:center;
 }
 </style>

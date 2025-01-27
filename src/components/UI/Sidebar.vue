@@ -54,7 +54,7 @@ div.sidebar {
     position: relative;
     width: 14vw;
     border-right: 1px solid black;
-    height: 100vh;
+    min-height: 90vh;
 }
 
 ul.lista {
