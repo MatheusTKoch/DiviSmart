@@ -109,4 +109,18 @@ function loadHorario() {
         left: 5%;
         padding-bottom: 5vh;
     }
+
+    @media screen and (max-width: 480px){
+        div.texto-titulo {
+        font-size: large;
+        }
+        
+        div.text {
+        font-size: small;
+        }
+
+        button.carteira {
+        font-size: small;
+        }
+    }
 </style>

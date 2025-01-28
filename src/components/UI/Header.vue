@@ -100,4 +100,20 @@ div.border {
     border-bottom: 1px black solid;
     padding: 0.5vh;
 }
+
+@media screen and (max-width: 480px) {
+    div.titulo {
+        font-size: large;
+    }
+
+    button.login {
+        left: 70vw;
+        font-size: medium;
+        padding: 5px;
+    }
+
+    svg.logout_icon {
+        top: 0.75vh;
+    }
+}
 </style>
