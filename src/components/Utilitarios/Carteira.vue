@@ -171,5 +171,24 @@ function sendID(num: number) {
         transition: 0.3s;
     }
 
+    @media screen and (max-width: 480px){
+        div.texto-titulo {
+            font-size: large;
+            left: 30%;
+        }
+        
+        div.subtexto-titulo {
+            font-size: small;
+            transform: translateX(0.8vw);
+        }
+
+        button.carteira {
+            font-size: small;
+        }
+
+        div.carteira-lista {
+            font-size: medium;
+        }
+    }
     
 </style>

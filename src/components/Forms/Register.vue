@@ -208,4 +208,19 @@ function showHide() {
         font-size: small;
         text-align: center;
     }
+
+    @media screen and (max-width: 480px) {
+        p.titulo {
+            font-size: larger;
+            padding-bottom: 0;
+        }
+
+        button.cadastro {
+            font-size: medium;
+        }
+
+        input {
+            width: 40%;
+        }
+    }
 </style>

@@ -171,4 +171,19 @@ async function login() {
         fill: black;
         transition: 0.3s;
     }
+
+    @media screen and (max-width: 480px) {
+        p.titulo {
+            font-size: x-large;
+            padding-bottom: 0;
+        }
+
+        button.login {
+            font-size: medium;
+        }
+
+        input {
+            width: 40%;
+        }
+    }
 </style>
