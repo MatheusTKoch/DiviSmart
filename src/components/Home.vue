@@ -63,4 +63,24 @@ div.message {
     left: 20vh;
     font-size:calc(100% + 0.25vw);
 }
+
+@media screen and (max-width: 480px) {
+
+    h1.message {
+        left: 10vw;
+        font-size: medium;
+    }
+
+    div.message {
+        font-size: small;
+        top: 18vh;
+        left: 1vw;
+    }
+
+    button.cadastro {
+        font-size: small;
+        left: 20vw;
+        bottom: 50vh;
+    }
+}
 </style>
