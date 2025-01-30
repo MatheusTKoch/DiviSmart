@@ -16,7 +16,7 @@ const db = mysql.createConnection({
 
 db.connect((err) => {
     if (err) throw err;
-    let sql = 'CREATE TABLE IF NOT EXISTS dividendos_fii (DividendoFiiID int NOT NULL AUTO_INCREMENT, DataPagamento DATE NOT NULL, ValorPagamento float(15,2), fiiID INT NOT NULL, FOREIGN KEY (fiiID) REFERENCES fundo_imobiliario(FundoImobiliarioID), PRIMARY KEY(DividendoFiiID))'
+    let sql = 'CREATE TABLE IF NOT EXISTS dividendos_fii (DividendoFiiID int NOT NULL AUTO_INCREMENT, DataPagamento DATETIME NOT NULL, ValorPagamento float(15,2), fiiID INT NOT NULL, FOREIGN KEY (fiiID) REFERENCES fundo_imobiliario(FundoImobiliarioID), PRIMARY KEY(DividendoFiiID))'
     db.query(sql, (err) => {
         if (err) throw err;
         console.log("Tabela criada!");
