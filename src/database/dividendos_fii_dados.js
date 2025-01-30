@@ -68,28 +68,34 @@ async function salvarDividendos(fiiID, dividendos) {
   console.log(`Dividendos do fundo com FundoImobiliarioID ${fiiID} inseridos com sucesso!`);
 }
 
-async function executar() {
-  try {
-    const fundos = await getFundosImobiliarios();
-
-    for (const fundo of fundos) {
-      const { FundoImobiliarioID, Ticker } = fundo;
-      console.log(`Obtendo dividendos para o ticker: ${Ticker}`);
-
-      const dividendos = await getDividendos(Ticker);
-      if (dividendos.length > 0) {
-        await salvarDividendos(FundoImobiliarioID, dividendos);
-      } else {
-        console.log(`Nenhum dividendo encontrado para o ticker ${Ticker}`);
-      }
-    }
-
-    console.log("Processo concluído!");
-  } catch (error) {
-    console.error("Erro no processo:", error.message);
-  } finally {
-    await db.end();
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
-}
+  
+  async function executar() {
+    try {
+      const fundos = await getFundosImobiliarios();
+  
+      for (const fundo of fundos) {
+        const { FundoImobiliarioID, Ticker } = fundo;
+        console.log(`Obtendo dividendos para o ticker: ${Ticker}`);
+  
+        const dividendos = await getDividendos(Ticker);
+        if (dividendos.length > 0) {
+          await salvarDividendos(FundoImobiliarioID, dividendos);
+        } else {
+          console.log(`Nenhum dividendo encontrado para o ticker ${Ticker}`);
+        }
+  
+        await delay(5000); 
+      }
+  
+      console.log("Processo concluído!");
+    } catch (error) {
+      console.error("Erro no processo:", error.message);
+    } finally {
+      await db.end();
+    }
+  }
 
 executar();
