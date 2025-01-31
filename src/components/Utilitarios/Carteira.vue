@@ -103,9 +103,10 @@ function sendID(num: number) {
                 <Modal @mostrarModal="showCarteira = false" v-if="showCarteira"></Modal>
             </div>
         </div>
-        <Ativos @editarCarteira="editCarteira = false" v-else-if="editCarteira"></Ativos>
-    </div>
-    
+        <div class="ativos">
+            <Ativos @editarCarteira="editCarteira = false" v-if="editCarteira"></Ativos>
+        </div>    
+    </div> 
 </template>
 
 <style scoped>
@@ -125,6 +126,11 @@ function sendID(num: number) {
         list-style-type: none;
         cursor: pointer;
         font-size: large;
+    }
+
+    div.ativos {
+        position: absolute;
+        transform: translateX(2vw);
     }
 
     div.modal {

@@ -57,13 +57,12 @@ button.cadastrar {
 }
 
 div.conteudo {
-    
-    padding: 30% 30% 20% 30%;
-    position: relative;
+    padding: 20% 20% 20% 20%;
+    position: absolute;
     text-align: center;
     white-space: nowrap;
     border: 1px solid black;
-    border-radius: 20px;
+    border-radius: 25px;
     background: linear-gradient(135deg, #055db6 10%, #8ecdd3, #6755d1);
     outline: 100vw solid rgba(0, 0, 0, .65);
 }   
