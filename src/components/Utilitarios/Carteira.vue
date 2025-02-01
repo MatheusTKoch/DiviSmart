@@ -135,8 +135,7 @@ function sendID(num: number) {
 
     div.modal {
         position: relative;
-        bottom: 10%;
-        left: 40%;
+        bottom: 28vh;
     }
 
     div.conteudo {
