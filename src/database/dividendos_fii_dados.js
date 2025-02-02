@@ -42,8 +42,8 @@ async function getDividendos(ticker) {
   
         if (dataPagamento && valorPagamento) {
           dividendos.push({
-            DataPagamento: new Date(dataPagamento.split("/").reverse().join("-")), // Formato YYYY-MM-DD
-            ValorPagamento: parseFloat(valorPagamento.replace(",", ".")), // Convertendo para float
+            DataPagamento: new Date(dataPagamento.split("/").reverse().join("-")), 
+            ValorPagamento: parseFloat(valorPagamento.replace(",", ".")),
           });
         }
       });

@@ -24,13 +24,20 @@ async function getAcoes() {
   return rows; 
 }
 
+function formatarData(dataStr) {
+  if (!dataStr || !/^\d{2}\/\d{2}\/\d{4}$/.test(dataStr)) {
+    return null;
+  }
+  return new Date(dataStr.split("/").reverse().join("-"));
+}
+
 async function getDividendos(ticker) {
   try {
     const url = `${ACOES_URL}${ticker}`;
     const response = await axios.get(url, {
       headers: { 
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36" 
-        },
+      },
     });
     const $ = cheerio.load(response.data);
 
@@ -39,15 +46,18 @@ async function getDividendos(ticker) {
       const dataPagamento = $(element).find("td:nth-child(3)").text().trim();
       const valorPagamento = $(element).find("td:nth-child(4)").text().trim();
 
-      if (dataPagamento && valorPagamento) {
+      const dataFormatada = formatarData(dataPagamento);
+      if (dataFormatada) {
         dividendos.push({
-          DataPagamento: new Date(dataPagamento.split("/").reverse().join("-")),
+          DataPagamento: dataFormatada,
           ValorPagamento: parseFloat(valorPagamento.replace(",", ".")),
         });
+      } else {
+        console.log(`Data inválida ignorada para o ticker ${ticker}`);
       }
     });
 
-    console.log(dividendos)
+    console.log(dividendos);
     return dividendos;
   } catch (error) {
     console.error(`Erro ao fazer scraping para o ticker ${ticker}:`, error.message);
@@ -69,7 +79,7 @@ async function salvarDividendos(acaoID, dividendos) {
 }
 
 function delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 async function executar() {
