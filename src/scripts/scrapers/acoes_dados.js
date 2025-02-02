@@ -22,7 +22,6 @@ async function consultaDados() {
     try {
         const dados = [];
         await axios.get(B3_URL).then(res => {
-            //console.log(res.data);
             const dataScrape = cherrio.load(res.data);
 
             dataScrape('table tbody tr').each((index, element) => {
@@ -33,7 +32,6 @@ async function consultaDados() {
                 }
             });
         });
-        //console.log('Dados obtidos:', dados);
         return dados;
     } catch (err) {
         console.log("Erro na requisicao: " + err);
