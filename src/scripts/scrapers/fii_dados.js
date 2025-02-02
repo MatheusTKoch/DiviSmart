@@ -33,7 +33,6 @@ async function consultaDados() {
                  }
              });
         });
-        //console.log('Dados obtidos:', dados);
         return dados;
     } catch (err) {
         console.log("Erro na requisicao: " + err);
