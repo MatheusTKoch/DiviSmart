@@ -33,7 +33,10 @@ function carregarRelatorio() {
     if (idCarteira.value == undefined || dataInicial.value == undefined || dataFinal.value == undefined) {
         alert('Verifique os campos informados e tente novamente!');
     }
-    console.log(idCarteira.value, dataFinal.value, dataInicial.value)
+    if (dataInicial.value > dataFinal.value) {
+        alert('Data inicial maior que a final, verifique os dados!');
+    }
+    console.log(idCarteira.value, dataInicial.value, dataFinal.value)
     //carregar relatorio de dividendos de acordo com intervalo
 }
 
