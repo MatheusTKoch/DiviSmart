@@ -262,14 +262,14 @@ app.post("/carteira", async (req, res) => {
 
 app.post("/dividendos_load", async (req, res) => {
     try {
-        const sql_dividendos_fii = `SELECT * FROM dividendos_fii_view WHERE carteiraID = ${req.body.cID}`;
+        const sql_dividendos_fii = `SELECT * FROM dividendos_fii_view WHERE carteiraID = ${req.body.cID} and DataPagamento >= ${req.body.dataInicial} and DataPagamento <= ${req.body.dataFinal}`;
         const fiiResult = await queryDatabase(sql_dividendos_fii);
 
         if (!fiiResult || fiiResult.length === 0) {
             return res.status(401).send("Erro pesquisar dividendos");
         }
 
-        res.status(200);
+        res.status(200).send(fiiResult);
     } catch (err) {
         console.error("Erro ao carregar dividendos: ", err);
         res.status(500).send("Erro interno no servidor");

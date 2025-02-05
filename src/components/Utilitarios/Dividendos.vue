@@ -32,12 +32,20 @@ function loadCarteira() {
 function carregarRelatorio() {
     if (idCarteira.value == undefined || dataInicial.value == undefined || dataFinal.value == undefined) {
         alert('Verifique os campos informados e tente novamente!');
-    }
-    if (dataInicial.value > dataFinal.value) {
+    } else if (dataInicial.value > dataFinal.value) {
         alert('Data inicial maior que a final, verifique os dados!');
+    } else {
+        axios.post('http://localhost:8080/dividendos_load', {
+            cID: idCarteira.value,
+            dataInicial: dataInicial.value,
+            dataFinal: dataFinal.value
+        }).then((res) => {
+            console.log(res);
+        }).catch((err) => {
+            console.log(err);
+        })
     }
     console.log(idCarteira.value, dataInicial.value, dataFinal.value)
-    //carregar relatorio de dividendos de acordo com intervalo
 }
 
 function verifyUser() {
