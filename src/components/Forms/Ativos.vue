@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import axios from 'axios';
+import Toast from '../UI/Toast.vue';
 import { ref, onMounted } from 'vue';
 
 let acoes = ref();
@@ -15,6 +16,7 @@ let idFii = ref();
 let idTesouro = ref();
 let quantidadeTesouro = ref();
 let valorInvestidoTesouro = ref();
+let showToast = ref(false);
 
 onMounted(() => {
     loadAtivos();
@@ -34,7 +36,7 @@ function cadastroAcao() {
             acaoID: idAcao.value
         }).then((res) => {
             console.log(res);
-
+            showToast.value = true;
         }).catch((err) => {
             console.log(err);
         })
@@ -115,6 +117,7 @@ function recarregar() {
     </svg>
 </div>
 <div class="conteudo">
+    <Toast>Sucesso</Toast>
     <h2 class="titulo_carteira">Editar Carteira - {{ cartNome }}</h2>
     <div class="acoes">
         <h2 class="acoes">Ações<hr></h2>
@@ -183,7 +186,6 @@ function recarregar() {
         </div>
     </div>
 </div>
-
 </template>
 
 <style scoped>

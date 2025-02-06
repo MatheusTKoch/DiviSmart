@@ -1,4 +1,4 @@
-<script lang="ts">
+<script lang="ts" setup>
 defineProps({
     retorno: String,
     sucesso: Boolean,
@@ -9,10 +9,10 @@ defineProps({
 
 <template>
     <div v-if="sucesso">
-        <p>{{ retorno }}</p>
+        <slot></slot>
     </div>
     <div v-if="erro">
-        <p>{{ retorno }}</p>
+        <slot></slot>
     </div>
 </template>
 
