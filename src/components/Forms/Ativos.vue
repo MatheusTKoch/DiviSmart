@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import axios from 'axios';
 import Toast from '../UI/Toast.vue';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, nextTick } from 'vue';
 
 let acoes = ref();
 let fii = ref();
@@ -23,6 +23,19 @@ onMounted(() => {
     loadDados();
 })
 
+function showToastComponent() {
+    if (showToast.value === false) {
+        showToast.value = true;
+        console.log(showToast)
+        setTimeout(() => {
+            showToast.value = false
+        }, 5000); 
+        console.log(showToast)
+    } else {
+        return;
+    }
+}
+
 function cadastroAcao() {
     if (idAcao.value == undefined || quantidadeAcao.value == undefined || valorInvestidoAcao.value == undefined) {
         alert('Verifique os campos informados e tente novamente!');
@@ -36,7 +49,7 @@ function cadastroAcao() {
             acaoID: idAcao.value
         }).then((res) => {
             console.log(res);
-            showToast.value = true;
+            showToastComponent();
         }).catch((err) => {
             console.log(err);
         })
@@ -117,7 +130,6 @@ function recarregar() {
     </svg>
 </div>
 <div class="conteudo">
-    <Toast>Sucesso</Toast>
     <h2 class="titulo_carteira">Editar Carteira - {{ cartNome }}</h2>
     <div class="acoes">
         <h2 class="acoes">Ações<hr></h2>
@@ -185,6 +197,7 @@ function recarregar() {
             </table>
         </div>
     </div>
+    <Toast sucesso v-if="showToast">Sucesso</Toast>
 </div>
 </template>
 
