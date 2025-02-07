@@ -27,7 +27,9 @@ let element = ref('');
             <RouterLink @click="element = 'relatorios'" to="/menu/relatorios">Relatórios</RouterLink>
         </li>
     </ul>
+    <div class="versao">DiviSmart V1.0.0</div>
 </div>
+
 </template>
 
 <style scoped>
@@ -48,6 +50,15 @@ a:hover {
 
 a:hover svg {
     fill: black;
+}
+
+div.versao {
+    position: absolute;
+    left: 4vw;
+    bottom: 1vh;
+    color: whitesmoke;
+    font-size: small;
+
 }
 
 div.sidebar {
