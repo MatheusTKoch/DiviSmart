@@ -45,7 +45,6 @@ function carregarRelatorio() {
             console.log(err);
         })
     }
-    console.log(idCarteira.value, dataInicial.value, dataFinal.value)
 }
 
 function verifyUser() {
