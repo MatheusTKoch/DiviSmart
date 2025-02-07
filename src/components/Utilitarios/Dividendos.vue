@@ -10,6 +10,9 @@ let carteiras = ref();
 let idCarteira = ref();
 let dataInicial = ref();
 let dataFinal = ref();
+let showValores = ref(false);
+let dadosAcoes = ref();
+let dadosFii = ref();
 
 onMounted(() => {
     verifyUser();
@@ -41,6 +44,11 @@ function carregarRelatorio() {
             dataFinal: dataFinal.value
         }).then((res) => {
             console.log(res);
+            nextTick(() => {
+                showValores.value = true;
+                dadosAcoes.value = res.data.acao;
+                dadosFii.value = res.data.fii;
+            });
         }).catch((err) => {
             console.log(err);
         })
@@ -85,6 +93,12 @@ function verifyUser() {
         <label for="data_final">Data Final:</label>
         <input type="date" v-model="dataFinal" required>
         <button class="pesquisa" @click="carregarRelatorio()">Pesquisar</button>
+        <div class="valores_totais">
+            <h1 class="titulo_totais">Detalhamento de valores</h1>
+            <div class="acoes">
+                <p></p>
+            </div>
+        </div>
     </div>  
 </template>
 
