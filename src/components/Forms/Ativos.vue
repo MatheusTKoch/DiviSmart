@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import axios from 'axios';
 import Toast from '../UI/Toast.vue';
-import { ref, onMounted, nextTick } from 'vue';
+import { ref, onMounted } from 'vue';
 
 let acoes = ref();
 let fii = ref();
@@ -192,7 +192,7 @@ function recarregar() {
                     </th>
                     <th scope="row"><input type="number" placeholder="R$" v-model="valorInvestidoTesouro"></input></th>
                     <th scope="row"><input type="number" v-model="quantidadeTesouro"></input></th>
-                    <button class="salvar_tesouro" @click="cadastroTesouro()">Salvar</button>
+                    <button class="save_tesouro" @click="cadastroTesouro()">Salvar</button>
                 </tr>
             </table>
         </div>
@@ -202,7 +202,7 @@ function recarregar() {
 </template>
 
 <style scoped>
-button.salvar_acoes, button.salvar_fii, button.salvar_tesouro {
+button.salvar_acoes, button.salvar_fii, button.save_tesouro {
     padding: 0.2vw;
     font-size: large;
     margin-left: 1vw;

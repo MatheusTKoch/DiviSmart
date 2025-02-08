@@ -262,10 +262,10 @@ app.post("/carteira", async (req, res) => {
 
 app.post("/dividendos_load", async (req, res) => {
     try {
-        const sql_dividendos_fii = `SELECT * FROM dividendos_fii_view WHERE carteiraID = ${req.body.cID} and DataPagamento >= '${req.body.dataInicial}' and DataPagamento <= '${req.body.dataFinal}'`;
+        const sql_dividendos_fii = `SELECT * FROM dividendos_fii_view WHERE carteiraID = ${req.body.cID} and DataPagamento >= '${req.body.dataInicial}' and DataPagamento <= '${req.body.dataFinal}' order by DataPagamento desc`;
         const fiiResult = await queryDatabase(sql_dividendos_fii);
 
-        const sql_dividendos_acoes = `SELECT * FROM dividendos_acoes_view WHERE carteiraID = ${req.body.cID} and DataPagamento >= '${req.body.dataInicial}' and DataPagamento <= '${req.body.dataFinal}'`;
+        const sql_dividendos_acoes = `SELECT * FROM dividendos_acoes_view WHERE carteiraID = ${req.body.cID} and DataPagamento >= '${req.body.dataInicial}' and DataPagamento <= '${req.body.dataFinal}' order by DataPagamento desc`;
         const acoesResult = await queryDatabase(sql_dividendos_acoes);
 
         res.status(200).send({fii:fiiResult, acao: acoesResult});
