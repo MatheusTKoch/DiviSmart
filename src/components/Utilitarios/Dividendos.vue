@@ -93,16 +93,30 @@ function verifyUser() {
         <label for="data_final">Data Final:</label>
         <input type="date" v-model="dataFinal" required>
         <button class="pesquisa" @click="carregarRelatorio()">Pesquisar</button>
-        <div class="valores_totais">
+        <div class="valores_totais" v-if="showValores">
             <h1 class="titulo_totais">Detalhamento de valores</h1>
-            <div class="acoes">
-                <p></p>
+            <h2 class="subtitulo_acoes">Ações</h2>
+            <div class="acoes" v-for="acao in dadosAcoes">
+                <div class="">{{ acao.Ticker }} - {{ acao.Descricao }} R${{ acao.ValorPagamento * acao.Quantidade }} {{ new Date(acao.DataPagamento).toISOString().slice(0,10) }}</div>
+            </div>
+            <h2 class="subtitulo_fii">Fundos Imobiliários</h2>
+            <div class="fii" v-for="fii in dadosFii">
+                <div class="">{{ fii.Ticker }} - {{ fii.Descricao }} R${{ fii.ValorPagamento * fii.Quantidade }} {{ new Date(fii.DataPagamento).toISOString().slice(0,10) }}</div>
             </div>
         </div>
     </div>  
 </template>
 
 <style scoped>
+
+div.valores_totais {
+    text-align: center;
+}
+
+h1.titulo_totais {
+    font-size: x-large;
+}
+
 div.conteudo {
     position: absolute;
     top: 20%;
