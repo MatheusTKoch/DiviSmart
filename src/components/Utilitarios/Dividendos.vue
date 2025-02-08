@@ -93,24 +93,44 @@ function verifyUser() {
         <label for="data_final">Data Final:</label>
         <input type="date" v-model="dataFinal" required>
         <button class="pesquisa" @click="carregarRelatorio()">Pesquisar</button>
+        <div class="grafico">
+            <!-- Adicionar grafico nessa div -->
+            Grafico
+        </div>
         <div class="valores_totais" v-if="showValores">
             <h1 class="titulo_totais">Detalhamento de valores</h1>
-            <h2 class="subtitulo_acoes">Ações</h2>
-            <div class="acoes" v-for="acao in dadosAcoes">
-                <div class="">{{ acao.Ticker }} - {{ acao.Descricao }} R${{ acao.ValorPagamento * acao.Quantidade }} {{ new Date(acao.DataPagamento).toISOString().slice(0,10) }}</div>
+            <div class="dados_acoes">
+                <h2 class="subtitulo_acoes">Ações</h2>
+                <div class="acoes" v-for="acao in dadosAcoes">
+                    <div class="">{{ acao.Ticker }} - {{ acao.Descricao }} R${{ (acao.ValorPagamento * acao.Quantidade).toFixed(2) }} {{ new Date(acao.DataPagamento).toISOString().slice(0,10) }}</div>
+                </div>
             </div>
-            <h2 class="subtitulo_fii">Fundos Imobiliários</h2>
-            <div class="fii" v-for="fii in dadosFii">
-                <div class="">{{ fii.Ticker }} - {{ fii.Descricao }} R${{ fii.ValorPagamento * fii.Quantidade }} {{ new Date(fii.DataPagamento).toISOString().slice(0,10) }}</div>
+            <div class="dados_fii">
+                <h2 class="subtitulo_fii">Fundos Imobiliários</h2>
+                <div class="fii" v-for="fii in dadosFii">
+                    <div class="">{{ fii.Ticker }} - {{ fii.Descricao }} R${{ (fii.ValorPagamento * fii.Quantidade).toFixed(2) }} {{ new Date(fii.DataPagamento).toISOString().slice(0,10) }}</div>
+                </div>
             </div>
         </div>
-    </div>  
+        </div>  
 </template>
 
 <style scoped>
+div.grafico {
+    width: 120%;
+    justify-self: center;
+}
+
+div.dados_acoes {
+   float: left;
+   width: 50%;
+   padding-bottom: 18vh;
+}
 
 div.valores_totais {
     text-align: center;
+    overflow: hidden;
+    transform: translateY(15vh);
 }
 
 h1.titulo_totais {
