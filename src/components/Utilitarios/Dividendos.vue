@@ -101,21 +101,29 @@ function verifyUser() {
             <h1 class="titulo_totais">Detalhamento de valores</h1>
             <div class="dados_acoes">
                 <h2 class="subtitulo_acoes">Ações</h2>
-                <div class="acoes" v-for="acao in dadosAcoes">
-                    <div class="">{{ acao.Ticker }} - {{ acao.Descricao }} R${{ (acao.ValorPagamento * acao.Quantidade).toFixed(2) }} {{ new Date(acao.DataPagamento).toISOString().slice(0,10) }}</div>
+                <div class="scroll_acoes">
+                    <div class="acoes" v-for="acao in dadosAcoes">
+                        <div class="">{{ acao.Ticker }} - {{ acao.Descricao }} R${{ (acao.ValorPagamento * acao.Quantidade).toFixed(2) }} {{ new Date(acao.DataPagamento).toISOString().slice(0,10) }}</div>
+                    </div>
                 </div>
             </div>
             <div class="dados_fii">
                 <h2 class="subtitulo_fii">Fundos Imobiliários</h2>
-                <div class="fii" v-for="fii in dadosFii">
-                    <div class="">{{ fii.Ticker }} - {{ fii.Descricao }} R${{ (fii.ValorPagamento * fii.Quantidade).toFixed(2) }} {{ new Date(fii.DataPagamento).toISOString().slice(0,10) }}</div>
+                    <div class="scroll_fii">
+                        <div class="fii" v-for="fii in dadosFii">
+                            <div class="">{{ fii.Ticker }} - {{ fii.Descricao }} R${{ (fii.ValorPagamento * fii.Quantidade).toFixed(2) }} {{ new Date(fii.DataPagamento).toISOString().slice(0,10) }}</div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
         </div>  
 </template>
 
 <style scoped>
+h2.subtitulo_acoes, h2.subtitulo_fii {
+    display: inline-block;
+}
+
 div.grafico {
     width: 120%;
     justify-self: center;
@@ -124,7 +132,11 @@ div.grafico {
 div.dados_acoes {
    float: left;
    width: 50%;
-   padding-bottom: 18vh;
+}
+
+div.scroll_fii, div.scroll_acoes {
+    height: 20vh;
+    overflow-y: auto;
 }
 
 div.valores_totais {
