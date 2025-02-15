@@ -1,6 +1,6 @@
 # DiviSmart
 
-DiviSmart é uma aplicação web desenvolvida em **VueJS**(https://vuejs.org/) que centraliza o gerenciamento e análise de ativos financeiros. O sistema possibilita o cadastro e a visualização de ações, fundos imobiliários, tesouro direto e dividendos, gerando também relatórios de valorização dos ativos. Os dados dos ativos e dividendos são armazenados em **MySQL**(https://www.mysql.com/), enquanto informações atualizadas – como cotações e dados de valorização – são obtidas por web scraping com **Cheerio**(https://cheerio.js.org/).
+DiviSmart é uma aplicação web desenvolvida em [**VueJS**](https://vuejs.org/) que centraliza o gerenciamento e análise de ativos financeiros. O sistema possibilita o cadastro e a visualização de ações, fundos imobiliários, tesouro direto e dividendos, gerando também relatórios de valorização dos ativos. Os dados dos ativos e dividendos são armazenados em [**MySQL**](https://www.mysql.com/), enquanto informações atualizadas – como cotações e dados de valorização – são obtidas por web scraping com [**Cheerio**](https://cheerio.js.org/).
 
 ## Tabela de Conteúdos
 
