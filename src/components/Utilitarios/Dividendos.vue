@@ -2,7 +2,7 @@
 import Header from '../UI/Header.vue';
 import Sidebar from '../UI/Sidebar.vue';
 import axios from 'axios';
-import { nextTick, onMounted, ref } from 'vue';
+import { nextTick, onMounted, ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
@@ -14,6 +14,12 @@ let showValores = ref(false);
 let dadosAcoes = ref();
 let dadosFii = ref();
 let showGraph = ref(false);
+let dadosRelatorioAcao = computed(() => {
+    return dadosAcoes.value;
+});
+let dadosRelatoriosFii = computed(() => {
+    return dadosFii.value;
+});
 
 onMounted(() => {
     verifyUser();
@@ -24,7 +30,6 @@ function loadCarteira() {
     axios.post('http://localhost:8080/carteira_load', {
         userID: localStorage.getItem('usID')
     }).then((res) => {
-        console.log(res);
         nextTick(() => {
             carteiras.value = res.data;
         })
@@ -44,12 +49,13 @@ function carregarRelatorio() {
             dataInicial: dataInicial.value,
             dataFinal: dataFinal.value
         }).then((res) => {
-            console.log(res);
             nextTick(() => {
                 showValores.value = true;
                 dadosAcoes.value = res.data.acao;
                 dadosFii.value = res.data.fii;
                 showGraph.value = true;
+                console.log(dadosRelatorioAcao);
+                console.log(dadosRelatoriosFii);
             });
         }).catch((err) => {
             console.log(err);
