@@ -13,6 +13,7 @@ let dataFinal = ref();
 let showValores = ref(false);
 let dadosAcoes = ref();
 let dadosFii = ref();
+let showGraph = ref(false);
 
 onMounted(() => {
     verifyUser();
@@ -48,6 +49,7 @@ function carregarRelatorio() {
                 showValores.value = true;
                 dadosAcoes.value = res.data.acao;
                 dadosFii.value = res.data.fii;
+                showGraph.value = true;
             });
         }).catch((err) => {
             console.log(err);
@@ -94,8 +96,9 @@ function verifyUser() {
         <input type="date" v-model="dataFinal" required>
         <button class="pesquisa" @click="carregarRelatorio()">Pesquisar</button>
         <div class="grafico">
-            <!-- Adicionar grafico nessa div -->
-            Grafico
+            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" v-if="showGraph">
+                <rect x="40" y="10" width="30" height="30" color="">Teste</rect>
+            </svg>
         </div>
         <div class="valores_totais" v-if="showValores">
             <h1 class="titulo_totais">Detalhamento de valores</h1>
