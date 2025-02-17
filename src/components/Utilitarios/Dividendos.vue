@@ -97,7 +97,8 @@ function verifyUser() {
         <button class="pesquisa" @click="carregarRelatorio()">Pesquisar</button>
         <div class="grafico">
             <svg version="1.1" xmlns="http://www.w3.org/2000/svg" v-if="showGraph">
-                <rect x="40" y="10" width="30" height="30" color="">Teste</rect>
+                <title id="title_grafico">Grafico de Proventos em barras</title>
+                <rect x="10" y="10" width="30" height="30" fill="rgba(123, 104, 238, 1)"/>
             </svg>
         </div>
         <div class="valores_totais" v-if="showValores">
