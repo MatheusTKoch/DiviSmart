@@ -15,7 +15,12 @@ let dadosAcoes = ref();
 let dadosFii = ref();
 let showGraph = ref(false);
 let dadosRelatorioAcao = computed(() => {
-    return dadosAcoes.value;
+    let mesDados: number[] = [];
+    for(const dados of dadosAcoes.value) {
+        let atual: number = new Date(dados.DataPagamento).getMonth() + 1;
+        mesDados.push(atual);
+    }
+    return mesDados;
 });
 let dadosRelatoriosFii = computed(() => {
     return dadosFii.value;
