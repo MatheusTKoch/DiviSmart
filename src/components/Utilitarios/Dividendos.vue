@@ -5,6 +5,12 @@ import axios from 'axios';
 import { nextTick, onMounted, ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 
+interface dadosGrafico {
+    data: number;
+    valor: number;
+    tipo: number;
+}
+
 const router = useRouter();
 let carteiras = ref();
 let idCarteira = ref();
@@ -15,15 +21,34 @@ let dadosAcoes = ref();
 let dadosFii = ref();
 let showGraph = ref(false);
 let dadosRelatorioAcao = computed(() => {
-    let mesDados: number[] = [];
+    let mesDados: dadosGrafico[] = [];
     for(const dados of dadosAcoes.value) {
-        let atual: number = new Date(dados.DataPagamento).getMonth() + 1;
-        mesDados.push(atual);
+        let atualData: number = new Date(dados.DataPagamento).getMonth() + 1;
+        let atualValor: number = Number((dados.ValorPagamento * dados.Quantidade).toFixed(2));
+        let tipo: number = 1;
+        let obj = {
+            data: atualData,
+            valor: atualValor,
+            tipo: tipo
+        }
+        mesDados.push(obj);
     }
     return mesDados;
 });
 let dadosRelatoriosFii = computed(() => {
-    return dadosFii.value;
+    let mesDados: dadosGrafico[] = [];
+    for(const dados of dadosFii.value) {
+        let atualData: number = new Date(dados.DataPagamento).getMonth() + 1;
+        let atualValor: number = Number((dados.ValorPagamento * dados.Quantidade).toFixed(2));
+        let tipo: number = 0;
+        let obj = {
+            data: atualData,
+            valor: atualValor,
+            tipo: tipo
+        }
+        mesDados.push(obj);
+    }
+    return mesDados;
 });
 
 onMounted(() => {
