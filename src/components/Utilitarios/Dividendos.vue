@@ -41,7 +41,7 @@ let dadosRelatoriosFii = computed(() => {
     for (const dados of dadosFii.value) {
         let atualData: number = new Date(dados.DataPagamento).getMonth() + 1;
         let atualValor: number = Number((dados.ValorPagamento * dados.Quantidade).toPrecision(3));
-        let tipo: number = 0;
+        let tipo: number = 1;
         let chave = `${atualData}-${tipo}`;
         if (mesDadosMap.has(chave)) {
             mesDadosMap.get(chave)!.valor += atualValor;
@@ -68,6 +68,20 @@ let dadosAgrupadosPorMes = computed(() => {
     return acc;
   }, {} as Record<number, { valor: number; tipo: number }[]>);
 });
+
+let dadosPorMes = computed(() => {
+  const resultado: { mes: number, acao: { valor: number; tipo: number } | null, fii: { valor: number; tipo: number } | null }[] = [];
+  for (const mes in dadosAgrupadosPorMes.value) {
+    const itens = dadosAgrupadosPorMes.value[mes];
+    const acao = itens.find(item => item.tipo === 0) || null;
+    const fii = itens.find(item => item.tipo === 1) || null;
+    resultado.push({ mes: Number(mes), acao, fii });
+  }
+  return resultado.sort((a, b) => a.mes - b.mes);
+});
+
+const groupWidth = 80;
+const scale = 4;
 
 onMounted(() => {
     verifyUser();
@@ -141,7 +155,7 @@ function verifyUser() {
         <div class="descricao">Visualize os relatórios de acordo com o periodo desejado:</div>
         <label for="carteira">Carteira:</label>
         <select name="carteira" v-model="idCarteira" required>
-            <option v-for="cart in carteiras" :value="cart.CarteiraID" :v-model="cart.CarteiraID">{{ cart.Nome }}</option>
+            <option v-for="cart in carteiras" :key="cart.CarteiraID" :value="cart.CarteiraID">{{ cart.Nome }}</option>
         </select>
         <label for="data_inicial">Data Inicial:</label>
         <input type="date" v-model="dataInicial" required>
@@ -149,10 +163,28 @@ function verifyUser() {
         <input type="date" v-model="dataFinal" required>
         <button class="pesquisa" @click="carregarRelatorio()">Pesquisar</button>
         <div class="grafico">
-            <title id="title_grafico">Grafico de Proventos em barras</title>
-            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" class="svg_grafico" v-if="showGraph" >
-                <g v-for="gr in dadosAgrupadosPorMes">
-                    <rect x="10" y="0" width="30" height="30" fill="rgba(123, 104, 238, 1)"/>
+            <title id="title_grafico">Gráfico de Proventos em barras</title>
+            <svg v-if="showGraph" version="1.1" xmlns="http://www.w3.org/2000/svg" class="svg_grafico" width="800" height="400" viewBox="0 0 800 400">
+                <g v-for="(item, index) in dadosPorMes" :key="item.mes">
+                    <text :x="index * groupWidth + groupWidth/2" y="20" text-anchor="middle" font-size="14" fill="white">
+                        Mês: {{ item.mes }}
+                    </text>
+                    <rect v-if="item.acao"
+                        :x="index * groupWidth + 10"
+                        :y="400 - item.acao.valor * scale"
+                        width="25"
+                        :height="item.acao.valor * scale"
+                        fill="blue">
+                        <title>Ações: {{ item.acao.valor.toFixed(2) }}</title>
+                    </rect>
+                    <rect v-if="item.fii"
+                        :x="index * groupWidth + 45"
+                        :y="400 - item.fii.valor * scale"
+                        width="25"
+                        :height="item.fii.valor * scale"
+                        fill="green">
+                        <title>FIIs: {{ item.fii.valor.toFixed(2) }}</title>
+                    </rect>
                 </g>
             </svg>
         </div>
@@ -161,21 +193,21 @@ function verifyUser() {
             <div class="dados_acoes">
                 <h2 class="subtitulo_acoes">Ações</h2>
                 <div class="scroll_acoes">
-                    <div class="acoes" v-for="acao in dadosAcoes">
-                        <div class="">{{ acao.Ticker }} - {{ acao.Descricao }} R${{ (acao.ValorPagamento * acao.Quantidade).toFixed(2) }} {{ new Date(acao.DataPagamento).toISOString().slice(0,10) }}</div>
+                    <div class="acoes" v-for="acao in dadosAcoes" :key="acao.Ticker">
+                        <div>{{ acao.Ticker }} - {{ acao.Descricao }} R${{ (acao.ValorPagamento * acao.Quantidade).toFixed(2) }} {{ new Date(acao.DataPagamento).toISOString().slice(0,10) }}</div>
                     </div>
                 </div>
             </div>
             <div class="dados_fii">
                 <h2 class="subtitulo_fii">Fundos Imobiliários</h2>
-                    <div class="scroll_fii">
-                        <div class="fii" v-for="fii in dadosFii">
-                            <div class="">{{ fii.Ticker }} - {{ fii.Descricao }} R${{ (fii.ValorPagamento * fii.Quantidade).toFixed(2) }} {{ new Date(fii.DataPagamento).toISOString().slice(0,10) }}</div>
-                        </div>
+                <div class="scroll_fii">
+                    <div class="fii" v-for="fii in dadosFii" :key="fii.Ticker">
+                        <div>{{ fii.Ticker }} - {{ fii.Descricao }} R${{ (fii.ValorPagamento * fii.Quantidade).toFixed(2) }} {{ new Date(fii.DataPagamento).toISOString().slice(0,10) }}</div>
                     </div>
                 </div>
             </div>
-        </div>  
+        </div>
+    </div>
 </template>
 
 <style scoped>
