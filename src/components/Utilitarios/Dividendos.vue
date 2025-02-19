@@ -35,6 +35,7 @@ let dadosRelatorioAcao = computed(() => {
     }
     return mesDados;
 });
+
 let dadosRelatoriosFii = computed(() => {
     let mesDados: dadosGrafico[] = [];
     for(const dados of dadosFii.value) {
@@ -50,6 +51,12 @@ let dadosRelatoriosFii = computed(() => {
     }
     return mesDados;
 });
+
+let dadosRelatorioFinal = computed(() => {
+    let mesDadosFinal: dadosGrafico[] = [];
+    mesDadosFinal = dadosRelatorioAcao.value.concat(dadosRelatoriosFii.value);
+    return mesDadosFinal;
+})
 
 onMounted(() => {
     verifyUser();
@@ -84,8 +91,7 @@ function carregarRelatorio() {
                 dadosAcoes.value = res.data.acao;
                 dadosFii.value = res.data.fii;
                 showGraph.value = true;
-                console.log(dadosRelatorioAcao);
-                console.log(dadosRelatoriosFii);
+                console.log(dadosRelatorioFinal);
             });
         }).catch((err) => {
             console.log(err);
@@ -132,9 +138,11 @@ function verifyUser() {
         <input type="date" v-model="dataFinal" required>
         <button class="pesquisa" @click="carregarRelatorio()">Pesquisar</button>
         <div class="grafico">
-            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" v-if="showGraph">
-                <title id="title_grafico">Grafico de Proventos em barras</title>
-                <rect x="10" y="10" width="30" height="30" fill="rgba(123, 104, 238, 1)"/>
+            <title id="title_grafico">Grafico de Proventos em barras</title>
+            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" class="svg_grafico" v-if="showGraph" >
+                <g v-for="gr in dadosRelatorioFinal">
+                    <rect x="10" y="0" width="30" height="30" fill="rgba(123, 104, 238, 1)"/>
+                </g>
             </svg>
         </div>
         <div class="valores_totais" v-if="showValores">
@@ -160,6 +168,10 @@ function verifyUser() {
 </template>
 
 <style scoped>
+svg.svg_grafico {
+    width: 100%;
+}
+
 h2.subtitulo_acoes, h2.subtitulo_fii {
     display: inline-block;
 }
