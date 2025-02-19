@@ -74,7 +74,7 @@ function loadHorario() {
         <div class="texto-titulo">Olá {{ nome }}, {{ horario }}!</div> 
         <div class="text">Inicie sua carteira para fazer o acompanhamento clicando no botão abaixo, e após tenha acesso
         a relatórios personalizados!</div>
-        <button class="carteira" @click="router.push('menu/carteira')">Criar Carteira</button>
+        <button class="carteira" @click="router.push('menu/carteira')">Criar/Acompanhar Carteira</button>
     </div>
 </template>
 

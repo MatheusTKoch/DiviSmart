@@ -116,7 +116,6 @@ function carregarRelatorio() {
                 dadosAcoes.value = res.data.acao;
                 dadosFii.value = res.data.fii;
                 showGraph.value = true;
-                console.log(dadosAgrupadosPorMes.value);
             });
         }).catch((err) => {
             console.log(err);
