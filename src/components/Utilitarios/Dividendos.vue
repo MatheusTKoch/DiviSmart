@@ -5,7 +5,7 @@ import axios from 'axios';
 import { nextTick, onMounted, ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 
-interface dadosGrafico {
+interface DADOSGRAFICO {
     data: number;
     valor: number;
     tipo: number;
@@ -21,39 +21,40 @@ let dadosAcoes = ref();
 let dadosFii = ref();
 let showGraph = ref(false);
 let dadosRelatorioAcao = computed(() => {
-    let mesDados: dadosGrafico[] = [];
-    for(const dados of dadosAcoes.value) {
+    let mesDadosMap = new Map<string, DADOSGRAFICO>();
+    for (const dados of dadosAcoes.value) {
         let atualData: number = new Date(dados.DataPagamento).getMonth() + 1;
-        let atualValor: number = Number((dados.ValorPagamento * dados.Quantidade).toFixed(2));
-        let tipo: number = 1;
-        let obj = {
-            data: atualData,
-            valor: atualValor,
-            tipo: tipo
+        let atualValor: number = Number((dados.ValorPagamento * dados.Quantidade).toPrecision(3));
+        let tipo: number = 0;
+        let chave = `${atualData}-${tipo}`;
+        if (mesDadosMap.has(chave)) {
+            mesDadosMap.get(chave)!.valor += atualValor;
+        } else {
+            mesDadosMap.set(chave, { data: atualData, valor: atualValor, tipo });
         }
-        mesDados.push(obj);
     }
-    return mesDados;
+    return Array.from(mesDadosMap.values());
 });
 
 let dadosRelatoriosFii = computed(() => {
-    let mesDados: dadosGrafico[] = [];
-    for(const dados of dadosFii.value) {
+    let mesDadosMap = new Map<string, DADOSGRAFICO>();
+    for (const dados of dadosFii.value) {
         let atualData: number = new Date(dados.DataPagamento).getMonth() + 1;
-        let atualValor: number = Number((dados.ValorPagamento * dados.Quantidade).toFixed(2));
+        let atualValor: number = Number((dados.ValorPagamento * dados.Quantidade).toPrecision(3));
         let tipo: number = 0;
-        let obj = {
-            data: atualData,
-            valor: atualValor,
-            tipo: tipo
+        let chave = `${atualData}-${tipo}`;
+        if (mesDadosMap.has(chave)) {
+            mesDadosMap.get(chave)!.valor += atualValor;
+            atualValor.toFixed(2);
+        } else {
+            mesDadosMap.set(chave, { data: atualData, valor: atualValor, tipo });
         }
-        mesDados.push(obj);
     }
-    return mesDados;
+    return Array.from(mesDadosMap.values());
 });
 
 let dadosRelatorioFinal = computed(() => {
-    let mesDadosFinal: dadosGrafico[] = [];
+    let mesDadosFinal: DADOSGRAFICO[] = [];
     mesDadosFinal = dadosRelatorioAcao.value.concat(dadosRelatoriosFii.value);
     return mesDadosFinal;
 })
@@ -91,7 +92,8 @@ function carregarRelatorio() {
                 dadosAcoes.value = res.data.acao;
                 dadosFii.value = res.data.fii;
                 showGraph.value = true;
-                console.log(dadosRelatorioFinal);
+                console.log(dadosRelatoriosFii);
+                console.log(dadosRelatorioAcao)
             });
         }).catch((err) => {
             console.log(err);
