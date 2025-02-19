@@ -164,26 +164,26 @@ function verifyUser() {
         <button class="pesquisa" @click="carregarRelatorio()">Pesquisar</button>
         <div class="grafico">
             <title id="title_grafico">Gráfico de Proventos em barras</title>
-            <svg v-if="showGraph" version="1.1" xmlns="http://www.w3.org/2000/svg" class="svg_grafico" width="800" height="400" viewBox="0 0 800 400">
+            <svg v-if="showGraph" version="1.1" xmlns="http://www.w3.org/2000/svg" class="svg_grafico" width="800" height="280" viewBox="0 0 800 400">
                 <g v-for="(item, index) in dadosPorMes" :key="item.mes">
-                    <text :x="index * groupWidth + groupWidth/2" y="50" text-anchor="middle" font-size="16" fill="white">
+                    <text :x="index * groupWidth + groupWidth/2" y="50" text-anchor="middle" font-size="20" fill="white">
                         Mês: {{ item.mes }}
                     </text>
                     <rect v-if="item.acao"
                         :x="index * groupWidth + 10"
-                        :y="400 - item.acao.valor * scale"
-                        width="25"
+                        :y="250 - item.acao.valor * scale"
+                        width="30"
                         :height="item.acao.valor * scale"
                         fill="blue">
-                        <title>Ações: {{ item.acao.valor.toFixed(2) }}</title>
+                        <title>Ações: R${{ item.acao.valor.toFixed(2) }}</title>
                     </rect>
                     <rect v-if="item.fii"
                         :x="index * groupWidth + 45"
-                        :y="400 - item.fii.valor * scale"
+                        :y="250 - item.fii.valor * scale"
                         width="25"
                         :height="item.fii.valor * scale"
                         fill="green">
-                        <title>FIIs: {{ item.fii.valor.toFixed(2) }}</title>
+                        <title>FIIs: R${{ item.fii.valor.toFixed(2) }}</title>
                     </rect>
                 </g>
             </svg>
@@ -240,7 +240,7 @@ div.scroll_fii, div.scroll_acoes {
 div.valores_totais {
     text-align: center;
     overflow: hidden;
-    transform: translateX(-6vw);
+    transform: translateX(-5vw);
 }
 
 h1.titulo_totais {
