@@ -57,7 +57,17 @@ let dadosRelatorioFinal = computed(() => {
     let mesDadosFinal: DADOSGRAFICO[] = [];
     mesDadosFinal = dadosRelatorioAcao.value.concat(dadosRelatoriosFii.value);
     return mesDadosFinal;
-})
+});
+
+let dadosAgrupadosPorMes = computed(() => {
+  return dadosRelatorioFinal.value.reduce((acc, curr) => {
+    if (!acc[curr.data]) {
+      acc[curr.data] = [];
+    }
+    acc[curr.data].push({ valor: curr.valor, tipo: curr.tipo });
+    return acc;
+  }, {} as Record<number, { valor: number; tipo: number }[]>);
+});
 
 onMounted(() => {
     verifyUser();
@@ -92,8 +102,7 @@ function carregarRelatorio() {
                 dadosAcoes.value = res.data.acao;
                 dadosFii.value = res.data.fii;
                 showGraph.value = true;
-                console.log(dadosRelatoriosFii);
-                console.log(dadosRelatorioAcao)
+                console.log(dadosAgrupadosPorMes.value);
             });
         }).catch((err) => {
             console.log(err);
@@ -142,7 +151,7 @@ function verifyUser() {
         <div class="grafico">
             <title id="title_grafico">Grafico de Proventos em barras</title>
             <svg version="1.1" xmlns="http://www.w3.org/2000/svg" class="svg_grafico" v-if="showGraph" >
-                <g v-for="gr in dadosRelatorioFinal">
+                <g v-for="gr in dadosAgrupadosPorMes">
                     <rect x="10" y="0" width="30" height="30" fill="rgba(123, 104, 238, 1)"/>
                 </g>
             </svg>
