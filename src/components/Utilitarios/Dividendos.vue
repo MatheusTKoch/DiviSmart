@@ -80,8 +80,8 @@ let dadosPorMes = computed(() => {
   return resultado.sort((a, b) => a.mes - b.mes);
 });
 
-const groupWidth = 80;
-const scale = 4;
+const groupWidth = 75;
+const scale = 2;
 
 onMounted(() => {
     verifyUser();
@@ -166,7 +166,7 @@ function verifyUser() {
             <title id="title_grafico">Gráfico de Proventos em barras</title>
             <svg v-if="showGraph" version="1.1" xmlns="http://www.w3.org/2000/svg" class="svg_grafico" width="800" height="400" viewBox="0 0 800 400">
                 <g v-for="(item, index) in dadosPorMes" :key="item.mes">
-                    <text :x="index * groupWidth + groupWidth/2" y="20" text-anchor="middle" font-size="14" fill="white">
+                    <text :x="index * groupWidth + groupWidth/2" y="50" text-anchor="middle" font-size="16" fill="white">
                         Mês: {{ item.mes }}
                     </text>
                     <rect v-if="item.acao"
@@ -212,7 +212,10 @@ function verifyUser() {
 
 <style scoped>
 svg.svg_grafico {
-    width: 100%;
+    width: 100vw;
+    max-width: 60vw;
+    max-height: 40vh;
+    transform: translateX(-4vw);
 }
 
 h2.subtitulo_acoes, h2.subtitulo_fii {
@@ -237,7 +240,7 @@ div.scroll_fii, div.scroll_acoes {
 div.valores_totais {
     text-align: center;
     overflow: hidden;
-    transform: translateY(15vh);
+    transform: translateX(-6vw);
 }
 
 h1.titulo_totais {
@@ -253,12 +256,12 @@ div.conteudo {
 
 div.titulo_div {
     font-size: xx-large;
-    text-align: center;
+    transform: translateX(15vw);
 }
 
 div.descricao {
     font-size: large;
-    transform: translateX(5vw);
+    transform: translateX(6vw);
 }
 
 label {
