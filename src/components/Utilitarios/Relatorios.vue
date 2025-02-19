@@ -2,13 +2,18 @@
 import Header from '../UI/Header.vue';
 import Sidebar from '../UI/Sidebar.vue';
 import axios from 'axios';
-import { onMounted } from 'vue';
+import { nextTick, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
+let idCarteira = ref();
+let carteiras = ref();
+let dataInicial = ref();
+let dataFinal = ref();
 
 onMounted(() => {
     verifyUser();
+    loadCarteira();
 })
 
 function verifyUser() {
@@ -32,11 +37,40 @@ function verifyUser() {
         }
     });
 }
+
+function loadCarteira() {
+    axios.post('http://localhost:8080/carteira_load', {
+        userID: localStorage.getItem('usID')
+    }).then((res) => {
+        nextTick(() => {
+            carteiras.value = res.data;
+        })
+    }).catch((err) => {
+        console.log(err);
+    });
+}
+
+function carregarRelatorio() {
+    
+}
 </script>
 
 <template>
     <Header showPerfil></Header>
     <Sidebar></Sidebar>
+    <div class="conteudo">
+        <div class="titulo_div">Relatórios</div>
+        <div class="descricao">Visualize os relatórios de acordo com o periodo desejado:</div>
+        <label for="carteira">Tipo de Relatório:</label>
+        <select name="carteira" v-model="idCarteira" required>
+            <option v-for="cart in carteiras" :value="cart.CarteiraID" :v-model="cart.CarteiraID">{{ cart.Nome }}</option>
+        </select>
+        <label for="data_inicial">Data Inicial:</label>
+        <input type="date" v-model="dataInicial" required>
+        <label for="data_final">Data Final:</label>
+        <input type="date" v-model="dataFinal" required>
+        <button class="pesquisa" @click="carregarRelatorio()">Pesquisar</button>
+    </div>
 </template>
 
 <style scoped>
