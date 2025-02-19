@@ -51,7 +51,7 @@ function loadCarteira() {
 }
 
 function carregarRelatorio() {
-    
+
 }
 </script>
 
@@ -61,9 +61,13 @@ function carregarRelatorio() {
     <div class="conteudo">
         <div class="titulo_div">Relatórios</div>
         <div class="descricao">Visualize os relatórios de acordo com o periodo desejado:</div>
-        <label for="carteira">Tipo de Relatório:</label>
+        <label for="carteira">Carteira:</label>
         <select name="carteira" v-model="idCarteira" required>
             <option v-for="cart in carteiras" :value="cart.CarteiraID" :v-model="cart.CarteiraID">{{ cart.Nome }}</option>
+        </select>
+        <label for="relatorio">Tipo de Relatório:</label>
+        <select name="relatorio" required>
+            <option></option>
         </select>
         <label for="data_inicial">Data Inicial:</label>
         <input type="date" v-model="dataInicial" required>
@@ -74,5 +78,30 @@ function carregarRelatorio() {
 </template>
 
 <style scoped>
+div.conteudo {
+    position: absolute;
+    top: 20%;
+    left: 30%;
+    color: ghostwhite;
+}
 
+div.titulo_div {
+    font-size: xx-large;
+    text-align: center;
+}
+
+div.descricao {
+    font-size: large;
+    transform: translateX(10vw);
+}
+
+button.pesquisa {
+    font-size: medium;
+    padding: 0.2vw;
+    margin-left: 1vw;
+}
+
+label {
+    margin: 0.5vw;
+}
 </style>
