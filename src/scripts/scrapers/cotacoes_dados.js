@@ -25,14 +25,14 @@ async function initDB() {
     return connection;
   }
 
-function parseFormattedNumber(str) {
-  let cleaned = str.replace(/[^\d.,]/g, '');
-  cleaned = cleaned.replace(/,/g, '');
-  const parts = cleaned.split('.');
-  const integerPart = parts[0] || '0';
-  const decimalPart = parts[1] ? parts[1].substring(0,2) : '00';
-  return integerPart + ',' + decimalPart;
-}  
+  function parseFormattedNumber(input) {
+    let cleaned = input.replace(/[^\d.,]/g, '');
+    cleaned = cleaned.replace(/,/g, '');
+    const parts = cleaned.split('.');
+    const integerPart = parts[0] || '0';
+    const decimalPart = parts[1] ? parts[1].substring(0,2) : '00';
+    return integerPart + '.' + decimalPart;
+  }  
 
 async function scrapeUSDBRL(connection) {
     try {
@@ -66,7 +66,7 @@ async function scrapeBitcoin(connection) {
       const $ = cherrio.load(response.data);
       let priceText = $('.tabular-nums').first().text().trim();
       const price = parseFormattedNumber(priceText);
-      console.log('Bitcoin:', priceText);
+      console.log('Bitcoin:', price);
       const now = new Date();
       await connection.execute(
         'INSERT INTO cotacoes (Ativo, ValorAtual, DataAtualizacao) VALUES (?, ?, ?)',
