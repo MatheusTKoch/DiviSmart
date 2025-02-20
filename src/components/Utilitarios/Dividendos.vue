@@ -4,6 +4,7 @@ import Sidebar from '../UI/Sidebar.vue';
 import axios from 'axios';
 import { nextTick, onMounted, ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
+import Spinner from '../UI/Spinner.vue';
 
 interface DADOSGRAFICO {
     data: number;
@@ -20,6 +21,7 @@ let showValores = ref(false);
 let dadosAcoes = ref();
 let dadosFii = ref();
 let showGraph = ref(false);
+let loading = ref(true);
 let dadosRelatorioAcao = computed(() => {
     let mesDadosMap = new Map<string, DADOSGRAFICO>();
     for (const dados of dadosAcoes.value) {
@@ -86,6 +88,9 @@ const scale = 2;
 onMounted(() => {
     verifyUser();
     loadCarteira();
+    setTimeout(() => {
+    loading.value = false;
+  }, 200);
 })
 
 function loadCarteira() {
@@ -148,7 +153,10 @@ function verifyUser() {
 <template>
     <Header showPerfil></Header>
     <Sidebar></Sidebar>
-    <div class="conteudo">
+    <div v-if="loading">
+        <Spinner></Spinner>
+    </div>
+    <div v-else class="conteudo">
         <div class="titulo_div">Dividendos</div>
         <div class="descricao">Visualize os relatórios de acordo com o periodo desejado:</div>
         <label for="carteira">Carteira:</label>

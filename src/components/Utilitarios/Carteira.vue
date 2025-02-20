@@ -6,12 +6,14 @@ import Ativos from '../Forms/Ativos.vue';
 import axios from 'axios';
 import { ref, onMounted, nextTick, defineProps } from 'vue';
 import { useRouter } from 'vue-router';
+import Spinner from '../UI/Spinner.vue';
 
 const router = useRouter();
 let showCarteira = ref(false);
 let carteiras = ref();
 let editCarteira = ref(false);
 let idCarteira = ref();
+let loading = ref(true);
 
 defineProps({
     cID: Number
@@ -21,6 +23,9 @@ onMounted(() => {
     verifyUser();
     loadCarteira();
     sessionStorage.removeItem('cID');
+    setTimeout(() => {
+    loading.value = false;
+    }, 200);
 })
 
 function verifyUser() {
@@ -79,7 +84,10 @@ function sendID(num: number) {
 <template>
     <Header showPerfil></Header>
     <Sidebar></Sidebar>
-    <div class="conteudo">
+    <div v-if="loading">
+        <Spinner></Spinner>
+    </div>
+    <div v-else class="conteudo">
         <div v-if="!editCarteira">
             <div class="titulos-carteira">
                 <div class="texto-titulo">Carteiras</div>

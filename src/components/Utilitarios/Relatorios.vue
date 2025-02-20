@@ -4,17 +4,23 @@ import Sidebar from '../UI/Sidebar.vue';
 import axios from 'axios';
 import { nextTick, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
+import Spinner from '../UI/Spinner.vue';
 
 const router = useRouter();
 let idCarteira = ref();
 let carteiras = ref();
 let dataInicial = ref();
 let dataFinal = ref();
+let loading = ref(true);
 
 onMounted(() => {
     verifyUser();
     loadCarteira();
-})
+    setTimeout(() => {
+    loading.value = false;
+  }, 200);
+}
+)
 
 function verifyUser() {
     axios.post('http://localhost:8080/session', {
@@ -50,14 +56,17 @@ function loadCarteira() {
 }
 
 function carregarRelatorio() {
-
+    return;
 }
 </script>
 
 <template>
     <Header showPerfil></Header>
     <Sidebar></Sidebar>
-    <div class="conteudo">
+    <div v-if="loading">
+        <Spinner></Spinner>
+    </div>
+    <div v-else class="conteudo">
         <div class="titulo_div">Relatórios</div>
         <div class="descricao">Visualize os relatórios de acordo com o periodo desejado:</div>
         <label for="carteira">Carteira:</label>
