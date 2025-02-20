@@ -19,7 +19,6 @@ function verifyUser() {
         sID: localStorage.getItem('sID'),
         exp: localStorage.getItem('exp')
     }).then((res) => {
-        console.log(res);
         loadUser();
         loadHorario();
     }).catch((err) => {
@@ -41,7 +40,6 @@ function loadUser() {
     axios.post('http://localhost:8080/users_load', {
         usID: localStorage.getItem('usID'),
     }).then((res) => {
-        console.log(res);
         nextTick(() => {
             nome.value = res.data.Nome;
         });
@@ -57,7 +55,7 @@ function loadHorario() {
         horario.value = 'bom dia';
     } 
     
-    if (hora > 12 || hora <= 18) {
+    if (hora > 12 && hora <= 18) {
         horario.value = 'boa tarde';
     }  
     
