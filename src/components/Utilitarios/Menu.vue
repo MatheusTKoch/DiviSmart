@@ -5,16 +5,24 @@ import axios from 'axios';
 import { nextTick, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import Cotacoes from './Cotacoes.vue';
+import Spinner from '../UI/Spinner.vue';
 
 const router = useRouter();
-onMounted(() => {
-    verifyUser();
+onMounted(async () => {
+    try {
+        await Promise.all([verifyUser()]);
+    } catch (error) {
+        console.error(error);
+    } finally {
+        loading.value = false;
+    }
 })
 
 let nome = ref('');
 let horario = ref('');
+let loading = ref(true);
 
-function verifyUser() {
+async function verifyUser() {
     axios.post('http://localhost:8080/session', {
         usID: localStorage.getItem('usID'),
         sID: localStorage.getItem('sID'),
@@ -69,7 +77,10 @@ function loadHorario() {
     <Header showPerfil></Header>
     <Sidebar></Sidebar>
     <Cotacoes></Cotacoes>
-    <div class="conteudo">  
+    <div v-if="loading">
+        <Spinner></Spinner>
+    </div>
+    <div v-else class="conteudo">  
         <div class="texto-titulo">Olá {{ nome }}, {{ horario }}!</div> 
         <div class="text">Inicie sua carteira para fazer o acompanhamento clicando no botão abaixo, e após tenha acesso
         a relatórios personalizados!</div>

@@ -13,16 +13,17 @@ let dataInicial = ref();
 let dataFinal = ref();
 let loading = ref(true);
 
-onMounted(() => {
-    verifyUser();
-    loadCarteira();
-    setTimeout(() => {
-    loading.value = false;
-  }, 200);
-}
-)
+onMounted(async () => {
+    try {
+        await Promise.all([loadCarteira(), verifyUser()]);
+    } catch (error) {
+        console.error(error);
+    } finally {
+        loading.value = false;
+    }
+});
 
-function verifyUser() {
+async function verifyUser() {
     axios.post('http://localhost:8080/session', {
         usID: localStorage.getItem('usID'),
         sID: localStorage.getItem('sID'),
@@ -43,7 +44,7 @@ function verifyUser() {
     });
 }
 
-function loadCarteira() {
+async function loadCarteira() {
     axios.post('http://localhost:8080/carteira_load', {
         userID: localStorage.getItem('usID')
     }).then((res) => {
