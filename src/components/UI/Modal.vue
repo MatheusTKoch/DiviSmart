@@ -52,8 +52,19 @@ p.alert {
     text-align: center;
 }
 
-button.cadastrar {
+button.cadastrar, button.voltar {
+    background-color: transparent;
+    color: ghostwhite;
+    border-color: ghostwhite;
+    margin: 10px;
     margin-right: 4%;
+}
+
+button.cadastrar:hover, button.voltar:hover {
+    color: black;
+    border-color: black;
+    background-color: ghostwhite;
+    transition: 0.3s;
 }
 
 div.conteudo {

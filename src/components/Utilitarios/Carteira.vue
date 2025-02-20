@@ -86,7 +86,7 @@ function sendID(num: number) {
                 <div class="subtexto-titulo">Visualize, edite ou exclua suas carteiras cadastradas!</div>
                 <button class="carteira" @click="showCarteira = true" :disabled="showCarteira">Adicionar Carteira</button>
             </div>
-            <div class="carteira-lista">Carteiras Cadastradas</div>
+            <div class="carteira-lista">Suas Carteiras:</div>
             <div>
                 <ol v-for="cart in carteiras">
                     <li>{{ cart.Nome }}<svg @click="editCarteira = true, $emit('editarCarteira'); sendID(cart.CarteiraID)" class="alter_icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF">
@@ -163,6 +163,10 @@ function sendID(num: number) {
     }
 
     button.carteira {
+        background-color: transparent;
+        color: ghostwhite;
+        border-color: ghostwhite;
+        margin: 10px;
         font-size: large;
     }
 

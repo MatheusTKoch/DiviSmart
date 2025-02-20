@@ -69,7 +69,7 @@ function loadHorario() {
     <Header showPerfil></Header>
     <Sidebar></Sidebar>
     <Cotacoes></Cotacoes>
-    <div class="conteudo">
+    <div class="conteudo">  
         <div class="texto-titulo">Olá {{ nome }}, {{ horario }}!</div> 
         <div class="text">Inicie sua carteira para fazer o acompanhamento clicando no botão abaixo, e após tenha acesso
         a relatórios personalizados!</div>
@@ -79,6 +79,10 @@ function loadHorario() {
 
 <style scoped>
     button.carteira {
+        background-color: transparent;
+        color: ghostwhite;
+        border-color: ghostwhite;
+        margin: 10px;
         font-size: large;
         margin-top: 5%;
     }
