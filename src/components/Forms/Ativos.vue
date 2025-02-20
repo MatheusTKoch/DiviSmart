@@ -28,13 +28,8 @@ onMounted(() => {
 
 function exibirToast(mensagem: string, sucesso: boolean) {
   toastMessage.value = mensagem;
-  if (sucesso) {
-    isSuccess.value = true;
-    isError.value = false;
-  } else {
-    isSuccess.value = false;
-    isError.value = true;
-  }
+  isSuccess.value = sucesso;
+  isError.value = !sucesso;
   showToast.value = true;
 
   setTimeout(() => {
@@ -203,9 +198,11 @@ function recarregar() {
             </table>
         </div>
     </div>
-    <Toast v-if="showToast" :sucesso="isSuccess" :erro="isError">
-    {{ toastMessage }}
-    </Toast>
+    <teleport to="body">
+        <Toast v-if="showToast" :sucesso="isSuccess">
+        {{ toastMessage }}
+        </Toast>
+    </teleport>    
 </div>
 </template>
 
