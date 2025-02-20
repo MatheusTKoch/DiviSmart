@@ -228,6 +228,8 @@ app.post('/acoes_cadastro', async(req, res) => {
         if (!cadastroResult || cadastroResult.length === 0) {
             return res.status(401).send("Erro ao cadstrar acao");
         }
+
+        res.status(200).send("Cadastro realizado com sucesso!");
     } catch (err) {
         console.error("Erro ao cadastrar ativo: ", err);
         res.status(500).send("Erro interno no servidor");
@@ -242,6 +244,8 @@ app.post('/fii_cadastro', async(req, res) => {
         if (!cadastroResult || cadastroResult.length === 0) {
             return res.status(401).send("Erro ao cadstrar fii");
         }
+
+        res.status(200).send("Cadastro realizado com sucesso!");
     } catch (err) {
         console.error("Erro ao cadastrar ativo: ", err);
         res.status(500).send("Erro interno no servidor");
@@ -256,6 +260,8 @@ app.post('/tesouro_cadastro', async(req, res) => {
         if (!cadastroResult || cadastroResult.length === 0) {
             return res.status(401).send("Erro ao cadstrar tesouro");
         }
+
+        res.status(200).send("Cadastro realizado com sucesso!");
     } catch (err) {
         console.error("Erro ao cadastrar ativo: ", err);
         res.status(500).send("Erro interno no servidor");
