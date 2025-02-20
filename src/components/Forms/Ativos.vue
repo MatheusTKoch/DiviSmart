@@ -16,52 +16,58 @@ let idFii = ref();
 let idTesouro = ref();
 let quantidadeTesouro = ref();
 let valorInvestidoTesouro = ref();
-let showToast = ref(false);
+let showToast = ref(false);       
+let isSuccess = ref(false);       
+let isError = ref(false);         
+let toastMessage = ref(''); 
 
 onMounted(() => {
     loadAtivos();
     loadDados();
 })
 
-function showToastComponent() {
-    if (showToast.value === false) {
-        showToast.value = true;
-        console.log(showToast)
-        setTimeout(() => {
-            showToast.value = false
-        }, 5000); 
-        console.log(showToast)
-    } else {
-        return;
-    }
+function exibirToast(mensagem: string, sucesso: boolean) {
+  toastMessage.value = mensagem;
+  if (sucesso) {
+    isSuccess.value = true;
+    isError.value = false;
+  } else {
+    isSuccess.value = false;
+    isError.value = true;
+  }
+  showToast.value = true;
+
+  setTimeout(() => {
+    showToast.value = false;
+  }, 3000);
 }
 
 function cadastroAcao() {
-    if (idAcao.value == undefined || quantidadeAcao.value == undefined || valorInvestidoAcao.value == undefined) {
-        alert('Verifique os campos informados e tente novamente!');
-    } else if (isNaN(quantidadeAcao.value) || isNaN(valorInvestidoAcao.value)) {
-        alert('O valor investido e quantidade devem ser informados somente com números, verifique e tente novamente!')
-    } else {
-        axios.post('http://localhost:8080/acoes_cadastro', {
-            quantidade: quantidadeAcao.value,
-            valorInvestido: valorInvestidoAcao.value,
-            cID: sessionStorage.getItem('cID'),
-            acaoID: idAcao.value
-        }).then((res) => {
-            console.log(res);
-            showToastComponent();
-        }).catch((err) => {
-            console.log(err);
-        })
+  if (idAcao.value == undefined || quantidadeAcao.value == undefined || valorInvestidoAcao.value == undefined) {
+    exibirToast('Verifique os campos informados e tente novamente!', false);
+  } else if (isNaN(quantidadeAcao.value) || isNaN(valorInvestidoAcao.value)) {
+    exibirToast('O valor investido e quantidade devem ser números!', false);
+  } else {
+    axios.post('http://localhost:8080/acoes_cadastro', {
+        quantidade: quantidadeAcao.value,
+        valorInvestido: valorInvestidoAcao.value,
+        cID: sessionStorage.getItem('cID'),
+        acaoID: idAcao.value
+    }).then((res) => {
+        console.log(res);
+        exibirToast('Ativo cadastrado com sucesso!', true);
+    }).catch((err) => {
+        console.log(err);
+        exibirToast('Erro no cadastro!', false);
+    });
     }
-    
 }
 
 function cadastroFii() {
     if (idFii.value == undefined || quantidadeFii.value == undefined || valoInvestidoFii.value == undefined) {
-        alert('Verifique os campos informados e tente novamente!');
+        exibirToast('Verifique os campos informados e tente novamente!', false);
     } else if (isNaN(quantidadeFii.value) || isNaN(valoInvestidoFii.value)) {
-        alert('O valor investido e quantidade devem ser informados somente com números, verifique e tente novamente!')
+        exibirToast('O valor investido e quantidade devem ser informados somente com números, verifique e tente novamente!', false);
     } else {
         axios.post('http://localhost:8080/fii_cadastro', {
             quantidade: quantidadeFii.value,
@@ -70,6 +76,7 @@ function cadastroFii() {
             fiiID: idFii.value
         }).then((res) => {
             console.log(res);
+            exibirToast('Ativo cadastrado com sucesso!', true);
         }).catch((err) => {
             console.log(err);
         })
@@ -78,9 +85,9 @@ function cadastroFii() {
 
 function cadastroTesouro() {
     if (idTesouro.value == undefined || quantidadeTesouro.value == undefined || valorInvestidoTesouro.value == undefined) {
-        alert('Verifique os campos informados e tente novamente!');
+        exibirToast('Verifique os campos informados e tente novamente!', false);
     } else if (isNaN(quantidadeTesouro.value) || isNaN(valorInvestidoTesouro.value)) {
-        alert('O valor investido e quantidade devem ser informados somente com números, verifique e tente novamente!')
+        exibirToast('O valor investido e quantidade devem ser informados somente com números, verifique e tente novamente!', false);
     } else {
         axios.post('http://localhost:8080/tesouro_cadastro', {
             quantidade: quantidadeTesouro.value,
@@ -89,6 +96,7 @@ function cadastroTesouro() {
             tesID: idTesouro.value
         }).then((res) => {
             console.log(res);
+            exibirToast('Ativo cadastrado com sucesso!', true);
         }).catch((err) => {
             console.log(err);
         })
@@ -97,7 +105,6 @@ function cadastroTesouro() {
 
 function loadAtivos() {
     axios.post('http://localhost:8080/ativos_load').then((res) => {
-        console.log(res);
         acoes.value = res.data.acoes;
         fii.value = res.data.fii;
         tesouro.value = res.data.tesouro;
@@ -111,7 +118,6 @@ function loadDados() {
         userID: localStorage.getItem('usID'),
         cID: sessionStorage.getItem('cID')
     }).then((res) => {
-        console.log(res);
         cartNome.value = res.data[0].Nome;
     }).catch((err) => {
         console.log(err);
@@ -197,7 +203,9 @@ function recarregar() {
             </table>
         </div>
     </div>
-    <Toast sucesso v-if="showToast">Sucesso</Toast>
+    <Toast v-if="showToast" :sucesso="isSuccess" :erro="isError">
+    {{ toastMessage }}
+    </Toast>
 </div>
 </template>
 

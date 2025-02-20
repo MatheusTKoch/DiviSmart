@@ -25,7 +25,7 @@ const cookie_life = 10 * 3600000;
 
 const caminhoCompletoCotacao = path.resolve(__dirname, '..', 'src', 'scripts', 'scrapers', 'cotacoes_dados.js');
 
-cron.schedule('*/20 * * * *', async () => {
+cron.schedule('*/2 * * * *', async () => {
     console.log(caminhoCompleto)
     exec(`node ${caminhoCompletoCotacao}`, (error, stdout, stderr) => {
         if (error) {
