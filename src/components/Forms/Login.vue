@@ -24,7 +24,6 @@ function verifyUser() {
         }
         console.log(res);
     }).catch((err) => {
-        console.log(err);
         if(err.response.data == 'Sessao expirada' && err.response.status == 401) {
             localStorage.removeItem('usID');
             localStorage.removeItem('exp');
@@ -49,8 +48,7 @@ async function login() {
         let dados = new URLSearchParams();
         dados.append('email', email.value);
         dados.append('senha', senha.value);
-        await axios.post('http://localhost:8080/users_login', dados).then(res => {
-            console.log(res);
+        await axios.post('http://localhost:8080/users_login', dados).then((res) => {
             if (res.status == 200) {
                 router.push('menu');
             }

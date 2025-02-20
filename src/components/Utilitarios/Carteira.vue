@@ -28,9 +28,8 @@ function verifyUser() {
         usID: localStorage.getItem('usID'),
         sID: localStorage.getItem('sID'),
         exp: localStorage.getItem('exp')
-    }).then((res) => {
-        console.log(res);
-    }).catch((err) => {
+    }).then()
+    .catch((err) => {
         console.log(err);
         if(err.response.data == 'Sessao expirada' && err.response.status == 401) {
             localStorage.removeItem('usID');
@@ -49,7 +48,6 @@ function loadCarteira() {
     axios.post('http://localhost:8080/carteira_load', {
         userID: localStorage.getItem('usID')
     }).then((res) => {
-        console.log(res);
         nextTick(() => {
             carteiras.value = res.data;
         })
@@ -62,8 +60,7 @@ function deleteCarteira(num:number) {
     if(confirm('Tem certeza que deseja apagar a carteira?')) {
         axios.post('http://localhost:8080/carteira_delete', {
             carteiraID: num
-        }).then((res) => {
-            console.log(res);
+        }).then(() => {
             window.location.reload();
         }).catch((err) => {
             console.log(err);

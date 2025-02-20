@@ -128,9 +128,8 @@ function verifyUser() {
         usID: localStorage.getItem('usID'),
         sID: localStorage.getItem('sID'),
         exp: localStorage.getItem('exp')
-    }).then((res) => {
-        console.log(res);
-    }).catch((err) => {
+    }).then()
+    .catch((err) => {
         console.log(err);
         if(err.response.data == 'Sessao expirada' && err.response.status == 401) {
             localStorage.removeItem('usID');

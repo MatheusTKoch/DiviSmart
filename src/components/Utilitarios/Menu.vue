@@ -23,7 +23,6 @@ function verifyUser() {
         loadUser();
         loadHorario();
     }).catch((err) => {
-        console.log(err);
         if(err.response.data == 'Sessao expirada' && err.response.status == 401) {
             localStorage.removeItem('usID');
             localStorage.removeItem('exp');
