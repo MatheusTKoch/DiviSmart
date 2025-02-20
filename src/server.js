@@ -305,6 +305,22 @@ app.post("/ativos_load", async (req, res) => {
     }
 })
 
+app.post("/cotacoes_load", async (req, res) => {
+    try {
+        const sql_cotacao = `SELECT * FROM cotacoes`;
+        const cotacaoResult = await queryDatabase(sql_cotacao);
+
+        if (!cotacaoResult || cotacaoResult.length === 0) {
+            return res.status(401).send("Erro ao selecionar cotacoes");
+        }
+
+        res.status(200).send(cotacaoResult);
+    } catch (err) {
+        console.error("Erro ao carregar cotacao", err);
+        res.status(500).send("Erro interno no servidor")
+    }
+})
+
 app.post("/session", async(req, res) => {
     const sql_session = `SELECT * FROM USER_SESSION WHERE userId = ${req.body.usID} and SessionID = "${req.body.sID}"`;
     const sessionResult = await queryDatabase(sql_session);
