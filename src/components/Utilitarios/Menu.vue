@@ -4,6 +4,7 @@ import Sidebar from '../UI/Sidebar.vue';
 import axios from 'axios';
 import { nextTick, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
+import Cotacoes from './Cotacoes.vue';
 
 const router = useRouter();
 onMounted(() => {
@@ -68,6 +69,7 @@ function loadHorario() {
 <template>
     <Header showPerfil></Header>
     <Sidebar></Sidebar>
+    <Cotacoes></Cotacoes>
     <div class="conteudo">
         <div class="texto-titulo">Olá {{ nome }}, {{ horario }}!</div> 
         <div class="text">Inicie sua carteira para fazer o acompanhamento clicando no botão abaixo, e após tenha acesso
