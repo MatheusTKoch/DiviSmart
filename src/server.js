@@ -7,6 +7,7 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import cron from 'node-cron';
+import { exec } from 'child_process'
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -21,6 +22,22 @@ const db = mysql.createConnection({
 
 const app = express();
 const cookie_life = 10 * 3600000;
+
+const caminhoCompletoCotacao = path.resolve(__dirname, '..', 'src', 'scripts', 'scrapers', 'cotacoes_dados.js');
+
+cron.schedule('*/20 * * * *', async () => {
+    console.log(caminhoCompleto)
+    exec(`node ${caminhoCompletoCotacao}`, (error, stdout, stderr) => {
+        if (error) {
+            console.error(`Erro ao executar script: ${error.message}`);
+            return res.status(500).send("Erro ao executar script de cotações");
+        }
+        if (stderr) {
+            console.error(`STDERR: ${stderr}`);
+        }
+            console.log(`STDOUT: ${stdout}`);
+        });
+    });
 
 app.use(cors({origin:"http://localhost:5173"}));
 app.use(bodyParser.urlencoded({extended: true}));
@@ -308,10 +325,6 @@ app.post("/ativos_load", async (req, res) => {
 
 app.post("/cotacoes_load", async (req, res) => {
     try {
-        cron.schedule('*/1 * * * *', async () => {
-            console.log('teste')
-        });
-
         const sql_cotacao = `SELECT * FROM cotacoes`;
         const cotacaoResult = await queryDatabase(sql_cotacao);
 
