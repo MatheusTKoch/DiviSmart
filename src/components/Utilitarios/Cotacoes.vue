@@ -32,7 +32,7 @@ function loadCotacoes() {
 <style scoped>
 div.conteudo {
     position: absolute;
-    transform: translate(45vw, -10vh);
+    transform: translate(45vw, -5vh);
 }
 
 li {

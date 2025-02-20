@@ -100,7 +100,7 @@ function loadHorario() {
 
     div.text {
         font-size: medium;
-        padding-top: 2%;
+        padding-top: 10%;
     }
 
     div.texto-titulo {
