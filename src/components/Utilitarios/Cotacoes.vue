@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import axios from 'axios';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, nextTick } from 'vue';
 
 let dadosCotacao = ref()
 
@@ -11,21 +11,20 @@ onMounted(() => {
 function loadCotacoes() {
     axios.post('http://localhost:8080/cotacoes_load').then((res) => {
         console.log(res.data)
-        dadosCotacao.value = res.data;
+        nextTick(() => {
+            dadosCotacao.value = res.data;
+        })
     }).catch((err) => {
         console.log(err)
     });
 }
-
 </script>
 
 <template>
     <div class="conteudo">
-        <h3>Cotações Atualizadas (atualizado as {{ new Date(dadosCotacao[0].DataAtualizacao).getHours() }}:{{ new Date(dadosCotacao[0].DataAtualizacao).getMinutes() }}):</h3>
-        <ol>
-            <li>{{ dadosCotacao[0].Ativo }}: R${{ dadosCotacao[0].ValorAtual }}</li>
-            <li>{{ dadosCotacao[1].Ativo }}: R${{ dadosCotacao[1].ValorAtual }}</li>
-            <li>{{ dadosCotacao[2].Ativo }}: ${{ dadosCotacao[2].ValorAtual }}</li>
+        <h3>Cotações Atualizadas:</h3>
+        <ol v-for="cot of dadosCotacao">
+            <li>{{ cot.Ativo }}: {{ cot.Ativo == 'Ouro/USD' ? '$' : 'R$' }}{{ cot.ValorAtual }}</li>
         </ol>
     </div>
 </template>
@@ -33,7 +32,7 @@ function loadCotacoes() {
 <style scoped>
 div.conteudo {
     position: absolute;
-    transform: translateX(40vw);
+    transform: translate(45vw, -10vh);
 }
 
 li {
