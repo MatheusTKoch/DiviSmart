@@ -19,7 +19,7 @@ function verifyUser() {
         usID: localStorage.getItem('usID'),
         sID: localStorage.getItem('sID'),
         exp: localStorage.getItem('exp')
-    }).then((res) => {
+    }).then(() => {
         loadUser();
         loadHorario();
     }).catch((err) => {

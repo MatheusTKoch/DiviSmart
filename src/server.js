@@ -6,6 +6,7 @@ import session from 'express-session';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import cron from 'node-cron';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -307,11 +308,15 @@ app.post("/ativos_load", async (req, res) => {
 
 app.post("/cotacoes_load", async (req, res) => {
     try {
+        cron.schedule('*/1 * * * *', async () => {
+            console.log('teste')
+        });
+
         const sql_cotacao = `SELECT * FROM cotacoes`;
         const cotacaoResult = await queryDatabase(sql_cotacao);
 
         if (!cotacaoResult || cotacaoResult.length === 0) {
-            return res.status(401).send("Erro ao selecionar cotacoes");
+            return res.status(401).send("Erro ao pesquisar cotacoes");
         }
 
         res.status(200).send(cotacaoResult);
