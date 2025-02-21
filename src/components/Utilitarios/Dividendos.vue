@@ -174,7 +174,7 @@ async function verifyUser() {
             <title id="title_grafico">Gráfico de Proventos em barras</title>
             <svg v-if="showGraph" version="1.1" xmlns="http://www.w3.org/2000/svg" class="svg_grafico" width="800" height="280" viewBox="0 0 800 400">
                 <g v-for="(item, index) in dadosPorMes" :key="item.mes">
-                    <text :x="index * groupWidth + groupWidth/2" y="50" text-anchor="middle" font-size="20" fill="white">
+                    <text :x="index * groupWidth + groupWidth/2" y="30" text-anchor="middle" font-size="20" fill="white">
                         Mês: {{ item.mes }}
                     </text>
                     <rect v-if="item.acao"
