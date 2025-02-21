@@ -15,6 +15,14 @@ let editCarteira = ref(false);
 let idCarteira = ref();
 let loading = ref(true);
 
+function abrirModal() {
+  showCarteira.value = true;
+}
+
+function fecharModal() {
+  showCarteira.value = false;
+}
+
 defineProps({
     cID: Number
 })
@@ -94,7 +102,7 @@ function sendID(num: number) {
             <div class="titulos-carteira">
                 <div class="texto-titulo">Carteiras</div>
                 <div class="subtexto-titulo">Visualize, edite ou exclua suas carteiras cadastradas!</div>
-                <button class="carteira" @click="showCarteira = true" :disabled="showCarteira">Adicionar Carteira</button>
+                <button class="carteira" @click="abrirModal()" :disabled="showCarteira">Adicionar Carteira</button>
             </div>
             <div class="carteira-lista">Suas Carteiras:</div>
             <div>
@@ -107,7 +115,7 @@ function sendID(num: number) {
                 </ol>
             </div>
             <div class="modal">
-                <Modal @mostrarModal="showCarteira = false" v-if="showCarteira"></Modal>
+                <Modal v-if="showCarteira" @fecharModal="fecharModal" />
             </div>
         </div>
         <div class="ativos">

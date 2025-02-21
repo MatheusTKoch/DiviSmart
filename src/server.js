@@ -26,18 +26,18 @@ const cookie_life = 10 * 3600000;
 const caminhoCompletoCotacao = path.resolve(__dirname, '..', 'src', 'scripts', 'scrapers', 'cotacoes_dados.js');
 
 cron.schedule('*/2 * * * *', async () => {
-    console.log(caminhoCompleto)
+    console.log("Cron disparado. Caminho:", caminhoCompletoCotacao);
     exec(`node ${caminhoCompletoCotacao}`, (error, stdout, stderr) => {
-        if (error) {
-            console.error(`Erro ao executar script: ${error.message}`);
-            return res.status(500).send("Erro ao executar script de cotações");
-        }
-        if (stderr) {
-            console.error(`STDERR: ${stderr}`);
-        }
-            console.log(`STDOUT: ${stdout}`);
-        });
+      if (error) {
+        console.error(`Erro ao executar script: ${error.message}`);
+        return;
+      }
+      if (stderr) {
+        console.error(`STDERR: ${stderr}`);
+      }
+      console.log(`STDOUT: ${stdout}`);
     });
+  });
 
 app.use(cors({origin:"http://localhost:5173"}));
 app.use(bodyParser.urlencoded({extended: true}));
