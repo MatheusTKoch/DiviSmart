@@ -9,6 +9,7 @@ DiviSmart é uma aplicação web desenvolvida em [**VueJS**](https://vuejs.org/)
 - [Tecnologias](#tecnologias)
 - [Pré-requisitos](#pré-requisitos)
 - [Instalação](#instalação)
+- [Próximos Passos](#próximos-passos)
 
 ## Visão Geral
 
@@ -71,3 +72,10 @@ Execute o script principal:
 ```bash
     node script.js
 ```
+
+### 4. Próximos Passos
+
+- **Finalizar a Seção de Relatórios:** Implementar gráficos interativos e exportação de dados.
+- **Atualização Automática de Cotações:** Configurar web scraping periódico para atualização dos valores dos ativos.
+- **Aprimoramento da UX/UI:** Melhorar a responsividade, adicionar animações e feedbacks visuais.
+- **Hospedagem Pública:** Planejar a implantação para que o projeto seja acessível publicamente.
