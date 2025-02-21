@@ -188,6 +188,29 @@ app.post("/carteira_name", async(req, res) => {
         console.error("Erro ao pesquisar carteiras: ", err);
         res.status(500).send("Erro interno no servidor");
     }
+});
+
+app.post("/carteira_dados", async(req, res) => {
+    try {
+        const sql_valores = `select sum(ValorInvestido) from ativos_acoes where carteiraID = ${req.body.cID} and deletedAt IS NULL;`;
+        const valoresResult = await queryDatabase(sql_valores);
+
+        if (!valoresResult || valoresResult.length === 0) {
+            return res.status(401).send("Erro ao carregar valores da carteira");
+        }
+
+        const sql_count = `select count(ValorInvestido) from ativos_acoes where carteiraID = ${req.body.cID} and deletedAt IS NULL;`;
+        const valoresCount = await queryDatabase(sql_count);
+
+        if (!valoresCount || valoresCount.length === 0) {
+            return res.status(401).send("Erro ao carregar quantidade de ativos da carteira");
+        }
+
+        res.status(200).send({valores: valoresResult, quantidade: valoresCount});
+    }   catch (err) {
+        console.error("Erro ao pesquisar carteiras: ", err);
+        res.status(500).send("Erro interno no servidor");
+    }
 })
 
 app.post("/carteira_delete", async (req, res) => {

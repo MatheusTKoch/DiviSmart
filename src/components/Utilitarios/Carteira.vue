@@ -141,6 +141,7 @@ function sendID(num: number) {
         list-style-type: none;
         cursor: pointer;
         font-size: large;
+        transform: translateX(20vw);
     }
 
     div.ativos {
@@ -178,6 +179,7 @@ function sendID(num: number) {
         white-space: nowrap;
         padding: 10%;
         text-decoration: underline;
+        transform: translateX(19.5vw);
     }
 
     button.carteira {
@@ -186,6 +188,7 @@ function sendID(num: number) {
         border-color: ghostwhite;
         margin: 10px;
         font-size: large;
+        transform: translateX(20vw);
     }
 
     button.carteira:hover {
