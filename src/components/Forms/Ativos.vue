@@ -64,8 +64,10 @@ function cadastroAcao() {
         valorInvestido: valorInvestidoAcao.value,
         cID: sessionStorage.getItem('cID'),
         acaoID: idAcao.value
-    }).then((res) => {
-        console.log(res);
+    }).then(() => {
+        nextTick(() => {
+            loadDadosCarteira();
+        });
         exibirToast('Ativo cadastrado com sucesso!', true);
     }).catch((err) => {
         console.log(err);
@@ -85,8 +87,10 @@ function cadastroFii() {
             valorInvestido: valoInvestidoFii.value,
             cID: sessionStorage.getItem('cID'),
             fiiID: idFii.value
-        }).then((res) => {
-            console.log(res);
+        }).then(() => {
+            nextTick(() => {
+            loadDadosCarteira();
+            });
             exibirToast('Ativo cadastrado com sucesso!', true);
         }).catch((err) => {
             console.log(err);
@@ -105,8 +109,10 @@ function cadastroTesouro() {
             valorInvestido: valorInvestidoTesouro.value,
             cID: sessionStorage.getItem('cID'),
             tesID: idTesouro.value
-        }).then((res) => {
-            console.log(res);
+        }).then(() => {
+            nextTick(() => {
+            loadDadosCarteira();
+            });
             exibirToast('Ativo cadastrado com sucesso!', true);
         }).catch((err) => {
             console.log(err);
@@ -146,7 +152,7 @@ function recarregar() {
         <path d="m287-446.67 240 240L480-160 160-480l320-320 47 46.67-240 240h513v66.66H287Z"/>
     </svg>
 </div>
-<div class="dados_carteira">Valor Total Investido: R$ {{ dadosCarteira?.valores?.[0]?.['sum(ValorInvestido)'] }} Quantidade de Ativos: {{ dadosCarteira?.quantidade?.[0]?.['count(ValorInvestido)'] }}</div>
+<div class="dados_carteira">Valor Total Investido: R$ {{ dadosCarteira?.valores }} Quantidade de Ativos Cadastrados: {{ dadosCarteira?.quantidade }}</div>
 <div class="conteudo">
     <h2 class="titulo_carteira">Editar Carteira - {{ cartNome }}</h2>
     <div class="acoes">

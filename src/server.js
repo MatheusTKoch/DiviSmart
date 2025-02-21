@@ -198,28 +198,62 @@ app.post("/carteira_name", async(req, res) => {
     }
 });
 
-app.post("/carteira_dados", async(req, res) => {
+app.post("/carteira_dados", async (req, res) => {
     try {
-        const sql_valores = `select sum(ValorInvestido) from ativos_acoes where carteiraID = ${req.body.cID} and deletedAt IS NULL;`;
-        const valoresResult = await queryDatabase(sql_valores);
-
-        if (!valoresResult || valoresResult.length === 0) {
-            return res.status(401).send("Erro ao carregar valores da carteira");
-        }
-
-        const sql_count = `select count(ValorInvestido) from ativos_acoes where carteiraID = ${req.body.cID} and deletedAt IS NULL;`;
-        const valoresCount = await queryDatabase(sql_count);
-
-        if (!valoresCount || valoresCount.length === 0) {
-            return res.status(401).send("Erro ao carregar quantidade de ativos da carteira");
-        }
-
-        res.status(200).send({valores: valoresResult, quantidade: valoresCount});
-    }   catch (err) {
-        console.error("Erro ao pesquisar carteiras: ", err);
-        res.status(500).send("Erro interno no servidor");
+      const sql_valoresAcao = `select sum(ValorInvestido) as totalAcao from ativos_acoes where carteiraID = ${req.body.cID} and deletedAt IS NULL;`;
+      const valoresAcaoResult = await queryDatabase(sql_valoresAcao);
+  
+      const sql_valoresFii = `select sum(ValorInvestido) as totalFii from ativos_fii where carteiraID = ${req.body.cID} and deletedAt IS NULL;`;
+      const valoresFiiResult = await queryDatabase(sql_valoresFii);
+  
+      const sql_valoresTesouro = `select sum(ValorInvestido) as totalTesouro from ativos_tesouro where carteiraID = ${req.body.cID} and deletedAt IS NULL;`;
+      const valoresTesouroResult = await queryDatabase(sql_valoresTesouro);
+  
+      if (!valoresAcaoResult || valoresAcaoResult.length === 0) {
+        return res.status(401).send("Erro ao carregar valores da carteira - Acao");
+      }
+      if (!valoresFiiResult || valoresFiiResult.length === 0) {
+        return res.status(401).send("Erro ao carregar valores da carteira - Fii");
+      }
+      if (!valoresTesouroResult || valoresTesouroResult.length === 0) {
+        return res.status(401).send("Erro ao carregar valores da carteira - Tesouro");
+      }
+  
+      const sql_countAcoes = `select count(ValorInvestido) as countAcao from ativos_acoes where carteiraID = ${req.body.cID} and deletedAt IS NULL;`;
+      const valoresAcaoCount = await queryDatabase(sql_countAcoes);
+  
+      const sql_countFii = `select count(ValorInvestido) as countFii from ativos_fii where carteiraID = ${req.body.cID} and deletedAt IS NULL;`;
+      const valoresFiiCount = await queryDatabase(sql_countFii);
+  
+      const sql_countTesouro = `select count(ValorInvestido) as countTesouro from ativos_tesouro where carteiraID = ${req.body.cID} and deletedAt IS NULL;`;
+      const valoresTesouroCount = await queryDatabase(sql_countTesouro);
+  
+      if (!valoresAcaoCount || valoresAcaoCount.length === 0) {
+        return res.status(401).send("Erro ao carregar quantidade de ativos da carteira - Acao");
+      }
+      if (!valoresFiiCount || valoresFiiCount.length === 0) {
+        return res.status(401).send("Erro ao carregar quantidade de ativos da carteira - Fii");
+      }
+      if (!valoresTesouroCount || valoresTesouroCount.length === 0) {
+        return res.status(401).send("Erro ao carregar quantidade de ativos da carteira - Tesouro");
+      }
+  
+      const totalAcao = valoresAcaoResult[0].totalAcao || 0;
+      const totalFii = valoresFiiResult[0].totalFii || 0;
+      const totalTesouro = valoresTesouroResult[0].totalTesouro || 0;
+      const totalInvestido = totalAcao + totalFii + totalTesouro;
+  
+      const countAcao = valoresAcaoCount[0].countAcao || 0;
+      const countFii = valoresFiiCount[0].countFii || 0;
+      const countTesouro = valoresTesouroCount[0].countTesouro || 0;
+      const totalCount = countAcao + countFii + countTesouro;
+  
+      res.status(200).send({ valores: totalInvestido, quantidade: totalCount });
+    } catch (err) {
+      console.error("Erro ao pesquisar carteiras: ", err);
+      res.status(500).send("Erro interno no servidor");
     }
-})
+  });
 
 app.post("/carteira_delete", async (req, res) => {
     try {
