@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import axios from 'axios';
 import Toast from '../UI/Toast.vue';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, nextTick } from 'vue';
 
 let acoes = ref();
 let fii = ref();
@@ -20,11 +20,27 @@ let showToast = ref(false);
 let isSuccess = ref(false);       
 let isError = ref(false);         
 let toastMessage = ref(''); 
+let dadosCarteira = ref();
+
 
 onMounted(() => {
     loadAtivos();
     loadDados();
+    loadDadosCarteira();
 })
+
+function loadDadosCarteira() {
+    axios.post('http://localhost:8080/carteira_dados', {
+        cID: sessionStorage.getItem('cID')
+    }).then((res) => {
+        console.log(res.data)
+        nextTick(() => {
+            dadosCarteira.value = res.data;
+        })
+    }).catch((err) => {
+        console.log(err);
+    });
+};
 
 function exibirToast(mensagem: string, sucesso: boolean) {
   toastMessage.value = mensagem;
@@ -130,6 +146,7 @@ function recarregar() {
         <path d="m287-446.67 240 240L480-160 160-480l320-320 47 46.67-240 240h513v66.66H287Z"/>
     </svg>
 </div>
+<div class="dados_carteira">Valor Total Investido: R$ {{ dadosCarteira?.valores?.[0]?.['sum(ValorInvestido)'] }} Quantidade de Ativos: {{ dadosCarteira?.quantidade?.[0]?.['count(ValorInvestido)'] }}</div>
 <div class="conteudo">
     <h2 class="titulo_carteira">Editar Carteira - {{ cartNome }}</h2>
     <div class="acoes">
@@ -207,6 +224,12 @@ function recarregar() {
 </template>
 
 <style scoped>
+div.dados_carteira {
+    font-size: large;
+    white-space: nowrap;
+    transform: translateX(12vw);
+}
+
 button.salvar_acoes, button.salvar_fii, button.save_tesouro {
     padding: 0.2vw;
     font-size: large;
@@ -223,7 +246,7 @@ tr.titulo {
 
 h2.titulo_carteira {
     white-space: nowrap;
-    transform: translateX(4vw);
+    transform: translate(4vw, -10vh);
 }
 
 div.conteudo {
