@@ -227,7 +227,7 @@ function recarregar() {
 div.dados_carteira {
     font-size: large;
     white-space: nowrap;
-    transform: translateX(12vw);
+    transform: translateX(10vw);
 }
 
 button.salvar_acoes, button.salvar_fii, button.save_tesouro {

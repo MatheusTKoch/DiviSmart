@@ -96,6 +96,7 @@ function loadHorario() {
         margin: 10px;
         font-size: large;
         margin-top: 5%;
+        transform: translateX(20vw);
     }
 
     button.carteira:hover {
@@ -121,7 +122,7 @@ function loadHorario() {
         position: relative;
         font-size: xx-large;
         left: 5%;
-        padding-bottom: 5vh;
+        padding-bottom: 2vh;
     }
 
     @media screen and (max-width: 480px){

@@ -70,14 +70,22 @@ app.use(session({
     try {
         const { email, nome, sobrenome, senha } = req.body;
         const sql_email = `SELECT * FROM USERS WHERE email = "${email}"`;
+        const sql_senha = `SELECT * FROM USERS WHERE Password = "${senha}"`;
         const sql_registro = `INSERT INTO USERS (email, nome, sobrenome, password) VALUES ("${email}", "${nome}", "${sobrenome}", "${senha}")`;
 
         const emailResult = await queryDatabase(sql_email);
+        const senhaResult = await queryDatabase(sql_senha)
 
         if (emailResult && emailResult.length > 0) {
             return res
                 .status(400)
                 .send("O email informado já foi utilizado!" );
+        }
+        
+        if (senhaResult && senhaResult.length > 0) {
+            return res
+                .status(400)
+                .send("A senha informada já foi utilizada!" );
         }
 
         const registroResult = await queryDatabase(sql_registro);
