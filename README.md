@@ -73,6 +73,12 @@ Execute o script principal:
     node script.js
 ```
 
+Este comando irá:
+
+- Criar o banco de dados
+- Criar todas as tabelas necessárias
+- Inserir dados iniciais via web scraping
+
 ### 4. Próximos Passos
 
 - **Finalizar a Seção de Relatórios:** Implementar gráficos interativos e exportação de dados.
