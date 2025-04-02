@@ -93,7 +93,12 @@ function showHide() {
 </script>
 
 <template>
-    <Header></Header> 
+    <Header></Header>
+        <a @click="router.push('/')" class="voltar_icon"> 
+            <svg xmlns="http://www.w3.org/2000/svg" height="40px" viewBox="0 -960 960 960" width="40px" fill="#FFFFFF">
+                <path d="m287-446.67 240 240L480-160 160-480l320-320 47 46.67-240 240h513v66.66H287Z"/>
+            </svg>
+        </a> 
         <p class="titulo">Cadastre-se</p>
         <div class="conteudo">
             <label for="email">Email:</label>
@@ -127,6 +132,13 @@ function showHide() {
 </template>
 
 <style scoped>
+    a.voltar_icon {
+        cursor: pointer;
+        position: relative;
+        top: 5vh;
+        left: 5vw;
+    }
+    
     svg.register_icon {
         position: relative;
         top: 0.75vh;
