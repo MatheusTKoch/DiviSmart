@@ -9,7 +9,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 dotenv.config({path: path.resolve(__dirname, '../../../.env')});
 
-const FUNDAMENTUS_URL = 'https://www.fundamentus.com.br/resultado.php';
+const FUNDAMENTUS_URL = process.env.VITE_URL_ACOES;
 
 const db = new Pool({
     database: process.env.VITE_DATABASE_DB, 
@@ -50,16 +50,17 @@ async function consultaDadosFundamentus() {
         return [];
     }
 }
-
+ 
 async function insertDados() {
     let client;
     try {
         client = await db.connect();
         
-        // SQL: PostgreSQL com $1, $2, e UPSERT
         const sql = `
             INSERT INTO acoes (ticker, descricao) 
-            VALUES ($1, $2);
+            VALUES ($1, $2)
+            ON CONFLICT (ticker) 
+            DO UPDATE SET descricao = EXCLUDED.descricao;
         `;
 
         const dadosFinal = await consultaDadosFundamentus(); 
