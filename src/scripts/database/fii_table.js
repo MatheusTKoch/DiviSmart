@@ -19,7 +19,7 @@ async function createFiiSchema() {
     const sql_fundo_imobiliario = `
         CREATE TABLE IF NOT EXISTS fundo_imobiliario (
             fundoimobiliarioid SERIAL PRIMARY KEY,
-            ticker VARCHAR(7) NOT NULL,
+            ticker VARCHAR(7) NOT NULL UNIQUE,
             segmento TEXT NOT NULL
         );
     `;

@@ -19,7 +19,7 @@ async function createTablesIfNotExists() {
     const sql_acoes = `
         CREATE TABLE IF NOT EXISTS acoes (
             acaoid SERIAL PRIMARY KEY,
-            ticker VARCHAR(6) NOT NULL,
+            ticker VARCHAR(6) NOT NULL UNIQUE,
             descricao TEXT NOT NULL
         );
     `;
