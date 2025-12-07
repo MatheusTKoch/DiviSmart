@@ -31,7 +31,7 @@ async function createTables() {
     const sql_cotacoes = `
         CREATE TABLE IF NOT EXISTS cotacoes (
             cotacaoid SERIAL PRIMARY KEY,
-            ativo TEXT NOT NULL,
+            ativo TEXT NOT NULL UNIQUE,
             valoratual NUMERIC(15, 2) NOT NULL,
             dataatualizacao TIMESTAMP WITHOUT TIME ZONE NOT NULL
         );

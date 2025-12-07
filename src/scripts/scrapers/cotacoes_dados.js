@@ -1,115 +1,118 @@
-import mysql from 'mysql2/promise';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { Pool } from 'pg'; 
 import axios from 'axios';
-import * as cherrio from 'cheerio';
+import * as cheerio from 'cheerio'; 
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 dotenv.config({path: path.resolve(__dirname, '../../../.env')});
 
-const db = mysql.createConnection({
+const db = new Pool({
     database: process.env.VITE_DATABASE_DB, 
     user: process.env.VITE_USER_DB, 
     password: process.env.VITE_PASSWORD_DB, 
     host: process.env.VITE_HOST_DB
 });
 
-const URL_DOLAR = process.env.VITE_URL_COTACAO_DOLAR;
-const URL_BITCOIN = process.env.VITE_URL_COTACAO_BITCOIN;
-const URL_OURO = process.env.VITE_URL_COTACAO_OURO;
+const BASE_URL_COTACOES = process.env.VITE_URL_COTACOES; 
 
-async function initDB() {
-    const connection = await db;
-    return connection;
-  }
+const ATIVOS_YAHOO = {
+    'Ouro/USD': 'GC=F', 
+    'Ibovespa': '^BVSP',
+    'DowJones': '^DJI'
+};
 
-  function parseFormattedNumber(input) {
+
+function parseFormattedNumber(input) {
     let cleaned = input.replace(/[^\d.,]/g, '');
     cleaned = cleaned.replace(/,/g, '');
     const parts = cleaned.split('.');
-    const integerPart = parts[0] || '0';
-    const decimalPart = parts[1] ? parts[1].substring(0,2) : '00';
-    return integerPart + '.' + decimalPart;
-  }  
+    if (parts.length > 2) {
+        cleaned = parts.slice(0, -1).join('') + '.' + parts.pop();
+    }
+    return parseFloat(cleaned);
+} 
 
-async function upsertQuote(connection, ativo, valor, dataAtualizacao) {
-    const [updateResult] = await connection.execute(
-        'UPDATE cotacoes SET ValorAtual = ?, DataAtualizacao = ? WHERE Ativo = ?',
-        [valor, dataAtualizacao, ativo]
-    );
-    if (updateResult.affectedRows === 0) {
-        await connection.execute(
-            'INSERT INTO cotacoes (Ativo, ValorAtual, DataAtualizacao) VALUES (?, ?, ?)',
-            [ativo, valor, dataAtualizacao]
-        );
-        console.log(`Inserido novo ativo ${ativo} com valor ${valor}`);
-    } else {
-        console.log(`Atualizado ${ativo} para o valor ${valor}`);
+async function upsertQuote(client, ativo, valor, dataAtualizacao) {
+    const sql = `
+        INSERT INTO cotacoes ("ativo", "valoratual", "dataatualizacao") 
+        VALUES ($1, $2, $3)
+        ON CONFLICT ("ativo") 
+        DO UPDATE SET 
+            "valoratual" = EXCLUDED."valoratual", 
+            "dataatualizacao" = EXCLUDED."dataatualizacao";
+    `;
+    
+    const params = [ativo, valor, dataAtualizacao];
+    
+    try {
+        await client.query(sql, params);
+        console.log(`Cotação atualizada/inserida para ${ativo} com valor ${valor}`);
+    } catch (error) {
+        console.error(`Erro ao fazer UPSERT para ${ativo}:`, error.message);
     }
 }
 
-async function scrapeUSDBRL(connection) {
+async function scrapeAndUpsertYahooQuote(client, ativo, ticker) {
+    if (!BASE_URL_COTACOES) {
+        console.error("Erro: VITE_URL_COTACOES não configurada.");
+        return;
+    }
+    
+    const url = `${BASE_URL_COTACOES}${ticker}`;
+    
     try {
-        const response = await axios.get(URL_DOLAR, {
-            headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' }
+        console.log(`Buscando ${ativo} em: ${url}`);
+
+        const response = await axios.get(url, {
+            headers: {'User-Agent': 'Mozilla/5.0'} 
         });
-        const $ = cherrio.load(response.data);
-        const rateText = $('.ccOutputRslt').first().text().trim();
-        const match = rateText.match(/([\d,.]+)/);
-        if (match) {
-            const rate = parseFloat(match[1].replace(',', ''));
-            console.log("USD/BRL:", rate);
+        const $ = cheerio.load(response.data);
+        
+        const priceSelector = 'fin-streamer[data-field="regularMarketPrice"]'; 
+        const fallbackSelector = 'div[data-test="instrument-price-last"]'; 
+
+        let priceText = $(priceSelector).first().attr('value') || $(priceSelector).first().text().trim();
+        
+        if (!priceText) {
+             priceText = $(fallbackSelector).first().text().trim();
+        }
+
+        const valor = parseFormattedNumber(priceText);
+        
+        if (valor && !isNaN(valor)) {
             const now = new Date();
-            await upsertQuote(connection, 'USD/BRL', rate, now);
+            await upsertQuote(client, ativo, valor, now);
         } else {
-            console.error("Não foi possível extrair a cotação do dólar.");
+            console.error(`Não foi possível extrair a cotação para ${ativo}. Valor extraído: "${priceText}"`);
         }
     } catch (error) {
-        console.error("Erro ao fazer scraping de USD/BRL:", error.message);
-    }
-}
-
-async function scrapeBitcoin(connection) {
-    try {
-        const response = await axios.get(URL_BITCOIN, {
-            headers: { 'User-Agent': 'Mozilla/5.0' }
-        });
-        const $ = cherrio.load(response.data);
-        let priceText = $('.tabular-nums').first().text().trim();
-        const price = parseFormattedNumber(priceText);
-        console.log('Bitcoin:', price);
-        const now = new Date();
-        await upsertQuote(connection, 'Bitcoin', price, now);
-    } catch (error) {
-        console.error('Erro ao fazer scraping do Bitcoin:', error.message);
-    }
-}
-
-async function scrapeGold(connection) {
-    try {
-        const response = await axios.get(URL_OURO, {
-            headers: { 'User-Agent': 'Mozilla/5.0' }
-        });
-        const $ = cherrio.load(response.data);
-        let priceText = $('div[data-test="instrument-price-last"]').first().text().trim();
-        priceText = priceText.replace(/,/g, '');
-        const price = parseFloat(priceText);
-        console.log('Gold:', price);
-        const now = new Date();
-        await upsertQuote(connection, 'Ouro/USD', price, now);
-    } catch (error) {
-        console.error('Erro ao fazer scraping do Ouro:', error.message);
+        console.error(`Erro ao fazer scraping do Yahoo para ${ativo}: Request failed with status code ${error.response ? error.response.status : 'N/A'}`);
     }
 }
 
 async function main() {
-    const connection = await initDB();
-    await scrapeUSDBRL(connection);
-    await scrapeBitcoin(connection);
-    await scrapeGold(connection);
-    await connection.end();
+    let client;
+    try {
+        client = await db.connect(); 
+        
+        console.log('\n--- 📈 Iniciando Scraping Unificado do Yahoo Finance ---');
+        
+        for (const [ativo, ticker] of Object.entries(ATIVOS_YAHOO)) {
+            await scrapeAndUpsertYahooQuote(client, ativo, ticker);
+        }
+        
+    } catch (error) {
+        console.error('Erro geral na execução:', error.message);
+    } finally {
+        if (client) {
+            client.release(); 
+        }
+        await db.end();
+        console.log('\nProcesso finalizado e conexão encerrada.');
+    }
 }
 
 main();
