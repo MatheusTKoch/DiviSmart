@@ -7,9 +7,9 @@ import * as cheerio from 'cheerio';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-dotenv.config({path: path.resolve(__dirname, '../../../.env')});
+dotenv.config({path: path.resolve(__dirname, '../../../.env')}); 
 
-const FUNDAMENTUS_URL = process.env.VITE_URL_ACOES;
+const FUNDAMENTUS_URL = process.env.VITE_URL_ACOES; 
 
 const db = new Pool({
     database: process.env.VITE_DATABASE_DB, 
@@ -18,7 +18,7 @@ const db = new Pool({
     host: process.env.VITE_HOST_DB
 });
 
-async function consultaDadosFundamentus() {
+async function consultaDadosFundamentusDetalhes() {
     try {
         const dados = [];
         console.log(`Buscando dados em: ${FUNDAMENTUS_URL}`);
@@ -29,12 +29,12 @@ async function consultaDadosFundamentus() {
         
         const dataScrape = cheerio.load(res.data);
 
-        const tableSelector = 'table:first';
+        const tableRowSelector = 'table:first tbody tr'; 
         
-        dataScrape(tableSelector + ' tbody tr').each((index, element) => {
+        dataScrape(tableRowSelector).each((index, element) => {
             const $el = dataScrape(element);
-            
-            const ticker = $el.find('td:nth-child(1) a').text().trim();
+
+            const ticker = $el.find('td:nth-child(1) a').text().trim(); 
             
             const descricao = $el.find('td:nth-child(2)').text().trim(); 
 
@@ -46,11 +46,15 @@ async function consultaDadosFundamentus() {
         console.log(`Dados raspados: ${dados.length} ações.`);
         return dados;
     } catch (err) {
-        console.error("Erro na requisição do Fundamentus:", err.message);
+        if (err.response && err.response.status === 403) {
+            console.error("Erro 403: Acesso negado. Tente usar um User-Agent diferente ou um proxy.");
+        } else {
+             console.error("Erro na requisição do Fundamentus:", err.message);
+        }
         return [];
     }
 }
- 
+
 async function insertDados() {
     let client;
     try {
@@ -63,7 +67,7 @@ async function insertDados() {
             DO UPDATE SET descricao = EXCLUDED.descricao;
         `;
 
-        const dadosFinal = await consultaDadosFundamentus(); 
+        const dadosFinal = await consultaDadosFundamentusDetalhes(); 
 
         for (const stock of dadosFinal) {
             await client.query(sql, [stock.ticker, stock.descricao]);
