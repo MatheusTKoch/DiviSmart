@@ -48,7 +48,9 @@ async function createFiiSchema() {
             valorpagamento NUMERIC(15, 2),
             fiid INT NOT NULL,
             
-            FOREIGN KEY (fiid) REFERENCES fundo_imobiliario("fundoimobiliarioid")
+            FOREIGN KEY (fiid) REFERENCES fundo_imobiliario("fundoimobiliarioid"),
+
+            UNIQUE(fiid, datapagamento)
         );
     `;
     

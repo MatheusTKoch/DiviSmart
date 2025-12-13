@@ -50,7 +50,9 @@ async function createTesouroSchema() {
             valorpagamento NUMERIC(15, 2),
             tesouroid INT NOT NULL,
             
-            FOREIGN KEY (tesouroid) REFERENCES tesouro_direto("tesouroid")
+            FOREIGN KEY (tesouroid) REFERENCES tesouro_direto("tesouroid"),
+
+            UNIQUE(tesouroid, datapagamento)
         );
     `;
     

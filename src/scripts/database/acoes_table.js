@@ -48,7 +48,9 @@ async function createTablesIfNotExists() {
             valorpagamento NUMERIC(15, 2),
             acaoid INT NOT NULL,
             
-            FOREIGN KEY (acaoid) REFERENCES acoes("acaoid")
+            FOREIGN KEY (acaoid) REFERENCES acoes("acaoid"),
+
+            UNIQUE(acaoid, datapagamento)
         );
     `;
     
