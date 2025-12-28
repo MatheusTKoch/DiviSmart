@@ -139,6 +139,7 @@ async function executar() {
             client.release();
         }
         await db.end(); 
+        process.exit(0);
     }
 }
 

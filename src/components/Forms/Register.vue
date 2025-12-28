@@ -57,7 +57,7 @@ async function register() {
         dados.append('senha', senha.value);
         dados.append('nome', nome.value);
         dados.append('sobrenome', sobrenome.value);
-        await axios.post('http://localhost:8080/users_register', dados).then((res) => {
+        await axios.post('http://localhost:3000/users_register', dados).then((res) => {
             if (res.status == 200) {
                 router.push('menu');
             }

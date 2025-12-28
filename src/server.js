@@ -12,6 +12,7 @@ import { exec } from 'child_process';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 const pool = new Pool({
@@ -25,22 +26,7 @@ const pool = new Pool({
 const app = express();
 const cookie_life = 10 * 3600000;
 
-const caminhoCompletoCotacao = path.resolve(__dirname, '..', 'src', 'scripts', 'scrapers', 'cotacoes_dados.js');
-
-//Comentado por enquanto para validar
-// cron.schedule('*/2 * * * *', async () => {
-//     console.log("Cron disparado. Caminho:", caminhoCompletoCotacao);
-//     exec(`node ${caminhoCompletoCotacao}`, (error, stdout, stderr) => {
-//         if (error) {
-//             console.error(`Erro ao executar script: ${error.message}`);
-//             return;
-//         }
-//         if (stderr) {
-//             console.error(`STDERR: ${stderr}`);
-//         }
-//         console.log(`STDOUT: ${stdout}`);
-//     });
-// });
+const caminhoCompletoCotacao = path.resolve(__dirname, 'scripts', 'scrapers', 'cotacoes_dados.js');
 
 app.use(cors({ origin: "http://localhost:5173" }));
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -50,7 +36,7 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     cookie: {
-        secure: false, 
+        secure: false, // Em desenvolvimento local/docker sem HTTPS, manter false
         maxAge: cookie_life
     }
 }));
@@ -60,28 +46,23 @@ const queryDatabase = async (text, params) => {
     return res.rows; 
 };
 
+// --- ROTAS ---
 app.post("/users_register", async (req, res) => {
     try {
         const { email, nome, sobrenome, senha } = req.body;
 
-        const emailResult = await queryDatabase('SELECT * FROM USERS WHERE email = $1', [email]);
-        const senhaResult = await queryDatabase('SELECT * FROM USERS WHERE password = $1', [senha]);
+        const emailResult = await queryDatabase('SELECT * FROM users WHERE email = $1', [email]);
+        const senhaResult = await queryDatabase('SELECT * FROM users WHERE password = $1', [senha]);
 
-        if (emailResult.length > 0) {
-            return res.status(400).send("O email informado já foi utilizado!");
-        }
+        if (emailResult.length > 0) return res.status(400).send("O email informado já foi utilizado!");
+        if (senhaResult.length > 0) return res.status(400).send("A senha informada já foi utilizada!");
 
-        if (senhaResult.length > 0) {
-            return res.status(400).send("A senha informada já foi utilizada!");
-        }
-
-        const registroSql = 'INSERT INTO USERS (email, nome, sobrenome, password) VALUES ($1, $2, $3, $4) RETURNING "userid"';
+        const registroSql = 'INSERT INTO users (email, nome, sobrenome, password) VALUES ($1, $2, $3, $4) RETURNING userid';
         const registroResult = await queryDatabase(registroSql, [email, nome, sobrenome, senha]);
 
         if (registroResult.length > 0) {
             const userID = registroResult[0].userid;
             req.session.usuario = userID;
-            console.log("Sucesso! UserID:", userID);
             res.status(200).send({ usID: req.session.usuario, exp: req.session.cookie.expires, sID: req.sessionID });
         } else {
             throw new Error("Erro ao inserir usuário!");
@@ -95,24 +76,18 @@ app.post("/users_register", async (req, res) => {
 app.post("/users_login", async (req, res) => {
     try {
         const { email, senha } = req.body;
-        const userResult = await queryDatabase('SELECT * FROM USERS WHERE email = $1', [email]);
+        const userResult = await queryDatabase('SELECT * FROM users WHERE email = $1', [email]);
 
-        if (userResult.length === 0) {
-            return res.status(404).send("Email não encontrado");
-        }
-
-        if (userResult[0].password !== senha) {
-            return res.status(401).send("Senha incorreta!");
-        }
+        if (userResult.length === 0) return res.status(404).send("Email não encontrado");
+        if (userResult[0].password !== senha) return res.status(401).send("Senha incorreta!");
 
         const userID = userResult[0].userid;
         req.session.usuario = userID;
 
         const expires = new Date(req.session.cookie.expires).toISOString();
-        const sql_session = 'INSERT INTO user_session ("expires", "sessionid", "sessiondata", "userid") VALUES ($1, $2, $3, $4)';
+        const sql_session = 'INSERT INTO user_session (expires, sessionid, sessiondata, userid) VALUES ($1, $2, $3, $4)';
         await queryDatabase(sql_session, [expires, req.sessionID, JSON.stringify(req.session), userID]);
 
-        console.log("Login com sucesso! UserID:", userID);
         res.status(200).send({ usID: req.session.usuario, exp: req.session.cookie.expires, sID: req.sessionID });
     } catch (err) {
         console.error("Erro ao autenticar usuário:", err);
@@ -122,7 +97,7 @@ app.post("/users_login", async (req, res) => {
 
 app.post("/carteira_load", async (req, res) => {
     try {
-        const sql = 'SELECT * FROM carteiras WHERE "userid" = $1 AND "deletedat" IS NULL';
+        const sql = 'SELECT * FROM carteiras WHERE userid = $1 AND deletedat IS NULL';
         const result = await queryDatabase(sql, [req.body.userID]);
         res.status(200).send(result);
     } catch (err) {

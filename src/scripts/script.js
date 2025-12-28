@@ -6,7 +6,7 @@ import fs from "fs";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const diretorios = ["database", "scrapers"];
+const DB_LOCK_FILE = path.join(__dirname, ".database_initialized.lock");
 
 const ORDEM_DATABASE = [
     "database.js",
@@ -17,40 +17,58 @@ const ORDEM_DATABASE = [
     "tesouro_table.js"
 ];
 
-async function executarScripts() {
-    for (const dir of diretorios) {
-        const pasta = path.join(__dirname, dir);
-        let arquivos = [];
+async function rodarScript(diretorio, arquivo) {
+    const caminhoCompleto = path.join(__dirname, diretorio, arquivo);
+    console.log(`> Executando: ${diretorio}/${arquivo}`);
 
-        if (dir === "database") {
-            arquivos = ORDEM_DATABASE;
-        } else {
-            arquivos = fs.readdirSync(pasta).filter(file => file.endsWith(".js"));
-        }
-        
-        arquivos = arquivos.filter(arquivo => fs.existsSync(path.join(pasta, arquivo)));
-
-        for (const arquivo of arquivos) {
-            const caminhoCompleto = path.join(pasta, arquivo);
-            console.log(`Executando: ${dir}/${arquivo}`);
-
-            await new Promise((resolve, reject) => {
-                exec(`node "${caminhoCompleto}"`, (error, stdout, stderr) => {
-                    if (error) {
-                        console.error(`Erro ao executar ${arquivo}:`, error.message);
-                        return reject(error);
-                    }
-                    if (stderr) {
-                        console.error(`Erro no script ${arquivo}:`, stderr);
-                    }
-                    console.log(stdout);
-                    resolve();
-                });
-            });
-        }
-    }
-
-    console.log("Todos os scripts foram executados!");
+    return new Promise((resolve, reject) => {
+        exec(`node "${caminhoCompleto}"`, (error, stdout, stderr) => {
+            if (error) {
+                console.error(`Erro ao executar ${arquivo}:`, error.message);
+                return reject(error);
+            }
+            if (stderr) console.error(`Aviso em ${arquivo}:`, stderr);
+            if (stdout) console.log(stdout);
+            resolve();
+        });
+    });
 }
 
-executarScripts().catch(error => console.error("Erro geral:", error));
+async function executarScripts() {
+    try {
+        if (!fs.existsSync(DB_LOCK_FILE)) {
+            console.log("=== Inicializando Banco de Dados (Primeira Execução) ===");
+            for (const arquivo of ORDEM_DATABASE) {
+                const pastaDatabase = path.join(__dirname, "database");
+                if (fs.existsSync(path.join(pastaDatabase, arquivo))) {
+                    await rodarScript("database", arquivo);
+                }
+            }
+            fs.writeFileSync(DB_LOCK_FILE, `Banco criado em: ${new Date().toISOString()}`);
+            console.log("✓ Tabelas criadas e trava gerada.");
+        } else {
+            console.log("=== Banco de dados já inicializado anteriormente. Pulando criação de tabelas. ===");
+        }
+
+        console.log("=== Iniciando Scrapers ===");
+        const pastaScrapers = path.join(__dirname, "scrapers");
+        if (fs.existsSync(pastaScrapers)) {
+            const arquivosScrapers = fs.readdirSync(pastaScrapers).filter(file => file.endsWith(".js"));
+            for (const arquivo of arquivosScrapers) {
+                await rodarScript("scrapers", arquivo);
+            }
+        }
+
+        console.log("=== Todos os scripts foram finalizados! ===");
+    } catch (error) {
+        console.error("FALHA NA EXECUÇÃO:", error);
+        process.exit(1); 
+    }
+}
+
+executarScripts().then(() => {
+    console.log("Fluxo de inicialização completo.");
+}).catch(err => {
+    console.error("Erro no fluxo:", err);
+    process.exit(1);
+});
