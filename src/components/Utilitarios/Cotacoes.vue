@@ -9,7 +9,7 @@ onMounted(() => {
 })
 
 function loadCotacoes() {
-    axios.post('http://localhost:8080/cotacoes_load').then((res) => {
+    axios.post('http://localhost:3000/cotacoes_load').then((res) => {
         nextTick(() => {
             dadosCotacao.value = res.data;
         })

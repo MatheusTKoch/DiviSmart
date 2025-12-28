@@ -14,7 +14,7 @@ let email = ref('');
 let senha = ref('');
 
 function verifyUser() {
-    axios.post('http://localhost:8080/session', {
+    axios.post('http://localhost:3000/session', {
         usID: localStorage.getItem('usID'),
         sID: localStorage.getItem('sID'),
         exp: localStorage.getItem('exp')
@@ -48,7 +48,7 @@ async function login() {
         let dados = new URLSearchParams();
         dados.append('email', email.value);
         dados.append('senha', senha.value);
-        await axios.post('http://localhost:8080/users_login', dados).then((res) => {
+        await axios.post('http://localhost:3000/users_login', dados).then((res) => {
             if (res.status == 200) {
                 router.push('menu');
             }

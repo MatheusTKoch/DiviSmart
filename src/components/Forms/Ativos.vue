@@ -30,7 +30,7 @@ onMounted(() => {
 })
 
 function loadDadosCarteira() {
-    axios.post('http://localhost:8080/carteira_dados', {
+    axios.post('http://localhost:3000/carteira_dados', {
         cID: sessionStorage.getItem('cID')
     }).then((res) => {
         console.log(res.data)
@@ -59,7 +59,7 @@ function cadastroAcao() {
   } else if (isNaN(quantidadeAcao.value) || isNaN(valorInvestidoAcao.value)) {
     exibirToast('O valor investido e quantidade devem ser números!', false);
   } else {
-    axios.post('http://localhost:8080/acoes_cadastro', {
+    axios.post('http://localhost:3000/acoes_cadastro', {
         quantidade: quantidadeAcao.value,
         valorInvestido: valorInvestidoAcao.value,
         cID: sessionStorage.getItem('cID'),
@@ -82,7 +82,7 @@ function cadastroFii() {
     } else if (isNaN(quantidadeFii.value) || isNaN(valoInvestidoFii.value)) {
         exibirToast('O valor investido e quantidade devem ser informados somente com números, verifique e tente novamente!', false);
     } else {
-        axios.post('http://localhost:8080/fii_cadastro', {
+        axios.post('http://localhost:3000/fii_cadastro', {
             quantidade: quantidadeFii.value,
             valorInvestido: valoInvestidoFii.value,
             cID: sessionStorage.getItem('cID'),
@@ -104,7 +104,7 @@ function cadastroTesouro() {
     } else if (isNaN(quantidadeTesouro.value) || isNaN(valorInvestidoTesouro.value)) {
         exibirToast('O valor investido e quantidade devem ser informados somente com números, verifique e tente novamente!', false);
     } else {
-        axios.post('http://localhost:8080/tesouro_cadastro', {
+        axios.post('http://localhost:3000/tesouro_cadastro', {
             quantidade: quantidadeTesouro.value,
             valorInvestido: valorInvestidoTesouro.value,
             cID: sessionStorage.getItem('cID'),
@@ -121,7 +121,7 @@ function cadastroTesouro() {
 }
 
 function loadAtivos() {
-    axios.post('http://localhost:8080/ativos_load').then((res) => {
+    axios.post('http://localhost:3000/ativos_load').then((res) => {
         acoes.value = res.data.acoes;
         fii.value = res.data.fii;
         tesouro.value = res.data.tesouro;
@@ -131,7 +131,7 @@ function loadAtivos() {
 }
 
 function loadDados() {
-    axios.post('http://localhost:8080/carteira_name', {
+    axios.post('http://localhost:3000/carteira_name', {
         userID: localStorage.getItem('usID'),
         cID: sessionStorage.getItem('cID')
     }).then((res) => {

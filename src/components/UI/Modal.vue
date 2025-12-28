@@ -20,7 +20,7 @@ function cadastroCarteira() {
     dados.append('carteira', nomeCarteira.value);
     dados.append('userID', userID.value);
     axios
-      .post('http://localhost:8080/carteira', dados)
+      .post('http://localhost:3000/carteira', dados)
       .then(() => {
         fecharModal();
         window.location.reload();

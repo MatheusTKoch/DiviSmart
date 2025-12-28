@@ -96,7 +96,7 @@ onMounted(async () => {
 });
 
 async function loadCarteira() {
-    axios.post('http://localhost:8080/carteira_load', {
+    axios.post('http://localhost:3000/carteira_load', {
         userID: localStorage.getItem('usID')
     }).then((res) => {
         nextTick(() => {
@@ -113,7 +113,7 @@ function carregarRelatorio() {
     } else if (dataInicial.value > dataFinal.value) {
         alert('Data inicial maior que a final, verifique os dados!');
     } else {
-        axios.post('http://localhost:8080/dividendos_load', {
+        axios.post('http://localhost:3000/dividendos_load', {
             cID: idCarteira.value,
             dataInicial: dataInicial.value,
             dataFinal: dataFinal.value
@@ -131,7 +131,7 @@ function carregarRelatorio() {
 }
 
 async function verifyUser() {
-    axios.post('http://localhost:8080/session', {
+    axios.post('http://localhost:3000/session', {
         usID: localStorage.getItem('usID'),
         sID: localStorage.getItem('sID'),
         exp: localStorage.getItem('exp')

@@ -39,7 +39,7 @@ onMounted(async () => {
 })
 
 async function verifyUser() {
-    axios.post('http://localhost:8080/session', {
+    axios.post('http://localhost:3000/session', {
         usID: localStorage.getItem('usID'),
         sID: localStorage.getItem('sID'),
         exp: localStorage.getItem('exp')
@@ -60,7 +60,7 @@ async function verifyUser() {
 }
 
 async function loadCarteira() {
-    axios.post('http://localhost:8080/carteira_load', {
+    axios.post('http://localhost:3000/carteira_load', {
         userID: localStorage.getItem('usID')
     }).then((res) => {
         nextTick(() => {
@@ -73,7 +73,7 @@ async function loadCarteira() {
 
 function deleteCarteira(num:number) {
     if(confirm('Tem certeza que deseja apagar a carteira?')) {
-        axios.post('http://localhost:8080/carteira_delete', {
+        axios.post('http://localhost:3000/carteira_delete', {
             carteiraID: num
         }).then(() => {
             window.location.reload();

@@ -10,7 +10,7 @@ defineProps({
 });
 
 function clearUser() {
-    axios.post('http://localhost:8080/logout', {
+    axios.post('http://localhost:3000/logout', {
         usID: localStorage.getItem('usID'),
         sID: localStorage.getItem('sID')
     }).then((res) => {

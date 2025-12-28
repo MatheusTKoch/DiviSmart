@@ -23,7 +23,7 @@ let horario = ref('');
 let loading = ref(true);
 
 async function verifyUser() {
-    axios.post('http://localhost:8080/session', {
+    axios.post('http://localhost:3000/session', {
         usID: localStorage.getItem('usID'),
         sID: localStorage.getItem('sID'),
         exp: localStorage.getItem('exp')
@@ -45,7 +45,7 @@ async function verifyUser() {
 }
 
 function loadUser() {
-    axios.post('http://localhost:8080/users_load', {
+    axios.post('http://localhost:3000/users_load', {
         usID: localStorage.getItem('usID'),
     }).then((res) => {
         nextTick(() => {
