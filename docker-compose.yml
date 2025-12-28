@@ -1,0 +1,28 @@
+services:
+  # Serviço do Banco de Dados
+  db:
+    image: postgres:17
+    container_name: postgres_db
+    restart: always
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${VITE_USER_DB}
+      POSTGRES_PASSWORD: ${VITE_PASSWORD_DB}
+      POSTGRES_DB: ${VITE_DATABASE_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+
+  # Serviço do Servidor Express
+  api:
+    build: .
+    container_name: express_server
+    restart: always
+    ports:
+      - "${VITE_PORT}:${VITE_PORT}"
+    depends_on:
+      - db
+    env_file:
+      - .env
