@@ -12,6 +12,7 @@ onMounted(() => {
 const router = useRouter()
 let email = ref('');
 let senha = ref('');
+let showPassword = ref(false);
 
 function verifyUser() {
     axios.post('http://localhost:3000/session', {
@@ -32,13 +33,8 @@ function verifyUser() {
     });
 }
 
-function showHide() {
-    let element = (<HTMLInputElement>document.getElementById("password")).type;
-    if (element == "password") {
-        (<HTMLInputElement>document.getElementById("password")).type = "text";
-    } else {
-        (<HTMLInputElement>document.getElementById("password")).type = "password";
-    }
+const togglePassword = () => {
+    showPassword.value = !showPassword.value;
 }
 
 async function login() {
@@ -75,125 +71,258 @@ async function login() {
 </script>
 
 <template>
-    <Header></Header>
-        <a @click="router.push('/')" class="voltar_icon"> 
-            <svg xmlns="http://www.w3.org/2000/svg" height="40px" viewBox="0 -960 960 960" width="40px" fill="#FFFFFF">
-                <path d="m287-446.67 240 240L480-160 160-480l320-320 47 46.67-240 240h513v66.66H287Z"/>
-            </svg>
-        </a>
-        <p class="titulo">Login</p>
-            <div class="conteudo">
-                <label for="email">Email:</label>
-                <input type="email" name="email" v-model="email" required>
-                <label for="password">Senha:</label>
-                <input type="password" name="password" id="password" v-on:keypress.enter="login" v-model="senha" required>
-            <div class="pass">
-                <input type="checkbox" id="showPass" name="showPass" :onkeypress="showHide" :onclick="showHide"> 
-                <label for="showPass" class="passLabel">Mostrar Senha</label>
+  <div class="auth-container">
+    <Header />
+
+    <main class="auth-main">
+      <Motion 
+        :initial="{ opacity: 0, x: -20 }" 
+        :animate="{ opacity: 1, x: 0 }"
+        class="back-wrapper"
+      >
+        <button @click="router.push('/')" class="btn-back">
+          <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24" fill="currentColor">
+            <path d="m287-446.67 240 240L480-160 160-480l320-320 47 46.67-240 240h513v66.66H287Z"/>
+          </svg>
+          <span>Voltar</span>
+        </button>
+      </Motion>
+
+      <Motion 
+        tag="div"
+        class="login-card"
+        :initial="{ opacity: 0, y: 20 }"
+        :animate="{ opacity: 1, y: 0 }"
+        :transition="{ duration: 0.6 }"
+      >
+        <div class="card-header">
+          <h1 class="titulo">Bem-vindo de volta</h1>
+          <p class="subtitulo">Acesse sua conta DiviSmart</p>
+        </div>
+
+        <form class="conteudo" @submit.prevent="login">
+          <div class="input-group">
+            <label for="email">E-mail</label>
+            <input 
+              type="email" 
+              id="email" 
+              v-model="email" 
+              placeholder="seu@email.com"
+              required
+            >
+          </div>
+
+          <div class="input-group">
+            <label for="password">Senha</label>
+            <div class="password-wrapper">
+              <input 
+                :type="showPassword ? 'text' : 'password'" 
+                id="password" 
+                v-model="senha" 
+                @keypress.enter="login"
+                placeholder="••••••••"
+                required
+              >
             </div>
-        </div>
-        <div class="registro">
-            <button class="login" type="button" :onclick="login">Login<svg class="login_icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF">
-                <path d="M480-120v-80h280v-560H480v-80h280q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H480Zm-80-160-55-58 102-102H120v-80h327L345-622l55-58 200 200-200 200Z"/></svg>
-            </button>
-        </div>
-        <p>Não é cadastrado? Faça o seu <RouterLink to="/register">cadastro</RouterLink></p>
+          </div>
+
+          <div class="pass-options">
+            <label class="checkbox-container">
+              <input type="checkbox" @change="togglePassword">
+              <span class="checkmark"></span>
+              Mostrar Senha
+            </label>
+            <a href="#" class="forgot-link">Esqueceu a senha?</a>
+          </div>
+
+          <Motion 
+            tag="button" 
+            whileHover="{ scale: 1.02 }" 
+            whileTap="{ scale: 0.98 }"
+            class="btn-login" 
+            type="submit"
+          >
+            Entrar
+            <svg class="login_icon" xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 -960 960 960" width="20" fill="currentColor">
+              <path d="M480-120v-80h280v-560H480v-80h280q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H480Zm-80-160-55-58 102-102H120v-80h327L345-622l55-58 200 200-200 200Z"/>
+            </svg>
+          </Motion>
+        </form>
+
+        <p class="footer-text">
+          Não é cadastrado? 
+          <RouterLink to="/register" class="signup-link">Crie sua conta</RouterLink>
+        </p>
+      </Motion>
+    </main>
+  </div>
 </template>
 
 <style scoped>
-    a.voltar_icon {
-        cursor: pointer;
-        position: relative;
-        top: 5vh;
-        left: 5vw;
-    }
+.auth-container {
+  background-color: #020617; 
+  min-height: 100vh;
+  color: #f8fafc;
+  display: flex;
+  flex-direction: column;
+}
 
-    svg.login_icon {
-        position: relative;
-        top: 0.75vh;
-    }
+.auth-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  position: relative;
+}
 
-    a {
-        text-decoration: none;
-        color: darkblue;
-    }
+.back-wrapper {
+  position: absolute;
+  top: 100px;
+  left: 8%;
+}
 
-    p {
-        color: whitesmoke;
-        text-align: center;
-    }
+.btn-back {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: color 0.3s;
+}
 
-    div.pass {
-        display: inline-flex;
-    }
+.btn-back:hover { color: #f8fafc; }
 
-    div.conteudo {
-        text-align: center;
-    }
+.login-card {
+  background: rgba(30, 41, 59, 0.4); 
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  padding: 40px;
+  border-radius: 24px;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
 
-    div.registro {
-        display: flex;
-        justify-content: center;
-    }
+.card-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
 
-    label.passLabel {
-        white-space: nowrap;
-        cursor: pointer;
-    }
+.titulo {
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
 
-    input {
-        display: block;
-        margin: auto;
-        width: 18%;
-        font-size: large;
-        padding: 4px;
-    }
+.subtitulo {
+  color: #94a3b8;
+  font-size: 0.9rem;
+}
 
-    label {
-        color: whitesmoke;
-        display: block;
-        text-align: center;
-        font-size: large;
-        padding: 4px;
-    }
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
 
-    p.titulo {
-        color: whitesmoke;
-        font-size: xx-large;
-        padding: 5%;
-    }
-    
-    button.login {
-        background-color: transparent;
-        color: ghostwhite;
-        border-color: ghostwhite;
-        margin: 10px;
-    }
+.input-group label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #cbd5e1;
+  text-align: left;
+}
 
-    button.login:hover, button.login:focus {
-        color: black;
-        border-color: black;
-        background-color: ghostwhite;
-        transition: 0.3s;
-    }
+input[type="email"], 
+input[type="password"],
+input[type="text"] {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 12px 16px;
+  border-radius: 10px;
+  color: white;
+  font-size: 1rem;
+  transition: all 0.3s;
+  width: 100%;
+}
 
-    button.login:hover svg.login_icon {
-        fill: black;
-        transition: 0.3s;
-    }
+input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  background: rgba(15, 23, 42, 0.8);
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
 
-    @media screen and (max-width: 480px) {
-        p.titulo {
-            font-size: x-large;
-            padding-bottom: 0;
-        }
+.pass-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  font-size: 0.85rem;
+}
 
-        button.login {
-            font-size: medium;
-        }
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  color: #94a3b8;
+}
 
-        input {
-            width: 40%;
-        }
-    }
+.forgot-link {
+  color: #3b82f6;
+  text-decoration: none;
+}
+
+.btn-login {
+  width: 100%;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 14px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3);
+}
+
+.footer-text {
+  margin-top: 24px;
+  font-size: 0.9rem;
+  color: #94a3b8;
+}
+
+.signup-link {
+  color: #3b82f6;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.signup-link:hover { 
+    text-decoration: underline; 
+}
+
+@media (max-width: 480px) {
+  .login-card {
+    padding: 30px 20px;
+    border: none;
+    background: transparent;
+    backdrop-filter: none;
+    box-shadow: none;
+  }
+  
+  .back-wrapper {
+    top: 80px;
+    left: 20px;
+  }
+}
 </style>

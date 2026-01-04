@@ -11,9 +11,9 @@ import Footer from './UI/Footer.vue';
     <main class="hero-grid">
       <Motion 
         class="hero-content"
-        :initial="{ opacity: 0, x: -30 }"
+        :initial="{ opacity: 0, x: -40 }"
         :animate="{ opacity: 1, x: 0 }"
-        :transition="{ duration: 0.8 }"
+        :transition="{ duration: 0.8, easing: 'ease-out' }"
       >
         <h1 class="main-title">
           Seu Guia Inteligente de <br/>
@@ -31,17 +31,25 @@ import Footer from './UI/Footer.vue';
         </div>
       </Motion>
 
-      <Motion 
-        class="hero-visual"
-        :initial="{ opacity: 0, y: 40 }"
-        :animate="{ opacity: 1, y: 0 }"
-        :transition="{ duration: 1, delay: 0.2 }"
-      >
-        <div class="glass-card">
+      <div class="hero-visual">
+        <Motion 
+          class="glass-card"
+          :initial="{ opacity: 0, scale: 0.9 }"
+          :animate="{ 
+            opacity: 1, 
+            scale: 1,
+            y: [0, -20, 0] 
+          }"
+          :transition="{ 
+            opacity: { duration: 1 },
+            scale: { duration: 1 },
+            y: { duration: 5, repeat: Infinity, easing: 'ease-in-out' } 
+          }"
+        >
           <img src="../assets/graph.png" alt="Análise de Dividendos" class="main-chart">
-          <div class="chart-overlay"></div>
-        </div>
-      </Motion>
+          <div class="glow-effect"></div>
+        </Motion>
+      </div>
     </main>
 
     <Footer />
@@ -55,6 +63,7 @@ import Footer from './UI/Footer.vue';
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
 }
 
 .hero-grid {
@@ -66,14 +75,15 @@ import Footer from './UI/Footer.vue';
   gap: 4rem;
   max-width: 1400px;
   margin: 0 auto;
+  width: 100%;
 }
 
 .main-title {
-  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-size: clamp(2.2rem, 5vw, 3.8rem);
   line-height: 1.1;
   font-weight: 800;
-  margin-top: 1.5rem;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
+  margin-bottom: 1.5rem;
 }
 
 .gradient-text {
@@ -84,62 +94,83 @@ import Footer from './UI/Footer.vue';
 }
 
 .description {
-  font-size: 1.2rem;
+  font-size: clamp(1rem, 2vw, 1.2rem);
   color: #94a3b8; 
-  margin: 2rem 0;
+  margin-bottom: 2.5rem;
   line-height: 1.6;
+  max-width: 540px;
 }
 
-.actions { display: flex; gap: 1rem; }
+.actions { display: flex; gap: 1.2rem; }
 
 .btn-primary {
   background: #3b82f6;
   border: none;
   padding: 1rem 2rem;
-  border-radius: 10px;
+  border-radius: 12px;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 10px 20px -5px rgba(59, 130, 246, 0.4);
 }
 
 .btn-secondary {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.1);
-  color: white;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #f8fafc;
   padding: 1rem 2rem;
-  border-radius: 10px;
+  border-radius: 12px;
   font-weight: 600;
-  transition: 0.3s;
+  cursor: pointer;
+  transition: all 0.3s;
 }
 
-.btn-secondary:hover { background: rgba(255,255,255,0.08); }
-
+.btn-secondary:hover { background: rgba(255, 255, 255, 0.08); }
 .link { color: white; text-decoration: none; }
 
+.hero-visual {
+  display: flex;
+  justify-content: center;
+  position: relative;
+}
+
 .glass-card {
-  background: rgba(30, 41, 59, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 24px;
-  padding: 20px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 28px;
+  padding: 12px;
   backdrop-filter: blur(10px);
   position: relative;
-  overflow: hidden;
+  z-index: 2;
+  box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.6);
 }
 
 .main-chart {
   width: 100%;
+  max-width: 550px;
   height: auto;
-  border-radius: 12px;
+  border-radius: 20px;
+  display: block;
+}
+
+.glow-effect {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 120%; height: 120%;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.12) 0%, transparent 70%);
+  z-index: -1;
+  pointer-events: none;
 }
 
 @media (max-width: 1024px) {
   .hero-grid {
     grid-template-columns: 1fr;
     text-align: center;
-    padding-top: 6rem;
-    gap: 2rem;
+    padding: 100px 5% 40px 5%;
+    gap: 3rem;
   }
   .actions { justify-content: center; }
-  .description { margin: 1.5rem auto; }
+  .description { margin: 0 auto 2.5rem auto; }
+  .main-chart { max-width: 100%; }
 }
 </style>
