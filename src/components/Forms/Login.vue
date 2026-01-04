@@ -107,7 +107,7 @@ async function login() {
               type="email" 
               id="email" 
               v-model="email" 
-              placeholder="seu@email.com"
+              placeholder="seu@email.com.br"
               required
             >
           </div>
@@ -172,7 +172,7 @@ async function login() {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: center; 
   padding: 20px;
   position: relative;
 }
@@ -203,24 +203,17 @@ async function login() {
   padding: 40px;
   border-radius: 24px;
   width: 100%;
-  max-width: 440px;
+  max-width: 400px; 
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
 }
 
-.card-header {
-  text-align: center;
-  margin-bottom: 32px;
-}
-
-.titulo {
-  font-size: 1.8rem;
-  font-weight: 800;
-  margin-bottom: 8px;
-}
-
-.subtitulo {
-  color: #94a3b8;
-  font-size: 0.9rem;
+.conteudo {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
 }
 
 .input-group {
@@ -228,26 +221,30 @@ async function login() {
   flex-direction: column;
   gap: 8px;
   margin-bottom: 20px;
+  width: 100%;
 }
 
 .input-group label {
   font-size: 0.85rem;
   font-weight: 500;
   color: #cbd5e1;
-  text-align: left;
+  text-align: left; 
+  padding-left: 4px;
 }
 
 input[type="email"], 
 input[type="password"],
 input[type="text"] {
+  box-sizing: border-box; 
   background: rgba(15, 23, 42, 0.6);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 12px 16px;
-  border-radius: 10px;
+  padding: 14px 16px;
+  border-radius: 12px;
   color: white;
   font-size: 1rem;
   transition: all 0.3s;
-  width: 100%;
+  width: 100%; 
+  margin: 0; 
 }
 
 input:focus {
@@ -257,25 +254,26 @@ input:focus {
   box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
 }
 
+.password-wrapper {
+  width: 100%;
+}
+
 .pass-options {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 24px;
   font-size: 0.85rem;
+  width: 100%;
 }
 
 .checkbox-container {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   cursor: pointer;
   color: #94a3b8;
-}
-
-.forgot-link {
-  color: #3b82f6;
-  text-decoration: none;
+  user-select: none;
 }
 
 .btn-login {
@@ -284,7 +282,7 @@ input:focus {
   color: white;
   border: none;
   padding: 14px;
-  border-radius: 10px;
+  border-radius: 12px;
   font-weight: 700;
   font-size: 1rem;
   display: flex;
@@ -292,37 +290,36 @@ input:focus {
   justify-content: center;
   gap: 10px;
   cursor: pointer;
-  box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3);
+  transition: background 0.3s, transform 0.2s;
+}
+
+.btn-login:hover {
+  background: #2563eb;
 }
 
 .footer-text {
   margin-top: 24px;
   font-size: 0.9rem;
   color: #94a3b8;
+  text-align: center;
 }
 
-.signup-link {
-  color: #3b82f6;
-  text-decoration: none;
-  font-weight: 600;
+.back-wrapper {
+  position: absolute;
+  top: 40px;
+  left: 40px;
 }
 
-.signup-link:hover { 
-    text-decoration: underline; 
-}
-
-@media (max-width: 480px) {
-  .login-card {
-    padding: 30px 20px;
-    border: none;
-    background: transparent;
-    backdrop-filter: none;
-    box-shadow: none;
+@media (max-width: 640px) {
+  .back-wrapper {
+    top: 20px;
+    left: 20px;
   }
   
-  .back-wrapper {
-    top: 80px;
-    left: 20px;
+  .login-card {
+    padding: 30px 24px;
+    max-width: 90%;
+    background: rgba(30, 41, 59, 0.6);
   }
 }
 </style>
