@@ -1,119 +1,157 @@
 <script setup lang="ts">
-import axios from 'axios';
-import { useRouter } from 'vue-router';
+import axios from "axios";
+import { useRouter } from "vue-router";
 
 const router = useRouter();
 
 defineProps({
-    showLogin: Boolean,
-    showPerfil: Boolean
+  showLogin: Boolean,
+  showPerfil: Boolean,
 });
 
 function clearUser() {
-    axios.post('http://localhost:3000/logout', {
-        usID: localStorage.getItem('usID'),
-        sID: localStorage.getItem('sID')
-    }).then((res) => {
-        if(res.status == 200) {
-            localStorage.removeItem('usID');
-            localStorage.removeItem('exp');
-            localStorage.removeItem('sID');
-
-            router.push('/login');
-        }
-        console.log(res);
-    }).catch((err) => {
-        console.log(err);
+  axios
+    .post("http://localhost:3000/logout", {
+      usID: localStorage.getItem("usID"),
+      sID: localStorage.getItem("sID"),
     })
-    
+    .then((res) => {
+      if (res.status == 200) {
+        localStorage.removeItem("usID");
+        localStorage.removeItem("exp");
+        localStorage.removeItem("sID");
+        router.push("/login");
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 }
 </script>
 
 <template>
- <div class="header">
-    <div class="titulo"><RouterLink class="titulo1" to="/">DiviSmart</RouterLink></div>
-    <button class="login" v-if="showLogin"><RouterLink class="titulo2" to="/login">Login</RouterLink></button>
-    <button class="login" v-if="showPerfil" @click="clearUser">
-        <RouterLink class="titulo2" to="/login">Sair<svg class="logout_icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF">
-            <path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h280v80H200Zm440-160-55-58 102-102H360v-80h327L585-622l55-58 200 200-200 200Z"/></svg>
-        </RouterLink>
-    </button>
-    <div class="border" v-if="showPerfil"></div>
- </div>
+  <header class="header-container">
+    <nav class="nav-content">
+      <div class="logo">
+        <RouterLink class="logo-link" to="/">DiviSmart</RouterLink>
+      </div>
+
+      <div class="actions">
+        <button
+          v-if="showLogin"
+          class="btn-action"
+          @click="router.push('/login')"
+        >
+          Login
+        </button>
+
+        <button v-if="showPerfil" class="btn-logout" @click="clearUser">
+          <span>Sair</span>
+          <svg
+            class="logout-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            height="20"
+            viewBox="0 -960 960 960"
+            width="20"
+            fill="currentColor"
+          >
+            <path
+              d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h280v80H200Zm440-160-55-58 102-102H360v-80h327L585-622l55-58 200 200-200 200Z"
+            />
+          </svg>
+        </button>
+      </div>
+    </nav>
+    <div class="header-border"></div>
+  </header>
 </template>
 
 <style scoped>
-svg.logout_icon {
-    position: relative;
-    top: 0.75vh;
+.header-container {
+  width: 100%;
+  background: transparent;
+  padding: 0 5%;
+  padding-top: 20px;
 }
 
-a.titulo1 {
-    text-decoration: none;
-    color: whitesmoke;
+.nav-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 60px;
 }
 
-a.titulo2 {
-    text-decoration: none;
-    color: inherit;
+.logo-link {
+  text-decoration: none;
+  color: #f8fafc;
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  transition: opacity 0.3s;
 }
 
-button.login {
-    background-color: transparent;
-    position: relative;
-    left: 170vh;
-    top: -2vh;
-    color: ghostwhite;
-    border-color: ghostwhite;
+.logo-link:hover {
+  opacity: 0.8;
 }
 
-button.login:hover {
-    color: black;
-    border-color: black;
-    background-color: ghostwhite;
-    transition: 0.3s;
+.btn-action,
+.btn-logout {
+  background: rgba(30, 41, 59, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #f8fafc;
+  padding: 8px 20px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
 }
 
-button.login:hover svg.logout_icon {
-    fill: black;
-    transition: 0.3s;
+.btn-action:hover,
+.btn-logout:hover {
+  background: #f8fafc;
+  color: #020617;
+  border-color: #f8fafc;
 }
 
-div.titulo {
-    color: ghostwhite;
-    position: relative;
-    left: 10vh;
-    top: 2vh;
-    font-weight: 800;
-    font-size: x-large;
-    margin: 0;
-    padding: 0;
+.logout-icon {
+  transition: transform 0.3s ease;
 }
 
-div.header {
-    width: 100%;
-    min-height: 5vh;
-    display: inline;
+.btn-logout:hover .logout-icon {
+  transform: translateX(3px);
 }
 
-div.border {
-    border-bottom: 1px black solid;
-    padding: 0.5vh;
+.header-border {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  margin-top: 10px;
 }
 
 @media screen and (max-width: 480px) {
-    div.titulo {
-        font-size: large;
-    }
+  .header-container {
+    padding: 15px 20px 0;
+  }
 
-    button.login {
-        left: 70vw;
-        font-size: medium;
-        padding: 5px;
-    }
+  .logo-link {
+    font-size: 1.2rem;
+  }
 
-    svg.logout_icon {
-        top: 0.75vh;
-    }
+  .btn-action,
+  .btn-logout {
+    padding: 6px 14px;
+    font-size: 0.8rem;
+  }
 }
 </style>
