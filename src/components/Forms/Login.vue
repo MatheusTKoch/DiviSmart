@@ -45,36 +45,25 @@ const togglePassword = () => {
 
 async function login() {
   if (email.value === "" || senha.value === "") {
-    alert("Verifique os campos informados e tente novamente!");
-  } else {
-    let dados = new URLSearchParams();
-    dados.append("email", email.value);
-    dados.append("senha", senha.value);
-    await axios
-      .post("http://localhost:3000/users_login", dados)
-      .then((res) => {
-        if (res.status == 200) {
-          router.push("menu");
-        }
+    alert("Preencha todos os campos!");
+    return;
+  }
+  
+  try {
+    const res = await axios.post("http://localhost:3000/users_login", {
+      email: email.value,
+      senha: senha.value
+    });
 
-        if (localStorage.getItem("usID") != res.data.usID) {
-          localStorage.clear();
-          localStorage.setItem("usID", res.data.usID);
-          localStorage.setItem("exp", res.data.exp);
-          localStorage.setItem("sID", res.data.sID);
-        } else if (localStorage.getItem("usID") == res.data.usID) {
-          localStorage.setItem("exp", res.data.exp);
-          localStorage.setItem("sID", res.data.sID);
-        } else {
-          localStorage.setItem("usID", res.data.usID);
-          localStorage.setItem("exp", res.data.exp);
-          localStorage.setItem("sID", res.data.sID);
-        }
-      })
-      .catch((err) => {
-        alert(err.response.data);
-        console.log(err);
-      });
+    if (res.status == 200) {
+      localStorage.setItem("usID", res.data.usID);
+      localStorage.setItem("exp", res.data.exp);
+      localStorage.setItem("sID", res.data.sID);
+      router.push("menu");
+    }
+  } catch (err: any) {
+    const msg = err.response?.data || "Erro ao conectar ao servidor";
+    alert(msg);
   }
 }
 </script>
