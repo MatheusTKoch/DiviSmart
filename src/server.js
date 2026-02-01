@@ -297,6 +297,16 @@ app.post("/logout", async (req, res) => {
   }
 });
 
+app.post("/cotacoes_load", async (req, res) => {
+  try {
+    const sql = "SELECT ativo, valoratual FROM cotacoes ORDER BY ativo";
+    const result = await queryDatabase(sql);
+    res.status(200).send(result);
+  } catch (err) {
+    res.status(500).send("Erro interno no servidor");
+  }
+});
+
 const PORT = process.env.VITE_PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Server rodando na porta ${PORT}.`);

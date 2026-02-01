@@ -23,7 +23,7 @@ function loadCotacoes() {
     <div class="conteudo">
         <h3>Cotações Atualizadas:</h3>
         <ol v-for="cot of dadosCotacao">
-            <li>{{ cot.Ativo }}: {{ cot.Ativo == 'Ouro/USD' ? '$' : 'R$' }}{{ cot.ValorAtual }}</li>
+            <li>{{ cot.Ativo }} {{ cot.Ativo == 'Ouro/USD' ? '$' : 'R$' }}{{ cot.ValorAtual }}</li>
         </ol>
     </div>
 </template>
