@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import Header from '../UI/Header.vue';
-import Sidebar from '../UI/Sidebar.vue';
 import axios from 'axios';
 import { nextTick, onMounted, ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
@@ -153,8 +151,6 @@ async function verifyUser() {
 </script>
 
 <template>
-    <Header showPerfil></Header>
-    <Sidebar></Sidebar>
     <div v-if="loading">
         <Spinner></Spinner>
     </div>

@@ -104,7 +104,7 @@ const activeItem = ref("menu");
 <style scoped>
 .sidebar {
   width: 260px;
-  height: calc(100vh - 80px);
+  min-height: 100vh;
   background: #020617;
   border-right: 1px solid rgba(255, 255, 255, 0.05);
   display: flex;
