@@ -90,21 +90,23 @@ watch(
 </script>
 
 <template>
+  <div>
     <Header showPerfil></Header>
     <Sidebar></Sidebar>
-    <Cotacoes v-if="route.path === '/menu'"></Cotacoes>
+    <Cotacoes v-if="route.path === '/menu'" />
     <div v-if="loading">
-        <Spinner></Spinner>
+      <Spinner></Spinner>
     </div>
     <div v-else-if="route.path === '/menu'" class="conteudo">
-        <div class="texto-titulo">Olá {{ nome }}, {{ horario }}!</div>
-        <div class="text">
-            Inicie sua carteira para fazer o acompanhamento clicando no botão abaixo, e após tenha acesso
-            a relatórios personalizados!
-        </div>
-        <button class="carteira" @click="router.push('/menu/carteira')">Criar/Acompanhar Carteira</button>
+      <div class="texto-titulo">Olá {{ nome }}, {{ horario }}!</div>
+      <div class="text">
+        Inicie sua carteira para fazer o acompanhamento clicando no botão abaixo, e após tenha acesso
+        a relatórios personalizados!
+      </div>
+      <button class="carteira" @click="router.push('/menu/carteira')">Criar/Acompanhar Carteira</button>
     </div>
     <RouterView />
+  </div>
 </template>
 
 <style scoped>
