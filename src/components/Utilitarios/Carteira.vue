@@ -2,7 +2,7 @@
 import Modal from '../UI/Modal.vue';
 import Ativos from '../Forms/Ativos.vue';
 import axios from 'axios';
-import { ref, onMounted, nextTick, defineProps } from 'vue';
+import { ref, onMounted, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
 import Spinner from '../UI/Spinner.vue';
 
@@ -95,20 +95,28 @@ function sendID(num: number) {
     </div>
     <div v-else class="conteudo">
         <div v-if="!editCarteira">
-            <div class="titulos-carteira">
-                <div class="texto-titulo">Carteiras</div>
-                <div class="subtexto-titulo">Visualize, edite ou exclua suas carteiras cadastradas!</div>
-                <button class="carteira" @click="abrirModal()" :disabled="showCarteira">Adicionar Carteira</button>
+            <div class="header-section">
+                <div class="titulo">Carteiras</div>
+                <div class="subtitulo">Visualize, edite ou exclua suas carteiras cadastradas!</div>
+                <button class="btn-add" @click="abrirModal()" :disabled="showCarteira">Adicionar Carteira</button>
             </div>
-            <div class="carteira-lista">Suas Carteiras:</div>
-            <div>
-                <ol v-for="cart in carteiras">
-                    <li>{{ cart.nome }}<svg @click="editCarteira = true, $emit('editarCarteira'); sendID(cart.carteiraid)" class="alter_icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF">
-                        <path d="M200-200h57l391-391-57-57-391 391v57Zm-80 80v-170l528-527q12-11 26.5-17t30.5-6q16 0 31 6t26 18l55 56q12 11 17.5 26t5.5 30q0 16-5.5 30.5T817-647L290-120H120Zm640-584-56-56 56 56Zm-141 85-28-29 57 57-29-28Z"/></svg>
-                        <svg @click="deleteCarteira(cart.CarteiraID)" class="delete_icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF">
-                        <path d="m376-300 104-104 104 104 56-56-104-104 104-104-56-56-104 104-104-104-56 56 104 104-104 104 56 56Zm-96 180q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520Zm-400 0v520-520Z"/></svg>
-                    </li>
-                </ol>
+            <div class="carteira-lista">
+                <h3>Suas Carteiras:</h3>
+                <div class="carteiras-grid">
+                    <div v-for="cart in carteiras" :key="cart.carteiraid" class="carteira-card">
+                        <div class="card-content">
+                            <span class="nome">{{ cart.nome }}</span>
+                            <div class="acoes">
+                                <svg @click="editCarteira = true, $emit('editarCarteira'); sendID(cart.carteiraid)" class="icon edit-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#3b82f6">
+                                    <path d="M200-200h57l391-391-57-57-391 391v57Zm-80 80v-170l528-527q12-11 26.5-17t30.5-6q16 0 31 6t26 18l55 56q12 11 17.5 26t5.5 30q0 16-5.5 30.5T817-647L290-120H120Zm640-584-56-56 56 56Zm-141 85-28-29 57 57-29-28Z"/>
+                                </svg>
+                                <svg @click="deleteCarteira(cart.CarteiraID)" class="icon delete-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#ef4444">
+                                    <path d="m376-300 104-104 104 104 56-56-104-104 104-104-56-56-104 104-104-104-56 56 104 104-104 104 56 56Zm-96 180q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520Zm-400 0v520-520Z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="modal">
                 <Modal v-if="showCarteira" @fecharModal="fecharModal" />
@@ -121,97 +129,141 @@ function sendID(num: number) {
 </template>
 
 <style scoped>
-    svg.delete_icon {
-        position: relative;
-        left: 0.75vh;
-        top: 0.75vh;
+.conteudo {
+    position: absolute;
+    top: 20%;
+    transform: translateX(30%);
+    color: #f8fafc;
+    max-width: 70vw;
+}
+
+.header-section {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.titulo {
+    font-size: 2.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #3b82f6, #1e40af);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    margin-bottom: 0.5rem;
+}
+
+.subtitulo {
+    font-size: 1.2rem;
+    color: #94a3b8;
+    margin-bottom: 1.5rem;
+}
+
+.btn-add {
+    background: linear-gradient(135deg, #3b82f6, #1e40af);
+    border: none;
+    color: #f8fafc;
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    transition: all 0.3s ease;
+}
+
+.btn-add:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+}
+
+.carteira-lista h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: #f8fafc;
+}
+
+.carteiras-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+.carteira-card {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 1.5rem;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+}
+
+.carteira-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+    border-color: rgba(59, 130, 246, 0.2);
+}
+
+.card-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nome {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #f8fafc;
+}
+
+.acoes {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.icon {
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding: 0.25rem;
+    border-radius: 8px;
+}
+
+.icon:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: scale(1.1);
+}
+
+.edit-icon:hover {
+    fill: #60a5fa;
+}
+
+.delete-icon:hover {
+    fill: #f87171;
+}
+
+.ativos {
+    position: absolute;
+    transform: translateX(2vw);
+}
+
+.modal {
+    position: relative;
+    bottom: 28vh;
+}
+
+@media (max-width: 768px) {
+    .conteudo {
+        left: 5%;
+        max-width: 90vw;
     }
-
-    svg.alter_icon {
-        position: relative;
-        left: 0.75vh;
-        top: 0.75vh;
+    .titulo {
+        font-size: 2rem;
     }
-
-    li {
-        list-style-type: none;
-        cursor: pointer;
-        font-size: large;
-        transform: translateX(20vw);
+    .subtitulo {
+        font-size: 1rem;
     }
-
-    div.ativos {
-        position: absolute;
-        transform: translateX(2vw);
+    .carteiras-grid {
+        grid-template-columns: 1fr;
     }
-
-    div.modal {
-        position: relative;
-        bottom: 28vh;
-    }
-
-    div.conteudo {
-        position: absolute;
-        top: 20%;
-        left: 30%;
-        color: ghostwhite;
-    }
-
-    div.texto-titulo {
-        position: relative;
-        left: 90%;
-        font-size: x-large;
-        margin-bottom: 2%;
-    }
-
-    div.subtexto-titulo {
-        transform: translateX(12vw);
-        font-size: large;
-        margin-bottom: 10%;  
-    }
-
-    div.carteira-lista {
-        font-size: large;
-        white-space: nowrap;
-        padding: 10%;
-        text-decoration: underline;
-        transform: translateX(19.5vw);
-    }
-
-    button.carteira {
-        background-color: transparent;
-        color: ghostwhite;
-        border-color: ghostwhite;
-        margin: 10px;
-        font-size: large;
-        transform: translateX(20vw);
-    }
-
-    button.carteira:hover {
-        color: black;
-        border-color: black;
-        background-color: ghostwhite;
-        transition: 0.3s;
-    }
-
-    @media screen and (max-width: 480px){
-        div.texto-titulo {
-            font-size: large;
-            left: 30%;
-        }
-        
-        div.subtexto-titulo {
-            font-size: small;
-            transform: translateX(0.8vw);
-        }
-
-        button.carteira {
-            font-size: small;
-        }
-
-        div.carteira-lista {
-            font-size: medium;
-        }
-    }
-    
+}
 </style>

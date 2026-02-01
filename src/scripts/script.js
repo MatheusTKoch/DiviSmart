@@ -1,6 +1,6 @@
 import path from "path";
 import { fileURLToPath } from "url";
-import { exec } from "child_process";
+import { spawn } from "child_process";
 import fs from "fs";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -22,14 +22,20 @@ async function rodarScript(diretorio, arquivo) {
     console.log(`> Executando: ${diretorio}/${arquivo}`);
 
     return new Promise((resolve, reject) => {
-        exec(`node "${caminhoCompleto}"`, (error, stdout, stderr) => {
-            if (error) {
-                console.error(`Erro ao executar ${arquivo}:`, error.message);
-                return reject(error);
+        const child = spawn("node", [caminhoCompleto], { stdio: "inherit" });
+
+        child.on("error", (err) => {
+            console.error(`Erro ao spawn do script ${arquivo}:`, err.message);
+            reject(err);
+        });
+
+        child.on("exit", (code, signal) => {
+            if (code === 0) {
+                console.log(`Script ${arquivo} finalizado com código 0.`);
+                resolve();
+            } else {
+                reject(new Error(`Script ${arquivo} terminou com código ${code} signal ${signal}`));
             }
-            if (stderr) console.error(`Aviso em ${arquivo}:`, stderr);
-            if (stdout) console.log(stdout);
-            resolve();
         });
     });
 }

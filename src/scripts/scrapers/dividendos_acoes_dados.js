@@ -135,6 +135,12 @@ function delay(ms) {
 
 async function executar() {
   let client;
+  const GLOBAL_TIMEOUT_MS = 1000 * 60 * 20; 
+  const timeoutHandle = setTimeout(() => {
+    console.error("Tempo máximo de execução atingido. Forçando saída.");
+    process.exit(1);
+  }, GLOBAL_TIMEOUT_MS);
+
   try {
     client = await db.connect();
     const acoes = await getAcoes();
@@ -148,7 +154,9 @@ async function executar() {
       const AcaoID = acao.acaoid;
       const Ticker = acao.ticker;
 
+      console.log(`Iniciando ticker: ${Ticker} (AcaoID: ${AcaoID})`);
       const dividendos = await getDividendos(Ticker);
+      console.log(`Ticker ${Ticker} retornou ${dividendos.length} dividendos.`);
 
       if (dividendos.length > 0) {
         await salvarDividendos(client, AcaoID, dividendos);
@@ -159,11 +167,27 @@ async function executar() {
 
     console.log("Processo concluído!");
   } catch (error) {
-    console.error("Erro fatal no processo principal:", error.message);
+    console.error("Erro fatal no processo principal:", error);
   } finally {
-    if (client) client.release();
-    await db.end();
-    process.exit(0);
+    clearTimeout(timeoutHandle);
+    try {
+      if (client) {
+        client.release();
+        console.log("Cliente DB liberado.");
+      }
+    } catch (err) {
+      console.warn("Erro ao liberar cliente DB:", err.message);
+    }
+
+    console.log("Encerrando pool de conexões (db.end)...");
+    try {
+      await db.end();
+      console.log("Pool encerrado com sucesso.");
+    } catch (endErr) {
+      console.error("Erro ao encerrar pool de conexões:", endErr);
+    }
+
+    // não chamar process.exit aqui — deixe o Node encerrar naturalmente
   }
 }
 

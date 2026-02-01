@@ -307,6 +307,27 @@ app.post("/cotacoes_load", async (req, res) => {
   }
 });
 
+app.post("/ativos_load", async (req, res) => {
+  try {
+    const carteiraID = req.body.carteiraid;
+    const acoes = await queryDatabase(
+      "SELECT aa.*, a.nome, a.simbolo FROM ativos_acoes aa JOIN acoes a ON aa.acaoID = a.acaoID WHERE aa.carteiraID = $1 AND aa.deletedAt IS NULL",
+      [carteiraID]
+    );
+    const fii = await queryDatabase(
+      "SELECT af.*, f.nome, f.simbolo FROM ativos_fii af JOIN fii f ON af.fiiID = f.fiiID WHERE af.carteiraID = $1 AND af.deletedAt IS NULL",
+      [carteiraID]
+    );
+    const tesouro = await queryDatabase(
+      "SELECT at.*, t.nome, t.simbolo FROM ativos_tesouro at JOIN tesouro t ON at.tesouroID = t.tesouroID WHERE at.carteiraID = $1 AND at.deletedAt IS NULL",
+      [carteiraID]
+    );
+    res.status(200).send({ acoes, fii, tesouro });
+  } catch (err) {
+    res.status(500).send("Erro interno no servidor");
+  }
+});
+
 const PORT = process.env.VITE_PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Server rodando na porta ${PORT}.`);
