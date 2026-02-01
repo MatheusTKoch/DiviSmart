@@ -2,21 +2,13 @@
 import Header from '../UI/Header.vue';
 import Sidebar from '../UI/Sidebar.vue';
 import axios from 'axios';
-import { nextTick, onMounted, ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { nextTick, onMounted, ref, watch } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import Cotacoes from './Cotacoes.vue';
 import Spinner from '../UI/Spinner.vue';
 
 const router = useRouter();
-onMounted(async () => {
-    try {
-        await Promise.all([verifyUser()]);
-    } catch (error) {
-        console.error(error);
-    } finally {
-        loading.value = false;
-    }
-})
+const route = useRoute();
 
 let nome = ref('');
 let horario = ref('');
@@ -71,21 +63,48 @@ function loadHorario() {
         horario.value = 'boa noite';
     }
 }
+
+onMounted(async () => {
+    try {
+        await Promise.all([verifyUser()]);
+    } catch (error) {
+        console.error(error);
+    } finally {
+        loading.value = false;
+    }
+});
+
+watch(
+  () => route.fullPath,
+  async () => {
+    loading.value = true;
+    try {
+      await Promise.all([verifyUser()]);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      loading.value = false;
+    }
+  }
+);
 </script>
 
 <template>
     <Header showPerfil></Header>
     <Sidebar></Sidebar>
-    <Cotacoes></Cotacoes>
+    <Cotacoes v-if="route.path === '/menu'"></Cotacoes>
     <div v-if="loading">
         <Spinner></Spinner>
     </div>
-    <div v-else class="conteudo">  
-        <div class="texto-titulo">Olá {{ nome }}, {{ horario }}!</div> 
-        <div class="text">Inicie sua carteira para fazer o acompanhamento clicando no botão abaixo, e após tenha acesso
-        a relatórios personalizados!</div>
-        <button class="carteira" @click="router.push('menu/carteira')">Criar/Acompanhar Carteira</button>
+    <div v-else-if="route.path === '/menu'" class="conteudo">
+        <div class="texto-titulo">Olá {{ nome }}, {{ horario }}!</div>
+        <div class="text">
+            Inicie sua carteira para fazer o acompanhamento clicando no botão abaixo, e após tenha acesso
+            a relatórios personalizados!
+        </div>
+        <button class="carteira" @click="router.push('/menu/carteira')">Criar/Acompanhar Carteira</button>
     </div>
+    <RouterView />
 </template>
 
 <style scoped>
