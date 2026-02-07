@@ -134,7 +134,14 @@ app.post("/carteira_load", async (req, res) => {
     const sql =
       "SELECT * FROM carteiras where userId = $1 and deletedAt IS NULL";
     const result = await queryDatabase(sql, [req.body.userID]);
-    res.status(200).send(result);
+
+    const mapped = result.map((row) => ({
+      ...row,
+      CarteiraID: row.carteiraid ?? row.carteiraId ?? row.CarteiraID,
+      Nome: row.nome ?? row.Nome,
+    }));
+
+    res.status(200).send(mapped);
   } catch (err) {
     res.status(500).send("Erro interno no servidor");
   }
@@ -238,12 +245,44 @@ app.post("/carteira_delete", async (req, res) => {
 app.post("/acoes_cadastro", async (req, res) => {
   try {
     const sql =
-      "INSERT INTO ativos_acoes (Quantidade, ValorInvestido, DataCadastro, carteiraID, acaoID) values ($1, $2, now(), $3, $4)";
+      "INSERT INTO ativos_acoes (quantidade, valorinvestido, datacadastro, carteiraid, acaoid) values ($1, $2, now(), $3, $4)";
     await queryDatabase(sql, [
       req.body.quantidade,
       req.body.valorInvestido,
       req.body.cID,
       req.body.acaoID,
+    ]);
+    res.status(200).send("Cadastro realizado com sucesso!");
+  } catch (err) {
+    res.status(500).send("Erro interno no servidor");
+  }
+});
+
+app.post("/fii_cadastro", async (req, res) => {
+  try {
+    const sql =
+      "INSERT INTO ativos_fii (quantidade, valorinvestido, datacadastro, carteiraid, fiid) values ($1, $2, now(), $3, $4)";
+    await queryDatabase(sql, [
+      req.body.quantidade,
+      req.body.valorInvestido,
+      req.body.cID,
+      req.body.fiiID,
+    ]);
+    res.status(200).send("Cadastro realizado com sucesso!");
+  } catch (err) {
+    res.status(500).send("Erro interno no servidor");
+  }
+});
+
+app.post("/tesouro_cadastro", async (req, res) => {
+  try {
+    const sql =
+      "INSERT INTO ativos_fii (quantidade, valorinvestido, datacadastro, carteiraid, fiid) values ($1, $2, now(), $3, $4)";
+    await queryDatabase(sql, [
+      req.body.quantidade,
+      req.body.valorInvestido,
+      req.body.cID,
+      req.body.tesID,
     ]);
     res.status(200).send("Cadastro realizado com sucesso!");
   } catch (err) {
@@ -306,21 +345,21 @@ app.post("/cotacoes_load", async (req, res) => {
 app.post("/ativos_load", async (req, res) => {
   try {
     const acoes = await queryDatabase(
-      "SELECT acaoid, ticker, descricao FROM acoes ORDER BY ticker ASC"
+      "SELECT acaoid, ticker, descricao FROM acoes ORDER BY ticker ASC",
     );
 
     const tesouro = await queryDatabase(
-      "SELECT tesouroid, descricao, investimentominimo, vencimento, codigotitulo FROM tesouro_direto ORDER BY descricao ASC"
+      "SELECT tesouroid, descricao, investimentominimo, vencimento, codigotitulo FROM tesouro_direto ORDER BY descricao ASC",
     );
 
     const fii = await queryDatabase(
-      "SELECT fundoimobiliarioid, ticker, segmento FROM fundo_imobiliario ORDER BY ticker ASC"
+      "SELECT fundoimobiliarioid, ticker, segmento FROM fundo_imobiliario ORDER BY ticker ASC",
     );
 
     res.status(200).send({
       acoes,
       tesouro,
-      fii
+      fii,
     });
   } catch (err) {
     console.error("Erro ao carregar ativos de referência:", err);
