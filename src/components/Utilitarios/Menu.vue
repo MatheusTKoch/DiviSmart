@@ -128,19 +128,24 @@ watch(
 <style scoped>
 button.carteira {
   background-color: transparent;
-  color: ghostwhite;
-  border-color: ghostwhite;
-  margin: 10px;
   font-size: large;
   margin-top: 5%;
-  transform: translateX(20vw);
+  margin-left: 6rem;
+  background: linear-gradient(135deg, #3b82f6, #1e40af);
+  border: none;
+  color: #f8fafc;
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  transition: all 0.3s ease;
 }
 
 button.carteira:hover {
-  color: black;
-  border-color: black;
-  background-color: ghostwhite;
-  transition: 0.3s;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
 }
 
 div.conteudo {
@@ -160,6 +165,11 @@ div.texto-titulo {
   font-size: xx-large;
   left: 5%;
   padding-bottom: 2vh;
+  font-weight: 800;
+  background: linear-gradient(135deg, #3b82f6, #1e40af);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 @media screen and (max-width: 480px) {
