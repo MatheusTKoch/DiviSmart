@@ -20,7 +20,7 @@ function clearUser() {
         localStorage.removeItem("usID");
         localStorage.removeItem("exp");
         localStorage.removeItem("sID");
-        router.push("/login");
+        router.push("/");
       }
     })
     .catch((err) => {

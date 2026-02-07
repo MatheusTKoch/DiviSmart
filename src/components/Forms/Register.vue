@@ -212,7 +212,7 @@ async function register() {
 
         <p class="footer-text">
           Já tem uma conta?
-          <RouterLink to="/login" class="signup-link">Faça login</RouterLink>
+          <RouterLink to="/" class="signup-link">Faça login</RouterLink>
         </p>
       </Motion>
     </main>

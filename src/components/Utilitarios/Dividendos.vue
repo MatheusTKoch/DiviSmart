@@ -168,14 +168,14 @@ async function verifyUser() {
         localStorage.removeItem("usID");
         localStorage.removeItem("exp");
         localStorage.removeItem("sID");
-        router.push("/login");
+        router.push("/");
       }
 
       if (
         err.response.data == "Sem dados na localStorage" &&
         err.response.status == 401
       ) {
-        router.push("/login");
+        router.push("/");
       }
     });
 }
