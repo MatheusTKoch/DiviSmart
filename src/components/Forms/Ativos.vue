@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import axios from "axios";
 import Toast from "../UI/Toast.vue";
-import { ref, onMounted, nextTick } from "vue";
+import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
@@ -41,18 +41,20 @@ const loadDadosCarteira = async () => {
     });
     dadosCarteira.value = res.data;
   } catch (err) {
-    console.error("Erro ao carregar dados da carteira:", err);
+    console.error(err);
   }
 };
 
 const loadAtivos = async () => {
   try {
-    const res = await axios.post("http://localhost:3000/ativos_load");
+    const res = await axios.post("http://localhost:3000/ativos_load", {
+      carteiraid: sessionStorage.getItem("cID")
+    });
     acoes.value = res.data.acoes;
     fii.value = res.data.fii;
     tesouro.value = res.data.tesouro;
   } catch (err) {
-    console.error("Erro ao carregar lista de ativos:", err);
+    console.error(err);
   }
 };
 
@@ -62,9 +64,9 @@ const loadDados = async () => {
       userID: localStorage.getItem("usID"),
       cID: sessionStorage.getItem("cID"),
     });
-    cartNome.value = res.data[0]?.Nome || "Minha Carteira";
+    cartNome.value = res.data[0]?.nome || "Minha Carteira";
   } catch (err) {
-    console.error("Erro ao carregar nome da carteira:", err);
+    console.error(err);
   }
 };
 
@@ -79,7 +81,7 @@ function exibirToast(mensagem: string, sucesso: boolean) {
 
 const cadastroAcao = async () => {
   if (!idAcao.value || !quantidadeAcao.value || !valorInvestidoAcao.value) {
-    return exibirToast("Preencha todos os campos de Ações!", false);
+    return exibirToast("Preencha todos os campos!", false);
   }
   try {
     await axios.post("http://localhost:3000/acoes_cadastro", {
@@ -89,19 +91,18 @@ const cadastroAcao = async () => {
       acaoID: idAcao.value,
     });
     await loadDadosCarteira();
-    exibirToast("Ação cadastrada com sucesso!", true);
-
+    exibirToast("Sucesso!", true);
     idAcao.value = "";
     quantidadeAcao.value = null;
     valorInvestidoAcao.value = null;
   } catch (err) {
-    exibirToast("Erro ao cadastrar ação.", false);
+    exibirToast("Erro no cadastro.", false);
   }
 };
 
 const cadastroFii = async () => {
   if (!idFii.value || !quantidadeFii.value || !valoInvestidoFii.value) {
-    return exibirToast("Preencha todos os campos de FIIs!", false);
+    return exibirToast("Preencha todos os campos!", false);
   }
   try {
     await axios.post("http://localhost:3000/fii_cadastro", {
@@ -111,22 +112,18 @@ const cadastroFii = async () => {
       fiiID: idFii.value,
     });
     await loadDadosCarteira();
-    exibirToast("FII cadastrado com sucesso!", true);
+    exibirToast("Sucesso!", true);
     idFii.value = "";
     quantidadeFii.value = null;
     valoInvestidoFii.value = null;
   } catch (err) {
-    exibirToast("Erro ao cadastrar FII.", false);
+    exibirToast("Erro no cadastro.", false);
   }
 };
 
 const cadastroTesouro = async () => {
-  if (
-    !idTesouro.value ||
-    !quantidadeTesouro.value ||
-    !valorInvestidoTesouro.value
-  ) {
-    return exibirToast("Preencha todos os campos do Tesouro!", false);
+  if (!idTesouro.value || !quantidadeTesouro.value || !valorInvestidoTesouro.value) {
+    return exibirToast("Preencha todos os campos!", false);
   }
   try {
     await axios.post("http://localhost:3000/tesouro_cadastro", {
@@ -136,42 +133,32 @@ const cadastroTesouro = async () => {
       tesID: idTesouro.value,
     });
     await loadDadosCarteira();
-    exibirToast("Tesouro cadastrado com sucesso!", true);
+    exibirToast("Sucesso!", true);
     idTesouro.value = "";
     quantidadeTesouro.value = null;
     valorInvestidoTesouro.value = null;
   } catch (err) {
-    exibirToast("Erro ao cadastrar Tesouro.", false);
+    exibirToast("Erro no cadastro.", false);
   }
 };
 
-const voltar = () => router.push("/menu");
+const voltar = () => router.push("/menu/carteira");
 </script>
 
 <template>
   <div class="ativos-page">
     <header class="ativos-header">
       <button @click="voltar" class="btn-back">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          height="24"
-          viewBox="0 -960 960 960"
-          width="24"
-          fill="currentColor"
-        >
-          <path
-            d="m287-446.67 240 240L480-160 160-480l320-320 47 46.67-240 240h513v66.66H287Z"
-          />
+        <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24" fill="currentColor">
+          <path d="m287-446.67 240 240L480-160 160-480l320-320 47 46.67-240 240h513v66.66H287Z" />
         </svg>
-        <span>Painel Principal</span>
+        <span>Carteiras</span>
       </button>
 
       <div class="resumo-box">
         <div class="resumo-item">
           <span class="label">Total Investido</span>
-          <span class="valor highlight"
-            >R$ {{ dadosCarteira?.valores || "0,00" }}</span
-          >
+          <span class="valor highlight">R$ {{ dadosCarteira?.valores || "0,00" }}</span>
         </div>
         <div class="divider"></div>
         <div class="resumo-item">
@@ -183,157 +170,104 @@ const voltar = () => router.push("/menu");
 
     <main class="ativos-container">
       <div class="title-section">
-        <h1 class="page-title">
-          Gerenciar Ativos: <span>{{ cartNome }}</span>
-        </h1>
-        <p class="page-subtitle">
-          Adicione novas posições à sua carteira de investimentos.
-        </p>
+        <h1 class="page-title">Gerenciar Ativos: <span>{{ cartNome }}</span></h1>
+        <p class="page-subtitle">Adicione novas posições à sua carteira de investimentos.</p>
       </div>
 
-      <section class="asset-section">
-        <div class="section-info">
-          <div class="icon-box blue">
-            <svg viewBox="0 0 24 24" fill="currentColor" width="20">
-              <path
-                d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"
-              />
-            </svg>
+      <div class="assets-grid">
+        <section class="asset-section">
+          <div class="section-info">
+            <div class="icon-box blue">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="20">
+                <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z" />
+              </svg>
+            </div>
+            <h2>Ações</h2>
           </div>
-          <h2>Ações Brasileiras</h2>
-        </div>
+          <div class="glass-card">
+            <div class="vertical-form">
+              <div class="form-group">
+                <label>Ticker</label>
+                <select v-model="idAcao">
+                  <option value="" disabled>Selecione</option>
+                  <option v-for="ac in acoes" :key="ac.acaoID" :value="ac.acaoID">{{ ac.simbolo }}</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Valor Investido</label>
+                <input type="number" placeholder="R$ 0,00" v-model="valorInvestidoAcao" />
+              </div>
+              <div class="form-group">
+                <label>Quantidade</label>
+                <input type="number" placeholder="Ex: 10" v-model="quantidadeAcao" />
+              </div>
+              <button class="btn-action blue-btn" @click="cadastroAcao">Salvar Ativo</button>
+            </div>
+          </div>
+        </section>
 
-        <div class="glass-card">
-          <div class="grid-form">
-            <div class="form-group">
-              <label>Ticker da Ação</label>
-              <select v-model="idAcao">
-                <option value="" disabled>Selecione o ativo</option>
-                <option v-for="ac in acoes" :key="ac.AcaoID" :value="ac.AcaoID">
-                  {{ ac.Ticker }}
-                </option>
-              </select>
+        <section class="asset-section">
+          <div class="section-info">
+            <div class="icon-box green">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="20">
+                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+              </svg>
             </div>
-            <div class="form-group">
-              <label>Valor Investido</label>
-              <input
-                type="number"
-                placeholder="R$ 0,00"
-                v-model="valorInvestidoAcao"
-              />
-            </div>
-            <div class="form-group">
-              <label>Quantidade</label>
-              <input
-                type="number"
-                placeholder="Ex: 10"
-                v-model="quantidadeAcao"
-              />
-            </div>
-            <button class="btn-action blue-btn" @click="cadastroAcao">
-              Salvar Ativo
-            </button>
+            <h2>FIIs</h2>
           </div>
-        </div>
-      </section>
+          <div class="glass-card">
+            <div class="vertical-form">
+              <div class="form-group">
+                <label>Ticker</label>
+                <select v-model="idFii">
+                  <option value="" disabled>Selecione</option>
+                  <option v-for="fi in fii" :key="fi.fiiID" :value="fi.fiiID">{{ fi.simbolo }}</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Valor Investido</label>
+                <input type="number" placeholder="R$ 0,00" v-model="valoInvestidoFii" />
+              </div>
+              <div class="form-group">
+                <label>Quantidade</label>
+                <input type="number" placeholder="Ex: 5" v-model="quantidadeFii" />
+              </div>
+              <button class="btn-action green-btn" @click="cadastroFii">Salvar Ativo</button>
+            </div>
+          </div>
+        </section>
 
-      <section class="asset-section">
-        <div class="section-info">
-          <div class="icon-box green">
-            <svg viewBox="0 0 24 24" fill="currentColor" width="20">
-              <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
-            </svg>
+        <section class="asset-section">
+          <div class="section-info">
+            <div class="icon-box orange">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="20">
+                <path d="M11.8 2.1L3.8 6.7V17.3L11.8 21.9L19.8 17.3V6.7L11.8 2.1ZM11.8 4.4L17.8 7.8L11.8 11.2L5.8 7.8L11.8 4.4Z" />
+              </svg>
+            </div>
+            <h2>Tesouro</h2>
           </div>
-          <h2>Fundos Imobiliários</h2>
-        </div>
-
-        <div class="glass-card">
-          <div class="grid-form">
-            <div class="form-group">
-              <label>Ticker do FII</label>
-              <select v-model="idFii">
-                <option value="" disabled>Selecione o ativo</option>
-                <option
-                  v-for="fi in fii"
-                  :key="fi.FundoImobiliarioID"
-                  :value="fi.FundoImobiliarioID"
-                >
-                  {{ fi.Ticker }}
-                </option>
-              </select>
+          <div class="glass-card">
+            <div class="vertical-form">
+              <div class="form-group">
+                <label>Título Público</label>
+                <select v-model="idTesouro">
+                  <option value="" disabled>Selecione</option>
+                  <option v-for="tes in tesouro" :key="tes.tesouroID" :value="tes.tesouroID">{{ tes.simbolo }}</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Valor Investido</label>
+                <input type="number" placeholder="R$ 0,00" v-model="valorInvestidoTesouro" />
+              </div>
+              <div class="form-group">
+                <label>Quantidade</label>
+                <input type="number" placeholder="Ex: 1.5" v-model="quantidadeTesouro" />
+              </div>
+              <button class="btn-action orange-btn" @click="cadastroTesouro">Salvar Ativo</button>
             </div>
-            <div class="form-group">
-              <label>Valor Investido</label>
-              <input
-                type="number"
-                placeholder="R$ 0,00"
-                v-model="valoInvestidoFii"
-              />
-            </div>
-            <div class="form-group">
-              <label>Quantidade</label>
-              <input
-                type="number"
-                placeholder="Ex: 5"
-                v-model="quantidadeFii"
-              />
-            </div>
-            <button class="btn-action green-btn" @click="cadastroFii">
-              Salvar Ativo
-            </button>
           </div>
-        </div>
-      </section>
-
-      <section class="asset-section">
-        <div class="section-info">
-          <div class="icon-box orange">
-            <svg viewBox="0 0 24 24" fill="currentColor" width="20">
-              <path
-                d="M11.8 2.1L3.8 6.7V17.3L11.8 21.9L19.8 17.3V6.7L11.8 2.1ZM11.8 4.4L17.8 7.8L11.8 11.2L5.8 7.8L11.8 4.4Z"
-              />
-            </svg>
-          </div>
-          <h2>Tesouro Direto</h2>
-        </div>
-
-        <div class="glass-card">
-          <div class="grid-form">
-            <div class="form-group wide">
-              <label>Título Público</label>
-              <select v-model="idTesouro">
-                <option value="" disabled>Selecione o título</option>
-                <option
-                  v-for="tes in tesouro"
-                  :key="tes.TesouroID"
-                  :value="tes.TesouroID"
-                >
-                  {{ tes.Descricao }}
-                </option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Valor Investido</label>
-              <input
-                type="number"
-                placeholder="R$ 0,00"
-                v-model="valorInvestidoTesouro"
-              />
-            </div>
-            <div class="form-group">
-              <label>Quantidade</label>
-              <input
-                type="number"
-                placeholder="Ex: 1.5"
-                v-model="quantidadeTesouro"
-              />
-            </div>
-            <button class="btn-action orange-btn" @click="cadastroTesouro">
-              Salvar Ativo
-            </button>
-          </div>
-        </div>
-      </section>
+        </section>
+      </div>
     </main>
 
     <teleport to="body">
@@ -345,7 +279,7 @@ const voltar = () => router.push("/menu");
 <style scoped>
 .ativos-page {
   padding: 2rem;
-  max-width: 1200px;
+  max-width: 1300px;
   margin: 0 auto;
   color: #f8fafc;
 }
@@ -354,7 +288,7 @@ const voltar = () => router.push("/menu");
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 3rem;
+  margin-bottom: 2.5rem;
 }
 
 .btn-back {
@@ -368,6 +302,7 @@ const voltar = () => router.push("/menu");
   font-weight: 500;
   transition: all 0.2s;
 }
+
 .btn-back:hover {
   color: #3b82f6;
   transform: translateX(-4px);
@@ -388,19 +323,22 @@ const voltar = () => router.push("/menu");
   display: flex;
   flex-direction: column;
 }
+
 .resumo-item .label {
   font-size: 0.7rem;
   color: #64748b;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
 }
+
 .resumo-item .valor {
   font-size: 1.1rem;
   font-weight: 700;
 }
+
 .valor.highlight {
   color: #3b82f6;
 }
+
 .divider {
   width: 1px;
   height: 30px;
@@ -408,156 +346,129 @@ const voltar = () => router.push("/menu");
 }
 
 .title-section {
-  margin-bottom: 2.5rem;
+  margin-bottom: 2rem;
 }
+
 .page-title {
   font-size: 1.75rem;
   font-weight: 300;
-  margin-bottom: 0.5rem;
 }
+
 .page-title span {
   font-weight: 700;
   color: #3b82f6;
 }
+
 .page-subtitle {
   color: #94a3b8;
   font-size: 0.95rem;
 }
 
-.asset-section {
-  margin-bottom: 2.5rem;
+.assets-grid {
+  display: flex;
+  flex-direction: row;
+  gap: 1.5rem;
+  align-items: stretch;
 }
+
+.asset-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
 .section-info {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 1.25rem;
+  margin-bottom: 1rem;
 }
+
 .section-info h2 {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   font-weight: 600;
   color: #cbd5e1;
 }
 
 .icon-box {
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.icon-box.blue {
-  background: rgba(59, 130, 246, 0.15);
-  color: #3b82f6;
-}
-.icon-box.green {
-  background: rgba(16, 185, 129, 0.15);
-  color: #10b981;
-}
-.icon-box.orange {
-  background: rgba(245, 158, 11, 0.15);
-  color: #f59e0b;
-}
+
+.icon-box.blue { background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
+.icon-box.green { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+.icon-box.orange { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
 
 .glass-card {
   background: rgba(30, 41, 59, 0.3);
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 20px;
   padding: 1.5rem;
+  flex-grow: 1;
 }
 
-.grid-form {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 1.5rem;
-  align-items: flex-end;
+.vertical-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-}
-.form-group.wide {
-  grid-column: span 1;
+  gap: 6px;
 }
 
 label {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 500;
   color: #94a3b8;
-  padding-left: 4px;
 }
 
-input,
-select {
+input, select {
   background: rgba(15, 23, 42, 0.5);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  padding: 12px 14px;
-  border-radius: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
   color: #fff;
   font-size: 0.9rem;
-  transition: all 0.2s;
 }
-input:focus,
-select:focus {
+
+input:focus, select:focus {
   outline: none;
   border-color: #3b82f6;
-  background: rgba(15, 23, 42, 0.8);
 }
 
 .btn-action {
-  padding: 12px 20px;
-  border-radius: 12px;
+  margin-top: 0.5rem;
+  padding: 12px;
+  border-radius: 10px;
   border: none;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s;
-  height: 46px;
-}
-.blue-btn {
-  background: #3b82f6;
-  color: white;
-}
-.blue-btn:hover {
-  background: #2563eb;
-  transform: translateY(-2px);
 }
 
-.green-btn {
-  background: #10b981;
-  color: white;
-}
-.green-btn:hover {
-  background: #059669;
+.blue-btn { background: #3b82f6; color: white; }
+.green-btn { background: #10b981; color: white; }
+.orange-btn { background: #f59e0b; color: white; }
+
+.btn-action:hover {
   transform: translateY(-2px);
+  filter: brightness(1.1);
 }
 
-.orange-btn {
-  background: #f59e0b;
-  color: white;
-}
-.orange-btn:hover {
-  background: #d97706;
-  transform: translateY(-2px);
+@media (max-width: 1024px) {
+  .assets-grid { flex-wrap: wrap; }
+  .asset-section { flex: 1 1 calc(50% - 1.5rem); }
 }
 
 @media (max-width: 768px) {
-  .ativos-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1.5rem;
-  }
-  .resumo-box {
-    width: 100%;
-    justify-content: space-around;
-  }
-  .grid-form {
-    grid-template-columns: 1fr;
-  }
-  .btn-action {
-    margin-top: 0.5rem;
-  }
+  .ativos-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
+  .asset-section { flex: 1 1 100%; }
 }
 </style>
