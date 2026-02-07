@@ -48,11 +48,11 @@ async function login() {
     alert("Preencha todos os campos!");
     return;
   }
-  
+
   try {
     const res = await axios.post("http://localhost:3000/users_login", {
       email: email.value,
-      senha: senha.value
+      senha: senha.value,
     });
 
     if (res.status == 200) {
@@ -303,7 +303,9 @@ input:focus {
   justify-content: center;
   gap: 10px;
   cursor: pointer;
-  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s,
+  transition:
+    transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+    background-color 0.3s,
     box-shadow 0.3s;
 }
 

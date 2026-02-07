@@ -50,7 +50,7 @@ async function getDividendos(ticker) {
       const url = `${ACOES_URL}${tickerUpper}`;
 
       console.log(
-        `[Tentativa ${attempts + 1}/${MAX_RETRIES}] Buscando: ${url}`
+        `[Tentativa ${attempts + 1}/${MAX_RETRIES}] Buscando: ${url}`,
       );
 
       const response = await axios.get(url, {
@@ -92,17 +92,17 @@ async function getDividendos(ticker) {
     } catch (error) {
       attempts++;
       console.warn(
-        `Aviso: Erro ao acessar ${ticker} (Tentativa ${attempts}). Motivo: ${error.message}`
+        `Aviso: Erro ao acessar ${ticker} (Tentativa ${attempts}). Motivo: ${error.message}`,
       );
 
       if (attempts < MAX_RETRIES) {
         console.log(
-          `Aguardando ${RETRY_DELAY / 1000}s para tentar novamente...`
+          `Aguardando ${RETRY_DELAY / 1000}s para tentar novamente...`,
         );
         await delay(RETRY_DELAY);
       } else {
         console.error(
-          `Erro: Limite de tentativas atingido para o ticker ${ticker}. Pulando para o próximo.`
+          `Erro: Limite de tentativas atingido para o ticker ${ticker}. Pulando para o próximo.`,
         );
       }
     }
@@ -135,7 +135,7 @@ function delay(ms) {
 
 async function executar() {
   let client;
-  const GLOBAL_TIMEOUT_MS = 1000 * 60 * 20; 
+  const GLOBAL_TIMEOUT_MS = 1000 * 60 * 20;
   const timeoutHandle = setTimeout(() => {
     console.error("Tempo máximo de execução atingido. Forçando saída.");
     process.exit(1);

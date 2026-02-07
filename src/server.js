@@ -36,7 +36,7 @@ app.use(
       secure: false,
       maxAge: cookie_life,
     },
-  })
+  }),
 );
 
 const queryDatabase = async (text, params) => {
@@ -50,7 +50,7 @@ app.post("/users_register", async (req, res) => {
     const { email, nome, sobrenome, senha } = req.body;
     const emailResult = await queryDatabase(
       "SELECT * FROM users WHERE email = $1",
-      [email]
+      [email],
     );
 
     if (emailResult.length > 0)
@@ -68,13 +68,11 @@ app.post("/users_register", async (req, res) => {
     if (registroResult.length > 0) {
       const userID = registroResult[0].userid;
       req.session.usuario = userID;
-      res
-        .status(200)
-        .send({
-          usID: userID,
-          exp: req.session.cookie.expires,
-          sID: req.sessionID,
-        });
+      res.status(200).send({
+        usID: userID,
+        exp: req.session.cookie.expires,
+        sID: req.sessionID,
+      });
     }
   } catch (err) {
     res.status(500).send("Erro interno no servidor");
@@ -86,7 +84,7 @@ app.post("/users_login", async (req, res) => {
     const { email, senha } = req.body;
     const userResult = await queryDatabase(
       "SELECT * FROM users WHERE email = $1",
-      [email]
+      [email],
     );
 
     if (userResult.length === 0)
@@ -107,13 +105,11 @@ app.post("/users_login", async (req, res) => {
       userID,
     ]);
 
-    res
-      .status(200)
-      .send({
-        usID: userID,
-        exp: req.session.cookie.expires,
-        sID: req.sessionID,
-      });
+    res.status(200).send({
+      usID: userID,
+      exp: req.session.cookie.expires,
+      sID: req.sessionID,
+    });
   } catch (err) {
     res.status(500).send("Erro interno no servidor");
   }
@@ -123,7 +119,7 @@ app.post("/users_load", async (req, res) => {
   try {
     const userResult = await queryDatabase(
       "SELECT * FROM USERS WHERE userId = $1",
-      [req.body.usID]
+      [req.body.usID],
     );
     if (!userResult || userResult.length === 0)
       return res.status(401).send("Usuário não encontrado");
@@ -162,21 +158,21 @@ app.post("/carteira_dados", async (req, res) => {
       (
         await queryDatabase(
           "SELECT sum(ValorInvestido) as total FROM ativos_acoes WHERE carteiraID = $1 AND deletedAt IS NULL",
-          [cID]
+          [cID],
         )
       )[0].total || 0;
     const totalFii =
       (
         await queryDatabase(
           "SELECT sum(ValorInvestido) as total FROM ativos_fii WHERE carteiraID = $1 AND deletedAt IS NULL",
-          [cID]
+          [cID],
         )
       )[0].total || 0;
     const totalTesouro =
       (
         await queryDatabase(
           "SELECT sum(ValorInvestido) as total FROM ativos_tesouro WHERE carteiraID = $1 AND deletedAt IS NULL",
-          [cID]
+          [cID],
         )
       )[0].total || 0;
 
@@ -185,27 +181,27 @@ app.post("/carteira_dados", async (req, res) => {
         (
           await queryDatabase(
             "SELECT count(*) as count FROM ativos_acoes WHERE carteiraID = $1 AND deletedAt IS NULL",
-            [cID]
+            [cID],
           )
-        )[0].count
+        )[0].count,
       ) || 0;
     const countFii =
       parseInt(
         (
           await queryDatabase(
             "SELECT count(*) as count FROM ativos_fii WHERE carteiraID = $1 AND deletedAt IS NULL",
-            [cID]
+            [cID],
           )
-        )[0].count
+        )[0].count,
       ) || 0;
     const countTesouro =
       parseInt(
         (
           await queryDatabase(
             "SELECT count(*) as count FROM ativos_tesouro WHERE carteiraID = $1 AND deletedAt IS NULL",
-            [cID]
+            [cID],
           )
-        )[0].count
+        )[0].count,
       ) || 0;
 
     res.status(200).send({
@@ -223,15 +219,15 @@ app.post("/carteira_delete", async (req, res) => {
     const id = req.body.carteiraID;
     await queryDatabase(
       "UPDATE carteiras SET deletedAt = now() WHERE carteiraId = $1",
-      [id]
+      [id],
     );
     await queryDatabase(
       "UPDATE ativos_acoes SET deletedAt = now() WHERE carteiraId = $1",
-      [id]
+      [id],
     );
     await queryDatabase(
       "UPDATE ativos_fii SET deletedAt = now() WHERE carteiraId = $1",
-      [id]
+      [id],
     );
     res.status(200).send("Carteira deletada!");
   } catch (err) {
@@ -270,7 +266,7 @@ app.post("/session", async (req, res) => {
     const { usID, sID, exp } = req.body;
     const sessionResult = await queryDatabase(
       "SELECT * FROM USER_SESSION WHERE userId = $1 AND sessionid = $2",
-      [usID, sID]
+      [usID, sID],
     );
 
     if (!sessionResult || sessionResult.length === 0)
@@ -289,7 +285,7 @@ app.post("/logout", async (req, res) => {
   try {
     await queryDatabase(
       "DELETE FROM USER_SESSION WHERE userId = $1 AND sessionid = $2",
-      [req.body.usID, req.body.sID]
+      [req.body.usID, req.body.sID],
     );
     res.status(200).send("sucesso");
   } catch (err) {
@@ -312,15 +308,15 @@ app.post("/ativos_load", async (req, res) => {
     const carteiraID = req.body.carteiraid;
     const acoes = await queryDatabase(
       "SELECT aa.*, a.nome, a.simbolo FROM ativos_acoes aa JOIN acoes a ON aa.acaoID = a.acaoID WHERE aa.carteiraID = $1 AND aa.deletedAt IS NULL",
-      [carteiraID]
+      [carteiraID],
     );
     const fii = await queryDatabase(
       "SELECT af.*, f.nome, f.simbolo FROM ativos_fii af JOIN fii f ON af.fiiID = f.fiiID WHERE af.carteiraID = $1 AND af.deletedAt IS NULL",
-      [carteiraID]
+      [carteiraID],
     );
     const tesouro = await queryDatabase(
       "SELECT at.*, t.nome, t.simbolo FROM ativos_tesouro at JOIN tesouro t ON at.tesouroID = t.tesouroID WHERE at.carteiraID = $1 AND at.deletedAt IS NULL",
-      [carteiraID]
+      [carteiraID],
     );
     res.status(200).send({ acoes, fii, tesouro });
   } catch (err) {

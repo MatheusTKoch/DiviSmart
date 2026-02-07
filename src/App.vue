@@ -33,7 +33,11 @@ const isHome = computed(() => route.path === "/");
 
 body {
   background-color: var(--bg-deep);
-  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  font-family:
+    "Inter",
+    system-ui,
+    -apple-system,
+    sans-serif;
   -webkit-font-smoothing: antialiased;
   color: #f8fafc;
   overflow-x: hidden;
@@ -43,7 +47,8 @@ body {
   min-height: 100vh;
   width: 100%;
   position: relative;
-  background: radial-gradient(
+  background:
+    radial-gradient(
       circle at 0% 0%,
       rgba(59, 130, 246, 0.08) 0%,
       transparent 35%

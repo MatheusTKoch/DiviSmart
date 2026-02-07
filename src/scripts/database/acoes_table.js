@@ -1,22 +1,22 @@
-import dotenv from 'dotenv';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { Pool } from 'pg';
+import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
+import { Pool } from "pg";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-dotenv.config({path: path.resolve(__dirname, '../../../.env')});
+dotenv.config({ path: path.resolve(__dirname, "../../../.env") });
 
 const db = new Pool({
-    database: process.env.VITE_DATABASE_DB, 
-    user: process.env.VITE_USER_DB, 
-    password: process.env.VITE_PASSWORD_DB, 
-    host: process.env.VITE_HOST_DB
+  database: process.env.VITE_DATABASE_DB,
+  user: process.env.VITE_USER_DB,
+  password: process.env.VITE_PASSWORD_DB,
+  host: process.env.VITE_HOST_DB,
 });
 
 async function createTablesIfNotExists() {
-    //Criando acoes
-    const sql_acoes = `
+  //Criando acoes
+  const sql_acoes = `
         CREATE TABLE IF NOT EXISTS acoes (
             acaoid SERIAL PRIMARY KEY,
             ticker VARCHAR(6) NOT NULL UNIQUE,
@@ -24,8 +24,8 @@ async function createTablesIfNotExists() {
         );
     `;
 
-    //Criando ativos_acoes
-    const sql_ativos_acoes = `
+  //Criando ativos_acoes
+  const sql_ativos_acoes = `
         CREATE TABLE IF NOT EXISTS ativos_acoes (
             ativoacaoid SERIAL PRIMARY KEY,
             quantidade INT NOT NULL,
@@ -40,8 +40,8 @@ async function createTablesIfNotExists() {
         );
     `;
 
-    //Criando dividendos_acoes
-    const sql_dividendos_acoes = `
+  //Criando dividendos_acoes
+  const sql_dividendos_acoes = `
         CREATE TABLE IF NOT EXISTS dividendos_acoes (
             dividendoacaoid SERIAL PRIMARY KEY,
             datapagamento TIMESTAMP WITHOUT TIME ZONE NOT NULL,
@@ -53,38 +53,36 @@ async function createTablesIfNotExists() {
             UNIQUE(acaoid, datapagamento)
         );
     `;
-    
-    try {
-        console.log('--- Iniciando Criação de Tabelas ---');
 
-        console.log('Criando "acoes"...');
-        await db.query(sql_acoes);
-        console.log('Tabela "ativos_acoes" criada ou já existente!');
+  try {
+    console.log("--- Iniciando Criação de Tabelas ---");
 
-        console.log('Criando "ativos_acoes"...');
-        await db.query(sql_ativos_acoes);
-        console.log('Tabela "ativos_acoes" criada ou já existente!');
-        
-        console.log('Criando "dividendos_acoes"...');
-        await db.query(sql_dividendos_acoes);
-        console.log('Tabela "dividendos_acoes" criada ou já existente!');
-        
-        console.log('--- Criação de FIIs Ações Concluída ---');
-        
-    } catch (err) {
-        console.error('Erro ao criar uma das tabelas:', err.message);
-        console.error('Verifique se as tabelas já existem.');
-        throw err;
-    } finally {
-        await db.end();
-    }
+    console.log('Criando "acoes"...');
+    await db.query(sql_acoes);
+    console.log('Tabela "ativos_acoes" criada ou já existente!');
+
+    console.log('Criando "ativos_acoes"...');
+    await db.query(sql_ativos_acoes);
+    console.log('Tabela "ativos_acoes" criada ou já existente!');
+
+    console.log('Criando "dividendos_acoes"...');
+    await db.query(sql_dividendos_acoes);
+    console.log('Tabela "dividendos_acoes" criada ou já existente!');
+
+    console.log("--- Criação de FIIs Ações Concluída ---");
+  } catch (err) {
+    console.error("Erro ao criar uma das tabelas:", err.message);
+    console.error("Verifique se as tabelas já existem.");
+    throw err;
+  } finally {
+    await db.end();
+  }
 }
 
-createTablesIfNotExists()
-    .catch(err => {
-        console.error('Falha no processo de criação das tabelas:', err.message);
-        process.exit(1);
-    });
+createTablesIfNotExists().catch((err) => {
+  console.error("Falha no processo de criação das tabelas:", err.message);
+  process.exit(1);
+});
 
 // db.connect((err) => {
 //     if (err) throw err;

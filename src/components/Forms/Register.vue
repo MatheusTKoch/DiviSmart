@@ -331,7 +331,9 @@ input:focus {
   justify-content: center;
   gap: 10px;
   cursor: pointer;
-  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s;
+  transition:
+    transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+    background-color 0.3s;
 }
 
 .btn-login:hover {
