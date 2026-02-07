@@ -4,11 +4,26 @@ import Toast from "../UI/Toast.vue";
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 
+interface Acao {
+  acaoid: string;
+  ticker: string;
+}
+
+interface Fii {
+  fundoimobiliarioid: string;
+  ticker: string;
+}
+
+interface Tesouro {
+  tesouroid: string;
+  descricao: string;
+}
+
 const router = useRouter();
 
-const acoes = ref([]);
-const fii = ref([]);
-const tesouro = ref([]);
+const acoes = ref<Acao[]>([]);
+const fii = ref<Fii[]>([]);
+const tesouro = ref<Tesouro[]>([]);
 const cartNome = ref("");
 const dadosCarteira = ref({ valores: 0, quantidade: 0 });
 
@@ -47,16 +62,20 @@ const loadDadosCarteira = async () => {
 
 const loadAtivos = async () => {
   try {
+
     const res = await axios.post("http://localhost:3000/ativos_load", {
       carteiraid: sessionStorage.getItem("cID")
     });
+
     acoes.value = res.data.acoes;
     fii.value = res.data.fii;
     tesouro.value = res.data.tesouro;
+
+    console.log("Ativos carregados com sucesso!");
   } catch (err) {
-    console.error(err);
+    console.error("Erro ao carregar ativos:", err);
   }
-};
+}
 
 const loadDados = async () => {
   try {
@@ -122,7 +141,11 @@ const cadastroFii = async () => {
 };
 
 const cadastroTesouro = async () => {
-  if (!idTesouro.value || !quantidadeTesouro.value || !valorInvestidoTesouro.value) {
+  if (
+    !idTesouro.value ||
+    !quantidadeTesouro.value ||
+    !valorInvestidoTesouro.value
+  ) {
     return exibirToast("Preencha todos os campos!", false);
   }
   try {
@@ -149,8 +172,16 @@ const voltar = () => router.push("/menu/carteira");
   <div class="ativos-page">
     <header class="ativos-header">
       <button @click="voltar" class="btn-back">
-        <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24" fill="currentColor">
-          <path d="m287-446.67 240 240L480-160 160-480l320-320 47 46.67-240 240h513v66.66H287Z" />
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          height="24"
+          viewBox="0 -960 960 960"
+          width="24"
+          fill="currentColor"
+        >
+          <path
+            d="m287-446.67 240 240L480-160 160-480l320-320 47 46.67-240 240h513v66.66H287Z"
+          />
         </svg>
         <span>Carteiras</span>
       </button>
@@ -158,7 +189,9 @@ const voltar = () => router.push("/menu/carteira");
       <div class="resumo-box">
         <div class="resumo-item">
           <span class="label">Total Investido</span>
-          <span class="valor highlight">R$ {{ dadosCarteira?.valores || "0,00" }}</span>
+          <span class="valor highlight"
+            >R$ {{ dadosCarteira?.valores || "0,00" }}</span
+          >
         </div>
         <div class="divider"></div>
         <div class="resumo-item">
@@ -170,8 +203,12 @@ const voltar = () => router.push("/menu/carteira");
 
     <main class="ativos-container">
       <div class="title-section">
-        <h1 class="page-title">Gerenciar Ativos: <span>{{ cartNome }}</span></h1>
-        <p class="page-subtitle">Adicione novas posições à sua carteira de investimentos.</p>
+        <h1 class="page-title">
+          Gerenciar Ativos: <span>{{ cartNome }}</span>
+        </h1>
+        <p class="page-subtitle">
+          Adicione novas posições à sua carteira de investimentos.
+        </p>
       </div>
 
       <div class="assets-grid">
@@ -179,7 +216,9 @@ const voltar = () => router.push("/menu/carteira");
           <div class="section-info">
             <div class="icon-box blue">
               <svg viewBox="0 0 24 24" fill="currentColor" width="20">
-                <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z" />
+                <path
+                  d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"
+                />
               </svg>
             </div>
             <h2>Ações</h2>
@@ -190,18 +229,34 @@ const voltar = () => router.push("/menu/carteira");
                 <label>Ticker</label>
                 <select v-model="idAcao">
                   <option value="" disabled>Selecione</option>
-                  <option v-for="ac in acoes" :key="ac.acaoID" :value="ac.acaoID">{{ ac.simbolo }}</option>
+                  <option
+                    v-for="ac in acoes"
+                    :key="ac.acaoid"
+                    :value="ac.acaoid"
+                  >
+                    {{ ac.ticker }}
+                  </option>
                 </select>
               </div>
               <div class="form-group">
                 <label>Valor Investido</label>
-                <input type="number" placeholder="R$ 0,00" v-model="valorInvestidoAcao" />
+                <input
+                  type="number"
+                  placeholder="R$ 0,00"
+                  v-model="valorInvestidoAcao"
+                />
               </div>
               <div class="form-group">
                 <label>Quantidade</label>
-                <input type="number" placeholder="Ex: 10" v-model="quantidadeAcao" />
+                <input
+                  type="number"
+                  placeholder="Ex: 10"
+                  v-model="quantidadeAcao"
+                />
               </div>
-              <button class="btn-action blue-btn" @click="cadastroAcao">Salvar Ativo</button>
+              <button class="btn-action blue-btn" @click="cadastroAcao">
+                Salvar Ativo
+              </button>
             </div>
           </div>
         </section>
@@ -221,18 +276,34 @@ const voltar = () => router.push("/menu/carteira");
                 <label>Ticker</label>
                 <select v-model="idFii">
                   <option value="" disabled>Selecione</option>
-                  <option v-for="fi in fii" :key="fi.fiiID" :value="fi.fiiID">{{ fi.simbolo }}</option>
+                  <option
+                    v-for="f in fii"
+                    :key="f.fundoimobiliarioid"
+                    :value="f.fundoimobiliarioid"
+                  >
+                    {{ f.ticker }}
+                  </option>
                 </select>
               </div>
               <div class="form-group">
                 <label>Valor Investido</label>
-                <input type="number" placeholder="R$ 0,00" v-model="valoInvestidoFii" />
+                <input
+                  type="number"
+                  placeholder="R$ 0,00"
+                  v-model="valoInvestidoFii"
+                />
               </div>
               <div class="form-group">
                 <label>Quantidade</label>
-                <input type="number" placeholder="Ex: 5" v-model="quantidadeFii" />
+                <input
+                  type="number"
+                  placeholder="Ex: 5"
+                  v-model="quantidadeFii"
+                />
               </div>
-              <button class="btn-action green-btn" @click="cadastroFii">Salvar Ativo</button>
+              <button class="btn-action green-btn" @click="cadastroFii">
+                Salvar Ativo
+              </button>
             </div>
           </div>
         </section>
@@ -241,7 +312,9 @@ const voltar = () => router.push("/menu/carteira");
           <div class="section-info">
             <div class="icon-box orange">
               <svg viewBox="0 0 24 24" fill="currentColor" width="20">
-                <path d="M11.8 2.1L3.8 6.7V17.3L11.8 21.9L19.8 17.3V6.7L11.8 2.1ZM11.8 4.4L17.8 7.8L11.8 11.2L5.8 7.8L11.8 4.4Z" />
+                <path
+                  d="M11.8 2.1L3.8 6.7V17.3L11.8 21.9L19.8 17.3V6.7L11.8 2.1ZM11.8 4.4L17.8 7.8L11.8 11.2L5.8 7.8L11.8 4.4Z"
+                />
               </svg>
             </div>
             <h2>Tesouro</h2>
@@ -252,18 +325,34 @@ const voltar = () => router.push("/menu/carteira");
                 <label>Título Público</label>
                 <select v-model="idTesouro">
                   <option value="" disabled>Selecione</option>
-                  <option v-for="tes in tesouro" :key="tes.tesouroID" :value="tes.tesouroID">{{ tes.simbolo }}</option>
+                  <option
+                    v-for="t in tesouro"
+                    :key="t.tesouroid"
+                    :value="t.tesouroid"
+                  >
+                    {{ t.descricao }}
+                  </option>
                 </select>
               </div>
               <div class="form-group">
                 <label>Valor Investido</label>
-                <input type="number" placeholder="R$ 0,00" v-model="valorInvestidoTesouro" />
+                <input
+                  type="number"
+                  placeholder="R$ 0,00"
+                  v-model="valorInvestidoTesouro"
+                />
               </div>
               <div class="form-group">
                 <label>Quantidade</label>
-                <input type="number" placeholder="Ex: 1.5" v-model="quantidadeTesouro" />
+                <input
+                  type="number"
+                  placeholder="Ex: 1.5"
+                  v-model="quantidadeTesouro"
+                />
               </div>
-              <button class="btn-action orange-btn" @click="cadastroTesouro">Salvar Ativo</button>
+              <button class="btn-action orange-btn" @click="cadastroTesouro">
+                Salvar Ativo
+              </button>
             </div>
           </div>
         </section>
@@ -399,9 +488,18 @@ const voltar = () => router.push("/menu/carteira");
   justify-content: center;
 }
 
-.icon-box.blue { background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
-.icon-box.green { background: rgba(16, 185, 129, 0.15); color: #10b981; }
-.icon-box.orange { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+.icon-box.blue {
+  background: rgba(59, 130, 246, 0.15);
+  color: #3b82f6;
+}
+.icon-box.green {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+}
+.icon-box.orange {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+}
 
 .glass-card {
   background: rgba(30, 41, 59, 0.3);
@@ -429,7 +527,8 @@ label {
   color: #94a3b8;
 }
 
-input, select {
+input,
+select {
   background: rgba(15, 23, 42, 0.5);
   border: 1px solid rgba(255, 255, 255, 0.08);
   padding: 10px 12px;
@@ -438,7 +537,8 @@ input, select {
   font-size: 0.9rem;
 }
 
-input:focus, select:focus {
+input:focus,
+select:focus {
   outline: none;
   border-color: #3b82f6;
 }
@@ -453,9 +553,18 @@ input:focus, select:focus {
   transition: all 0.2s;
 }
 
-.blue-btn { background: #3b82f6; color: white; }
-.green-btn { background: #10b981; color: white; }
-.orange-btn { background: #f59e0b; color: white; }
+.blue-btn {
+  background: #3b82f6;
+  color: white;
+}
+.green-btn {
+  background: #10b981;
+  color: white;
+}
+.orange-btn {
+  background: #f59e0b;
+  color: white;
+}
 
 .btn-action:hover {
   transform: translateY(-2px);
@@ -463,12 +572,22 @@ input:focus, select:focus {
 }
 
 @media (max-width: 1024px) {
-  .assets-grid { flex-wrap: wrap; }
-  .asset-section { flex: 1 1 calc(50% - 1.5rem); }
+  .assets-grid {
+    flex-wrap: wrap;
+  }
+  .asset-section {
+    flex: 1 1 calc(50% - 1.5rem);
+  }
 }
 
 @media (max-width: 768px) {
-  .ativos-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
-  .asset-section { flex: 1 1 100%; }
+  .ativos-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  .asset-section {
+    flex: 1 1 100%;
+  }
 }
 </style>

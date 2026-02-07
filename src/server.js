@@ -305,22 +305,26 @@ app.post("/cotacoes_load", async (req, res) => {
 
 app.post("/ativos_load", async (req, res) => {
   try {
-    const carteiraID = req.body.carteiraid;
     const acoes = await queryDatabase(
-      "SELECT aa.*, a.nome, a.simbolo FROM ativos_acoes aa JOIN acoes a ON aa.acaoID = a.acaoID WHERE aa.carteiraID = $1 AND aa.deletedAt IS NULL",
-      [carteiraID],
+      "SELECT acaoid, ticker, descricao FROM acoes ORDER BY ticker ASC"
     );
-    const fii = await queryDatabase(
-      "SELECT af.*, f.nome, f.simbolo FROM ativos_fii af JOIN fii f ON af.fiiID = f.fiiID WHERE af.carteiraID = $1 AND af.deletedAt IS NULL",
-      [carteiraID],
-    );
+
     const tesouro = await queryDatabase(
-      "SELECT at.*, t.nome, t.simbolo FROM ativos_tesouro at JOIN tesouro t ON at.tesouroID = t.tesouroID WHERE at.carteiraID = $1 AND at.deletedAt IS NULL",
-      [carteiraID],
+      "SELECT tesouroid, descricao, investimentominimo, vencimento, codigotitulo FROM tesouro_direto ORDER BY descricao ASC"
     );
-    res.status(200).send({ acoes, fii, tesouro });
+
+    const fii = await queryDatabase(
+      "SELECT fundoimobiliarioid, ticker, segmento FROM fundo_imobiliario ORDER BY ticker ASC"
+    );
+
+    res.status(200).send({
+      acoes,
+      tesouro,
+      fii
+    });
   } catch (err) {
-    res.status(500).send("Erro interno no servidor");
+    console.error("Erro ao carregar ativos de referência:", err);
+    res.status(500).send("Erro interno no servidor ao carregar dados.");
   }
 });
 
