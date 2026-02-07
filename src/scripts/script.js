@@ -6,7 +6,7 @@ import fs from "fs";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const DB_LOCK_FILE = path.join(__dirname, ".database_initialized.lock");
+const DB_LOCK_FILE = path.join(__dirname, ".last_run_date.lock");
 
 const ORDEM_DATABASE = [
     "database.js",
@@ -42,30 +42,49 @@ async function rodarScript(diretorio, arquivo) {
 
 async function executarScripts() {
     try {
-        if (!fs.existsSync(DB_LOCK_FILE)) {
-            console.log("=== Inicializando Banco de Dados (Primeira Execução) ===");
+        const hoje = new Date().toISOString().split('T')[0];
+        const DB_INITIALIZED_LOCK = path.join(__dirname, ".database_initialized.lock");
+        const SCRAPER_LAST_RUN_LOCK = path.join(__dirname, ".scraper_last_run.lock");
+
+        if (!fs.existsSync(DB_INITIALIZED_LOCK)) {
+            console.log("=== 🛠️ Inicializando Banco de Dados (Primeira Execução) ===");
             for (const arquivo of ORDEM_DATABASE) {
                 const pastaDatabase = path.join(__dirname, "database");
                 if (fs.existsSync(path.join(pastaDatabase, arquivo))) {
                     await rodarScript("database", arquivo);
                 }
             }
-            fs.writeFileSync(DB_LOCK_FILE, `Banco criado em: ${new Date().toISOString()}`);
-            console.log("✓ Tabelas criadas e trava gerada.");
+            fs.writeFileSync(DB_INITIALIZED_LOCK, `Banco criado em: ${new Date().toISOString()}`);
+            console.log("✓ Tabelas criadas com sucesso.");
         } else {
-            console.log("=== Banco de dados já inicializado anteriormente. Pulando criação de tabelas. ===");
+            console.log("=== Estrutura do banco de dados já existente ===");
         }
 
-        console.log("=== Iniciando Scrapers ===");
-        const pastaScrapers = path.join(__dirname, "scrapers");
-        if (fs.existsSync(pastaScrapers)) {
-            const arquivosScrapers = fs.readdirSync(pastaScrapers).filter(file => file.endsWith(".js"));
-            for (const arquivo of arquivosScrapers) {
-                await rodarScript("scrapers", arquivo);
+        let ultimaExecucao = "";
+        if (fs.existsSync(SCRAPER_LAST_RUN_LOCK)) {
+            ultimaExecucao = fs.readFileSync(SCRAPER_LAST_RUN_LOCK, 'utf8').trim();
+        }
+
+        if (ultimaExecucao === hoje) {
+            console.log(`\n=== Scrapers já executados hoje (${hoje}). Pulando atualização de dados... ===\n`);
+        } else {
+            console.log(`\n=== Iniciando Scrapers (Primeira execução do dia: ${hoje}) ===`);
+            const pastaScrapers = path.join(__dirname, "scrapers");
+            
+            if (fs.existsSync(pastaScrapers)) {
+                const arquivosScrapers = fs.readdirSync(pastaScrapers).filter(file => file.endsWith(".js"));
+                
+                for (const arquivo of arquivosScrapers) {
+                    await rodarScript("scrapers", arquivo);
+                }
+                
+                fs.writeFileSync(SCRAPER_LAST_RUN_LOCK, hoje);
+                console.log(`\n Todos os scrapers foram finalizados e registrados para ${hoje}!`);
             }
         }
 
-        console.log("=== Todos os scripts foram finalizados! ===");
+        console.log("=== Fluxo de execução finalizado! ===");
+        
     } catch (error) {
         console.error("FALHA NA EXECUÇÃO:", error);
         process.exit(1); 
