@@ -342,6 +342,51 @@ app.post("/cotacoes_load", async (req, res) => {
   }
 });
 
+app.post("/dividendos_load", async (req, res) => {
+  try {
+    const { cID, dataInicial, dataFinal } = req.body;
+
+    const sql_dividendos_acoes = `
+      SELECT 
+        da.*, 
+        a.ticker, 
+        a.descricao
+      FROM dividendos_acoes da
+      JOIN acoes a ON da.acaoid = a.acaoid
+      JOIN ativos_acoes aa ON a.acaoid = aa.acaoid
+      WHERE aa.carteiraid = $1 
+        AND aa.deletedat IS NULL
+        AND da.datapagamento >= $2 
+        AND da.datapagamento <= $3
+      ORDER BY da.datapagamento DESC`;
+
+    const sql_dividendos_fii = `
+      SELECT 
+        df.*, 
+        f.ticker
+      FROM dividendos_fii df
+      JOIN fundo_imobiliario f ON df.fiid = f.fundoimobiliarioid
+      JOIN ativos_fii af ON f.fundoimobiliarioid = af.fiid
+      WHERE af.carteiraid = $1 
+        AND af.deletedat IS NULL
+        AND df.datapagamento >= $2 
+        AND df.datapagamento <= $3
+      ORDER BY df.datapagamento DESC`;
+
+    const acoesResult = await queryDatabase(sql_dividendos_acoes, [cID, dataInicial, dataFinal]);
+    const fiiResult = await queryDatabase(sql_dividendos_fii, [cID, dataInicial, dataFinal]);
+
+    res.status(200).send({
+      fii: fiiResult,
+      acao: acoesResult
+    });
+
+  } catch (err) {
+    console.error("Erro ao carregar dividendos: ", err);
+    res.status(500).send("Erro interno no servidor");
+  }
+});
+
 app.post("/ativos_load", async (req, res) => {
   try {
     const acoes = await queryDatabase(

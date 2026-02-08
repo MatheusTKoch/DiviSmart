@@ -3,6 +3,7 @@ import axios from "axios";
 import { nextTick, onMounted, ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import Spinner from "../UI/Spinner.vue";
+import DividendosChart from "../UI/DividendosChart.vue";
 
 interface DADOSGRAFICO {
   data: number;
@@ -92,9 +93,29 @@ let dadosPorMes = computed(() => {
   return resultado.sort((a, b) => a.mes - b.mes);
 });
 
-const groupWidth = 80;
-const scale = 2;
-const maxHeight = 200;
+const categories = computed(() => dadosPorMes.value.map((i) => `Mês ${i.mes}`));
+
+const series = computed(() => [
+  {
+    name: "Ações",
+    data: dadosPorMes.value.map((i) =>
+      i.acao ? Number(i.acao.valor.toFixed(2)) : 0,
+    ),
+  },
+  {
+    name: "FIIs",
+    data: dadosPorMes.value.map((i) =>
+      i.fii ? Number(i.fii.valor.toFixed(2)) : 0,
+    ),
+  },
+]);
+
+const formatDateSafe = (dateValue: unknown): string => {
+  if (!dateValue) return "";
+  const d = new Date(dateValue as any);
+  if (isNaN(d.getTime())) return "";
+  return d.toISOString().slice(0, 10);
+};
 
 onMounted(async () => {
   try {
@@ -218,98 +239,7 @@ async function verifyUser() {
     <div v-if="showGraph" class="chart-section">
       <h3>Gráfico de Proventos</h3>
       <div class="chart-container">
-        <svg
-          version="1.1"
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 800 300"
-          class="chart-svg"
-        >
-          <!-- Grid lines -->
-          <defs>
-            <pattern
-              id="grid"
-              width="40"
-              height="20"
-              patternUnits="userSpaceOnUse"
-            >
-              <path
-                d="M 40 0 L 0 0 0 20"
-                fill="none"
-                stroke="rgba(255,255,255,0.05)"
-                stroke-width="1"
-              />
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#grid)" />
-          <!-- Axes -->
-          <line
-            x1="50"
-            y1="250"
-            x2="750"
-            y2="250"
-            stroke="#94a3b8"
-            stroke-width="2"
-          />
-          <line
-            x1="50"
-            y1="50"
-            x2="50"
-            y2="250"
-            stroke="#94a3b8"
-            stroke-width="2"
-          />
-          <!-- Bars -->
-          <g v-for="(item, index) in dadosPorMes" :key="item.mes">
-            <text
-              :x="50 + index * groupWidth + groupWidth / 2"
-              y="270"
-              text-anchor="middle"
-              font-size="12"
-              fill="#f8fafc"
-            >
-              Mês {{ item.mes }}
-            </text>
-            <rect
-              v-if="item.acao"
-              :x="50 + index * groupWidth + 5"
-              :y="250 - Math.min(item.acao.valor * scale, maxHeight)"
-              width="30"
-              :height="Math.min(item.acao.valor * scale, maxHeight)"
-              fill="url(#acaoGrad)"
-              rx="4"
-            >
-              <title>Ações: R$ {{ item.acao.valor.toFixed(2) }}</title>
-            </rect>
-            <rect
-              v-if="item.fii"
-              :x="50 + index * groupWidth + 40"
-              :y="250 - Math.min(item.fii.valor * scale, maxHeight)"
-              width="30"
-              :height="Math.min(item.fii.valor * scale, maxHeight)"
-              fill="url(#fiiGrad)"
-              rx="4"
-            >
-              <title>FIIs: R$ {{ item.fii.valor.toFixed(2) }}</title>
-            </rect>
-          </g>
-          <!-- Gradients -->
-          <defs>
-            <linearGradient id="acaoGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" style="stop-color: #1e40af; stop-opacity: 1" />
-              <stop
-                offset="100%"
-                style="stop-color: #3b82f6; stop-opacity: 1"
-              />
-            </linearGradient>
-            <linearGradient id="fiiGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" style="stop-color: #1e3a8a; stop-opacity: 1" />
-              <stop
-                offset="100%"
-                style="stop-color: #1d4ed8; stop-opacity: 1"
-              />
-            </linearGradient>
-          </defs>
-        </svg>
+        <DividendosChart :categories="categories" :series="series" />
       </div>
     </div>
     <div v-if="showValores" class="details-section">
@@ -321,7 +251,7 @@ async function verifyUser() {
             <div v-for="acao in dadosAcoes" :key="acao.Ticker" class="item">
               {{ acao.Ticker }} - {{ acao.Descricao }} | R$
               {{ (acao.ValorPagamento * acao.Quantidade).toFixed(2) }} |
-              {{ new Date(acao.DataPagamento).toISOString().slice(0, 10) }}
+              {{ formatDateSafe(acao.DataPagamento) }}
             </div>
           </div>
         </div>
@@ -331,7 +261,7 @@ async function verifyUser() {
             <div v-for="fii in dadosFii" :key="fii.Ticker" class="item">
               {{ fii.Ticker }} - {{ fii.Descricao }} | R$
               {{ (fii.ValorPagamento * fii.Quantidade).toFixed(2) }} |
-              {{ new Date(fii.DataPagamento).toISOString().slice(0, 10) }}
+              {{ formatDateSafe(fii.DataPagamento) }}
             </div>
           </div>
         </div>
