@@ -20,8 +20,8 @@ const BASE_URL_COTACOES = process.env.VITE_URL_COTACOES;
 
 const ATIVOS_YAHOO = {
   "Ouro/USD": "GC=F",
-  Ibovespa: "^BVSP",
-  DowJones: "^DJI",
+  "S&P 500": "^GSPC",
+  "DowJones": "^DJI",
 };
 
 function parseFormattedNumber(input) {
@@ -60,40 +60,67 @@ async function scrapeAndUpsertYahooQuote(client, ativo, ticker) {
     return;
   }
 
-  const url = `${BASE_URL_COTACOES}${ticker}`;
+  const url = `${BASE_URL_COTACOES}${encodeURIComponent(ticker)}`;
 
   try {
-    console.log(`Buscando ${ativo} em: ${url}`);
-
-    const response = await axios.get(url, {
-      headers: { "User-Agent": "Mozilla/5.0" },
-    });
+    console.log(`Buscando ${ativo} (${ticker}) em: ${url}`);
+    const response = await axios.get(url, { headers: { "User-Agent": "Mozilla/5.0" } });
     const $ = cheerio.load(response.data);
 
-    const priceSelector = 'fin-streamer[data-field="regularMarketPrice"]';
-    const fallbackSelector = 'div[data-test="instrument-price-last"]';
+    const header = $("#quote-header-info").first();
+    const headerTitle = header.find("h1").first().text().trim() || header.text().trim().slice(0, 120);
+    console.log(`Página carregada (header): "${headerTitle}"`);
 
-    let priceText =
-      $(priceSelector).first().attr("value") ||
-      $(priceSelector).first().text().trim();
+    const selectors = [
+      'fin-streamer[data-field="regularMarketPrice"]',
+      'span[data-test="qsp-price"]',
+      'span.price',
+      'div[data-test="instrument-price-last"]'
+    ];
 
-    if (!priceText) {
-      priceText = $(fallbackSelector).first().text().trim();
+    let priceText = "";
+
+    // Tenta cada seletor dentro do header (preferência)
+    for (const sel of selectors) {
+      const el = header.find(sel).first();
+      if (el && el.length) {
+        priceText = el.attr("value") || el.text().trim();
+        console.log(`Seletor usado: ${sel}`);
+        break;
+      }
     }
 
-    const valor = parseFormattedNumber(priceText);
+    // Se não achou no header, tenta fin-streamer por símbolo na página (tratando ^)
+    if (!priceText) {
+      const normalized = ticker.replace(/^\^/, "");
+      const bySymbol = $(`fin-streamer[data-symbol="${ticker}"], fin-streamer[data-symbol="${normalized}"]`).filter((i, el) => $(el).text().trim()).first();
+      if (bySymbol && bySymbol.length) {
+        priceText = bySymbol.attr("value") || bySymbol.text().trim();
+        console.log("Seletor usado: fin-streamer por símbolo");
+      }
+    }
+
+    // Último recurso: primeiro fin-streamer visível na página
+    if (!priceText) {
+      const anyPriceElem = $('fin-streamer[data-field="regularMarketPrice"]').filter((i, el) => $(el).text().trim()).first();
+      priceText = (anyPriceElem && anyPriceElem.length) ? (anyPriceElem.attr("value") || anyPriceElem.text().trim()) : "";
+      if (priceText) console.log("Seletor usado: fin-streamer (any)");
+    }
+
+    console.log(`Valor bruto extraído para ${ativo}: "${priceText}"`);
+
+    const valor = priceText ? parseFormattedNumber(priceText) : NaN;
 
     if (valor && !isNaN(valor)) {
       const now = new Date();
       await upsertQuote(client, ativo, valor, now);
     } else {
-      console.error(
-        `Não foi possível extrair a cotação para ${ativo}. Valor extraído: "${priceText}"`,
-      );
+      console.error(`Não foi possível extrair a cotação correta para ${ativo}. Valor extraído: "${priceText}"`);
     }
   } catch (error) {
     console.error(
-      `Erro ao fazer scraping do Yahoo para ${ativo}: Request failed with status code ${error.response ? error.response.status : "N/A"}`,
+      `Erro ao fazer scraping do Yahoo para ${ativo}:`,
+      error.response ? `${error.response.status} ${error.response.statusText}` : error.message,
     );
   }
 }

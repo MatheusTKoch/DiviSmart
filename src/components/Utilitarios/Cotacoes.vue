@@ -42,7 +42,7 @@ function loadCotacoes() {
       <li v-for="cot of dadosCotacao" :key="cot.ativo">
         <span class="ativo">{{ cot.ativo }}</span>
         <span class="valor">
-          {{ cot.ativo == "Ouro/USD" ? "$" : "R$" }}{{ cot.valoratual }}
+          {{ "$ " }}{{ cot.valoratual }}
         </span>
       </li>
     </ol>
