@@ -13,6 +13,7 @@
     "axios": "^1.13.5",
     "body-parser": "^1.20.3",
     "cheerio": "^1.0.0",
+    "connect-redis": "^9.0.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "echarts": "^6.0.0",
@@ -21,6 +22,7 @@
     "node-cron": "^3.0.3",
     "pg": "^8.16.3",
     "pg-hstore": "^2.3.4",
+    "redis": "^5.10.0",
     "sequelize": "^6.37.5",
     "vue": "^3.5.10",
     "vue-router": "^4.5.0"

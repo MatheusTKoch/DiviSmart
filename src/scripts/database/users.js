@@ -26,19 +26,6 @@ async function createAuthTables() {
         );
     `;
 
-  // User session
-  const sql_user_session = `
-        CREATE TABLE IF NOT EXISTS user_session (
-            usersessionid SERIAL PRIMARY KEY,
-            expires TIMESTAMP WITH TIME ZONE NOT NULL, 
-            sessionid VARCHAR(50) NOT NULL,
-            sessiondata TEXT NOT NULL, 
-            userid INT NOT NULL,
-            
-            FOREIGN KEY (userid) REFERENCES users(userid)
-        );
-    `;
-
   try {
     console.log("--- Iniciando Criação das Tabelas users e user_session ---");
 
@@ -46,11 +33,6 @@ async function createAuthTables() {
     console.log('Tentando criar a tabela "users"...');
     await db.query(sql_users);
     console.log('Tabela "users" criada ou já existente!');
-
-    // Executa a criação da tabela user_session
-    console.log('Tentando criar a tabela "user_session"...');
-    await db.query(sql_user_session);
-    console.log('Tabela "user_session" criada ou já existente!');
 
     console.log("--- Criação de Tabelas Concluída ---");
   } catch (err) {
