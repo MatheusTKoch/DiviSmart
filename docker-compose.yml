@@ -1,4 +1,16 @@
 services:
+  # Serviço do Redis
+  redis:
+    image: redis:alpine
+    container_name: redis_cache
+    restart: always
+    ports:
+      - "6379:6379"
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+
   # Serviço do Banco de Dados
   db:
     image: postgres:17
@@ -31,8 +43,12 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      redis:
+        condition: service_started
     env_file:
       - .env
+    environment:
+      REDIS_URL: redis://redis:6379
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules

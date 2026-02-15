@@ -8,7 +8,7 @@ import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
 import { createClient } from "redis";
-import RedisStore from "connect-redis";
+import { RedisStore } from "connect-redis";
 
 //Configuração do .env e express
 const __filename = fileURLToPath(import.meta.url);
@@ -29,9 +29,11 @@ const pool = new Pool({
 
 //Configuração do Redis
 const redisClient = createClient({
-  url: process.env.REDIS_URL || "redis://localhost:6379"
+  url: process.env.REDIS_URL || "redis://127.0.0.1:6379"
 });
-redisClient.connect().catch(console.error);
+
+redisClient.on('error', err => console.log('Redis Client Error', err));
+await redisClient.connect();
 
 const redisStore = new RedisStore({
   client: redisClient,
@@ -71,6 +73,9 @@ const queryDatabase = async (text, params) => {
 };
 
 // --- ROTAS ---
+
+//Rotas de login e autenticação
+
 app.post("/users_register", async (req, res) => {
   try {
     const { email, nome, sobrenome, senha } = req.body;
@@ -113,32 +118,32 @@ app.post("/users_login", async (req, res) => {
       [email],
     );
 
-    if (userResult.length === 0)
-      return res.status(404).send("Email não encontrado");
-    if (userResult[0].password !== senha)
-      return res.status(401).send("Senha incorreta!");
+    if (userResult.length === 0 || userResult[0].password !== senha)
+      return res.status(401).send("Credenciais inválidas");
 
-    const userID = userResult[0].userid;
-    req.session.usuario = userID;
+    const user = userResult[0];
 
-    const expires = new Date(req.session.cookie.expires).toISOString();
-    const sql_session =
-      "INSERT INTO user_session (expires, sessionid, sessiondata, userid) VALUES ($1, $2, $3, $4)";
-    await queryDatabase(sql_session, [
-      expires,
-      req.sessionID,
-      JSON.stringify(req.session),
-      userID,
-    ]);
+    req.session.userId = user.userid;
 
-    res.status(200).send({
-      usID: userID,
-      exp: req.session.cookie.expires,
-      sID: req.sessionID,
-    });
+    res.status(200).send({ Nome: user.nome });
   } catch (err) {
     res.status(500).send("Erro interno no servidor");
   }
+});
+
+app.get("/verify_session", (req, res) => {
+  if (req.session.userId) {
+    return res.status(200).send({ authenticated: true });
+  }
+  res.status(401).send("Sessão expirada");
+});
+
+app.post("/logout", (req, res) => {
+  req.session.destroy((err) => {
+    if (err) return res.status(500).send("Erro ao sair");
+    res.clearCookie('connect.sid');
+    res.status(200).send("sucesso");
+  });
 });
 
 app.post("/users_load", async (req, res) => {
@@ -150,6 +155,17 @@ app.post("/users_load", async (req, res) => {
     if (!userResult || userResult.length === 0)
       return res.status(401).send("Usuário não encontrado");
     res.status(200).send({ Nome: userResult[0].nome });
+  } catch (err) {
+    res.status(500).send("Erro interno no servidor");
+  }
+});
+
+//Rotas de carteira
+app.post("/carteira", async (req, res) => {
+  try {
+    const sql = "INSERT INTO carteiras (nome, userId) values ($1, $2)";
+    await queryDatabase(sql, [req.body.carteira, req.body.userID]);
+    res.status(200).send("fecharModal");
   } catch (err) {
     res.status(500).send("Erro interno no servidor");
   }
@@ -268,6 +284,8 @@ app.post("/carteira_delete", async (req, res) => {
   }
 });
 
+
+//Rotas de ativos/dividendos
 app.post("/acoes_cadastro", async (req, res) => {
   try {
     const sql =
@@ -311,48 +329,6 @@ app.post("/tesouro_cadastro", async (req, res) => {
       req.body.tesID,
     ]);
     res.status(200).send("Cadastro realizado com sucesso!");
-  } catch (err) {
-    res.status(500).send("Erro interno no servidor");
-  }
-});
-
-app.post("/carteira", async (req, res) => {
-  try {
-    const sql = "INSERT INTO carteiras (nome, userId) values ($1, $2)";
-    await queryDatabase(sql, [req.body.carteira, req.body.userID]);
-    res.status(200).send("fecharModal");
-  } catch (err) {
-    res.status(500).send("Erro interno no servidor");
-  }
-});
-
-app.post("/session", async (req, res) => {
-  try {
-    const { usID, sID, exp } = req.body;
-    const sessionResult = await queryDatabase(
-      "SELECT * FROM USER_SESSION WHERE userId = $1 AND sessionid = $2",
-      [usID, sID],
-    );
-
-    if (!sessionResult || sessionResult.length === 0)
-      return res.status(401).send("Sessão não encontrada");
-
-    if (new Date() > new Date(exp))
-      return res.status(401).send("Sessao expirada");
-
-    res.status(200).send({ status: "Sessão ativa" });
-  } catch (err) {
-    res.status(500).send("Erro interno no servidor");
-  }
-});
-
-app.post("/logout", async (req, res) => {
-  try {
-    await queryDatabase(
-      "DELETE FROM USER_SESSION WHERE userId = $1 AND sessionid = $2",
-      [req.body.usID, req.body.sID],
-    );
-    res.status(200).send("sucesso");
   } catch (err) {
     res.status(500).send("Erro interno no servidor");
   }

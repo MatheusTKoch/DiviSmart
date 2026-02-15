@@ -12,33 +12,22 @@ onMounted(() => {
 });
 
 const router = useRouter();
+const api = axios.create({ baseURL: "http://localhost:3000", withCredentials: true });
+
 let email = ref("");
 let senha = ref("");
 let showPassword = ref(false);
 
-function verifyUser() {
-  axios
-    .post("http://localhost:3000/session", {
-      usID: localStorage.getItem("usID"),
-      sID: localStorage.getItem("sID"),
-      exp: localStorage.getItem("exp"),
-    })
-    .then((res) => {
-      if (res.status == 200) {
-        router.push("menu");
-      }
-      console.log(res);
-    })
-    .catch((err) => {
-      if (
-        err.response.data == "Sessao expirada" &&
-        err.response.status == 401
-      ) {
-        localStorage.removeItem("usID");
-        localStorage.removeItem("exp");
-        localStorage.removeItem("sID");
-      }
-    });
+async function verifyUser() {
+  try {
+    const res = await api.get("/verify_session");
+    if (res.status === 200) {
+      router.push("menu");
+    }
+  } catch (err) {
+    console.log("Sessão expirada ou usuário não logado");
+    localStorage.removeItem("user_name");
+  }
 }
 
 const togglePassword = () => {
@@ -52,15 +41,13 @@ async function login() {
   }
 
   try {
-    const res = await axios.post("http://localhost:3000/users_login", {
+    const res = await api.post("/users_login", {
       email: email.value,
       senha: senha.value,
     });
 
-    if (res.status == 200) {
-      localStorage.setItem("usID", res.data.usID);
-      localStorage.setItem("exp", res.data.exp);
-      localStorage.setItem("sID", res.data.sID);
+    if (res.status === 200) {
+      localStorage.setItem("user_name", res.data.Nome);
       router.push("menu");
     }
   } catch (err: any) {
