@@ -110,6 +110,7 @@ app.post("/users_register", async (req, res) => {
   }
 });
 
+
 app.post("/users_login", async (req, res) => {
   try {
     const { email, senha } = req.body;
@@ -125,8 +126,28 @@ app.post("/users_login", async (req, res) => {
 
     req.session.userId = user.userid;
 
-    res.status(200).send({ Nome: user.nome });
+    res.status(200).send({ message: "Login successful" });
   } catch (err) {
+    res.status(500).send("Erro interno no servidor");
+  }
+});
+
+app.get("/get_user_name", async (req, res) => {
+  try {
+    if (!req.session.userId) {
+      return res.status(401).send("Usuário não autenticado");
+    }
+    const userResult = await queryDatabase(
+      "SELECT nome FROM users WHERE userid = $1",
+      [req.session.userId],
+    );
+    if (userResult.length > 0) {
+      res.status(200).send({ Nome: userResult[0].nome });
+    } else {
+      res.status(404).send("Nome de usuário não encontrado");
+    }
+  } catch (err) {
+    console.error("Erro ao obter nome do usuário:", err);
     res.status(500).send("Erro interno no servidor");
   }
 });

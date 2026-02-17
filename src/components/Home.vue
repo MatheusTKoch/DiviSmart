@@ -47,7 +47,6 @@ async function login() {
     });
 
     if (res.status === 200) {
-      localStorage.setItem("user_name", res.data.Nome);
       router.push("menu");
     }
   } catch (err: any) {

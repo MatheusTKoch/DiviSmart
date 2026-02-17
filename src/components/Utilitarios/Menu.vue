@@ -14,50 +14,35 @@ let nome = ref("");
 let horario = ref("");
 let loading = ref(true);
 
-async function verifyUser() {
-  axios
-    .post("http://localhost:3000/session", {
-      usID: localStorage.getItem("usID"),
-      sID: localStorage.getItem("sID"),
-      exp: localStorage.getItem("exp"),
-    })
-    .then(() => {
-      loadUser();
-      loadHorario();
-    })
-    .catch((err) => {
-      if (
-        err.response.data == "Sessao expirada" &&
-        err.response.status == 401
-      ) {
-        localStorage.removeItem("usID");
-        localStorage.removeItem("exp");
-        localStorage.removeItem("sID");
-        router.push("/");
-      }
+const api = axios.create({ baseURL: "http://localhost:3000", withCredentials: true });
 
-      if (
-        err.response.data == "Sem dados na localStorage" &&
-        err.response.status == 401
-      ) {
-        router.push("/");
-      }
-    });
+async function verifyUser() {
+  try {
+    const res = await api.get("/verify_session");
+    if (res.status === 200 && res.data.authenticated) {
+      await getUserName();
+      loadHorario();
+    } else {
+      router.push("/");
+    }
+  } catch (err) {
+    console.error("Erro na verificação de sessão:", err);
+    router.push("/");
+  }
 }
 
-function loadUser() {
-  axios
-    .post("http://localhost:3000/users_load", {
-      usID: localStorage.getItem("usID"),
-    })
-    .then((res) => {
+async function getUserName() {
+  try {
+    const res = await api.get("/get_user_name");
+    if (res.status === 200) {
       nextTick(() => {
         nome.value = res.data.Nome;
       });
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+    }
+  } catch (err) {
+    console.error("Erro ao carregar nome do usuário:", err);
+    router.push("/");
+  }
 }
 
 function loadHorario() {
@@ -78,7 +63,7 @@ function loadHorario() {
 
 onMounted(async () => {
   try {
-    await Promise.all([verifyUser()]);
+    await verifyUser();
   } catch (error) {
     console.error(error);
   } finally {
@@ -91,7 +76,7 @@ watch(
   async () => {
     loading.value = true;
     try {
-      await Promise.all([verifyUser()]);
+      await verifyUser();
     } catch (error) {
       console.error(error);
     } finally {
