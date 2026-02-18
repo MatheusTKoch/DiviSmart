@@ -11,15 +11,9 @@ defineProps({
 
 function clearUser() {
   axios
-    .post("http://localhost:3000/logout", {
-      usID: localStorage.getItem("usID"),
-      sID: localStorage.getItem("sID"),
-    })
+    .post("http://localhost:3000/logout")
     .then((res) => {
       if (res.status == 200) {
-        localStorage.removeItem("usID");
-        localStorage.removeItem("exp");
-        localStorage.removeItem("sID");
         router.push("/");
       }
     })

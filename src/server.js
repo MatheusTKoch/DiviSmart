@@ -162,7 +162,7 @@ app.get("/verify_session", (req, res) => {
 app.post("/logout", (req, res) => {
   req.session.destroy((err) => {
     if (err) return res.status(500).send("Erro ao sair");
-    res.clearCookie('connect.sid');
+    res.clearCookie('connect.sid', { httpOnly: true, sameSite: 'lax' });
     res.status(200).send("sucesso");
   });
 });
