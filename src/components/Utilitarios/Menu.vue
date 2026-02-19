@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Header from "../UI/Header.vue";
 import Sidebar from "../UI/Sidebar.vue";
-import axios from "axios";
+import api from "../../api/main";
 import { nextTick, onMounted, ref, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import Cotacoes from "./Cotacoes.vue";
@@ -13,8 +13,6 @@ const route = useRoute();
 let nome = ref("");
 let horario = ref("");
 let loading = ref(true);
-
-const api = axios.create({ baseURL: "http://localhost:3000", withCredentials: true });
 
 async function verifyUser() {
   try {

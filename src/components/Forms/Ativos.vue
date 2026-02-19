@@ -62,9 +62,7 @@ const loadDadosCarteira = async () => {
 
 const loadAtivos = async () => {
   try {
-    const res = await api.post("/ativos_load", {
-      carteiraid: sessionStorage.getItem("cID")
-    });
+    const res = await api.post("/ativos_load");
 
     acoes.value = res.data.acoes;
     fii.value = res.data.fii;
@@ -79,7 +77,6 @@ const loadAtivos = async () => {
 const loadDados = async () => {
   try {
     const res = await api.post("/carteira_name", {
-      userID: localStorage.getItem("usID"),
       cID: sessionStorage.getItem("cID"),
     });
     cartNome.value = res.data[0]?.nome || "Minha Carteira";

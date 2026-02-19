@@ -45,7 +45,6 @@ async function verifyUser() {
     await api.get("/verify_session");
   } catch (err: any) {
     console.log(err);
-    localStorage.removeItem("usID");
     localStorage.removeItem("exp");
     localStorage.removeItem("sID");
     router.push("/");
@@ -54,9 +53,7 @@ async function verifyUser() {
 
 async function loadCarteira() {
   try {
-    const res = await api.post("/carteira_load", {
-      userID: localStorage.getItem("usID"),
-    });
+    const res = await api.post("/carteira_load");
     nextTick(() => {
       carteiras.value = res.data;
     });

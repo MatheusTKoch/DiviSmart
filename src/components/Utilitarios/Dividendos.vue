@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import axios from "axios";
+import api from "../../api/main";
 import { nextTick, onMounted, ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import Spinner from "../UI/Spinner.vue";
@@ -24,6 +24,7 @@ let loading = ref(true);
 
 let dadosRelatorioAcao = computed(() => {
   let mesDadosMap = new Map<string, DADOSGRAFICO>();
+  if (!dadosAcoes.value) return [];
   for (const dados of dadosAcoes.value) {
     let atualData: number = new Date(dados.DataPagamento).getMonth() + 1;
     let atualValor: number = Number(
@@ -42,6 +43,7 @@ let dadosRelatorioAcao = computed(() => {
 
 let dadosRelatoriosFii = computed(() => {
   let mesDadosMap = new Map<string, DADOSGRAFICO>();
+  if (!dadosFii.value) return [];
   for (const dados of dadosFii.value) {
     let atualData: number = new Date(dados.DataPagamento).getMonth() + 1;
     let atualValor: number = Number(
@@ -51,7 +53,6 @@ let dadosRelatoriosFii = computed(() => {
     let chave = `${atualData}-${tipo}`;
     if (mesDadosMap.has(chave)) {
       mesDadosMap.get(chave)!.valor += atualValor;
-      atualValor.toFixed(2);
     } else {
       mesDadosMap.set(chave, { data: atualData, valor: atualValor, tipo });
     }
@@ -127,19 +128,26 @@ onMounted(async () => {
   }
 });
 
+async function verifyUser() {
+  try {
+    await api.get("/verify_session");
+  } catch (err: any) {
+    console.log(err);
+    localStorage.removeItem("exp");
+    localStorage.removeItem("sID");
+    router.push("/");
+  }
+}
+
 async function loadCarteira() {
-  axios
-    .post("http://localhost:3000/carteira_load", {
-      userID: localStorage.getItem("usID"),
-    })
-    .then((res) => {
-      nextTick(() => {
-        carteiras.value = res.data;
-      });
-    })
-    .catch((err) => {
-      console.log(err);
+  try {
+    const res = await api.post("/carteira_load");
+    nextTick(() => {
+      carteiras.value = res.data;
     });
+  } catch (err) {
+    console.log(err);
+  }
 }
 
 function carregarRelatorio() {
@@ -152,8 +160,8 @@ function carregarRelatorio() {
   } else if (dataInicial.value > dataFinal.value) {
     alert("Data inicial maior que a final, verifique os dados!");
   } else {
-    axios
-      .post("http://localhost:3000/dividendos_load", {
+    api
+      .post("/dividendos_load", {
         cID: idCarteira.value,
         dataInicial: dataInicial.value,
         dataFinal: dataFinal.value,
@@ -170,35 +178,6 @@ function carregarRelatorio() {
         console.log(err);
       });
   }
-}
-
-async function verifyUser() {
-  axios
-    .post("http://localhost:3000/session", {
-      usID: localStorage.getItem("usID"),
-      sID: localStorage.getItem("sID"),
-      exp: localStorage.getItem("exp"),
-    })
-    .then()
-    .catch((err) => {
-      console.log(err);
-      if (
-        err.response.data == "Sessao expirada" &&
-        err.response.status == 401
-      ) {
-        localStorage.removeItem("usID");
-        localStorage.removeItem("exp");
-        localStorage.removeItem("sID");
-        router.push("/");
-      }
-
-      if (
-        err.response.data == "Sem dados na localStorage" &&
-        err.response.status == 401
-      ) {
-        router.push("/");
-      }
-    });
 }
 </script>
 

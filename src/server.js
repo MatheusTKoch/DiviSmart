@@ -72,6 +72,16 @@ const queryDatabase = async (text, params) => {
   return res.rows;
 };
 
+// --- MIDDLEWARE ---
+
+const authMiddleware = (req, res, next) => {
+  if (req.session.userId) {
+    next();
+  } else {
+    res.status(401).send("Usuário não autenticado");
+  }
+};
+
 // --- ROTAS ---
 
 //Rotas de login e autenticação
@@ -98,12 +108,8 @@ app.post("/users_register", async (req, res) => {
 
     if (registroResult.length > 0) {
       const userID = registroResult[0].userid;
-      req.session.usuario = userID;
-      res.status(200).send({
-        usID: userID,
-        exp: req.session.cookie.expires,
-        sID: req.sessionID,
-      });
+      req.session.userId = userID;
+      res.status(200).send({ message: "Registro realizado com sucesso" });
     }
   } catch (err) {
     res.status(500).send("Erro interno no servidor");
@@ -132,11 +138,8 @@ app.post("/users_login", async (req, res) => {
   }
 });
 
-app.get("/get_user_name", async (req, res) => {
+app.get("/get_user_name", authMiddleware, async (req, res) => {
   try {
-    if (!req.session.userId) {
-      return res.status(401).send("Usuário não autenticado");
-    }
     const userResult = await queryDatabase(
       "SELECT nome FROM users WHERE userid = $1",
       [req.session.userId],
@@ -167,11 +170,11 @@ app.post("/logout", (req, res) => {
   });
 });
 
-app.post("/users_load", async (req, res) => {
+app.get("/users_load", authMiddleware, async (req, res) => {
   try {
     const userResult = await queryDatabase(
       "SELECT * FROM USERS WHERE userId = $1",
-      [req.body.usID],
+      [req.session.userId],
     );
     if (!userResult || userResult.length === 0)
       return res.status(401).send("Usuário não encontrado");
@@ -182,21 +185,21 @@ app.post("/users_load", async (req, res) => {
 });
 
 //Rotas de carteira
-app.post("/carteira", async (req, res) => {
+app.post("/carteira", authMiddleware, async (req, res) => {
   try {
     const sql = "INSERT INTO carteiras (nome, userId) values ($1, $2)";
-    await queryDatabase(sql, [req.body.carteira, req.body.userID]);
+    await queryDatabase(sql, [req.body.carteira, req.session.userId]);
     res.status(200).send("fecharModal");
   } catch (err) {
     res.status(500).send("Erro interno no servidor");
   }
 });
 
-app.post("/carteira_load", async (req, res) => {
+app.post("/carteira_load", authMiddleware, async (req, res) => {
   try {
     const sql =
       "SELECT * FROM carteiras where userId = $1 and deletedAt IS NULL";
-    const result = await queryDatabase(sql, [req.body.userID]);
+    const result = await queryDatabase(sql, [req.session.userId]);
 
     const mapped = result.map((row) => ({
       ...row,
@@ -210,18 +213,18 @@ app.post("/carteira_load", async (req, res) => {
   }
 });
 
-app.post("/carteira_name", async (req, res) => {
+app.post("/carteira_name", authMiddleware, async (req, res) => {
   try {
     const sql =
       "SELECT * FROM carteiras where userId = $1 and CarteiraID = $2 and deletedAt IS NULL";
-    const result = await queryDatabase(sql, [req.body.userID, req.body.cID]);
+    const result = await queryDatabase(sql, [req.session.userId, req.body.cID]);
     res.status(200).send(result);
   } catch (err) {
     res.status(500).send("Erro interno no servidor");
   }
 });
 
-app.post("/carteira_dados", async (req, res) => {
+app.post("/carteira_dados", authMiddleware, async (req, res) => {
   try {
     const cID = req.body.cID;
     const totalAcao =
@@ -284,12 +287,12 @@ app.post("/carteira_dados", async (req, res) => {
   }
 });
 
-app.post("/carteira_delete", async (req, res) => {
+app.post("/carteira_delete", authMiddleware, async (req, res) => {
   try {
     const id = req.body.carteiraID;
     await queryDatabase(
-      "UPDATE carteiras SET deletedAt = now() WHERE carteiraId = $1",
-      [id],
+      "UPDATE carteiras SET deletedAt = now() WHERE carteiraId = $1 AND userId = $2",
+      [id, req.session.userId],
     );
     await queryDatabase(
       "UPDATE ativos_acoes SET deletedAt = now() WHERE carteiraId = $1",
@@ -307,7 +310,7 @@ app.post("/carteira_delete", async (req, res) => {
 
 
 //Rotas de ativos/dividendos
-app.post("/acoes_cadastro", async (req, res) => {
+app.post("/acoes_cadastro", authMiddleware, async (req, res) => {
   try {
     const sql =
       "INSERT INTO ativos_acoes (quantidade, valorinvestido, datacadastro, carteiraid, acaoid) values ($1, $2, now(), $3, $4)";
@@ -323,7 +326,7 @@ app.post("/acoes_cadastro", async (req, res) => {
   }
 });
 
-app.post("/fii_cadastro", async (req, res) => {
+app.post("/fii_cadastro", authMiddleware, async (req, res) => {
   try {
     const sql =
       "INSERT INTO ativos_fii (quantidade, valorinvestido, datacadastro, carteiraid, fiid) values ($1, $2, now(), $3, $4)";
@@ -339,7 +342,7 @@ app.post("/fii_cadastro", async (req, res) => {
   }
 });
 
-app.post("/tesouro_cadastro", async (req, res) => {
+app.post("/tesouro_cadastro", authMiddleware, async (req, res) => {
   try {
     const sql =
       "INSERT INTO ativos_fii (quantidade, valorinvestido, datacadastro, carteiraid, fiid) values ($1, $2, now(), $3, $4)";
@@ -355,7 +358,7 @@ app.post("/tesouro_cadastro", async (req, res) => {
   }
 });
 
-app.post("/cotacoes_load", async (req, res) => {
+app.post("/cotacoes_load", authMiddleware, async (req, res) => {
   try {
     const sql = "SELECT ativo, valoratual FROM cotacoes ORDER BY ativo";
     const result = await queryDatabase(sql);
@@ -365,7 +368,7 @@ app.post("/cotacoes_load", async (req, res) => {
   }
 });
 
-app.post("/dividendos_load", async (req, res) => {
+app.post("/dividendos_load", authMiddleware, async (req, res) => {
   try {
     const { cID, dataInicial, dataFinal } = req.body;
 
@@ -410,7 +413,7 @@ app.post("/dividendos_load", async (req, res) => {
   }
 });
 
-app.post("/ativos_load", async (req, res) => {
+app.post("/ativos_load", authMiddleware, async (req, res) => {
   try {
     const acoes = await queryDatabase(
       "SELECT acaoid, ticker, descricao FROM acoes ORDER BY ticker ASC",

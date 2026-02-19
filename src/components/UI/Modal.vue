@@ -6,7 +6,6 @@ import Toast from "./Toast.vue";
 const emit = defineEmits(["fecharModal", "carteiraCriada"]);
 
 const nomeCarteira = ref("");
-const userID = ref("");
 const showAlert = ref(false);
 
 const showToast = ref(false);
@@ -35,10 +34,8 @@ async function cadastroCarteira() {
     showAlert.value = true;
   } else {
     try {
-      userID.value = localStorage.getItem("usID") || "";
       await api.post("/carteira", {
-        carteira: nomeCarteira.value,
-        userID: userID.value,
+        carteira: nomeCarteira.value
       });
       triggerToast("Carteira criada com sucesso!", true);
     } catch (err) {

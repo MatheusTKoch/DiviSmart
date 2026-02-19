@@ -79,9 +79,6 @@ async function register() {
       });
 
       if (res.status == 200) {
-        localStorage.setItem("usID", res.data.usID);
-        localStorage.setItem("exp", res.data.exp);
-        localStorage.setItem("sID", res.data.sID);
         router.push("menu");
       }
     } catch (err: any) {
