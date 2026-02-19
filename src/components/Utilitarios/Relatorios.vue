@@ -12,7 +12,7 @@ let dataFinal = ref();
 let tipoRelatorio = ref("");
 let loading = ref(true);
 let showRelatorio = ref(false);
-let relatorioUrl = ref<string | null>(null);
+let relatorioUrl = ref<string | undefined>();
 
 onMounted(async () => {
   try {
@@ -80,7 +80,7 @@ async function carregarRelatorio() {
       showRelatorio.value = false;
       if (relatorioUrl.value) {
         URL.revokeObjectURL(relatorioUrl.value);
-        relatorioUrl.value = null;
+        relatorioUrl.value = undefined;
       }
     } else {
       if (relatorioUrl.value) {
