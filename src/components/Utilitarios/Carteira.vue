@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import Modal from "../UI/Modal.vue";
 import Ativos from "../Forms/Ativos.vue";
-import axios from "axios";
+import api from "../../api/main";
 import { ref, onMounted, nextTick } from "vue";
 import { useRouter } from "vue-router";
 import Spinner from "../UI/Spinner.vue";
 
 const router = useRouter();
 let showCarteira = ref(false);
-let carteiras = ref();
+let carteiras = ref<any[]>([]);
 let editCarteira = ref(false);
 let idCarteira = ref();
 let loading = ref(true);
@@ -19,6 +19,10 @@ function abrirModal() {
 
 function fecharModal() {
   showCarteira.value = false;
+}
+
+function handleCarteiraCriada() {
+  loadCarteira();
 }
 
 defineProps({
@@ -37,63 +41,40 @@ onMounted(async () => {
 });
 
 async function verifyUser() {
-  axios
-    .post("http://localhost:3000/session", {
-      usID: localStorage.getItem("usID"),
-      sID: localStorage.getItem("sID"),
-      exp: localStorage.getItem("exp"),
-    })
-    .then()
-    .catch((err) => {
-      console.log(err);
-      if (
-        err.response.data == "Sessao expirada" &&
-        err.response.status == 401
-      ) {
-        localStorage.removeItem("usID");
-        localStorage.removeItem("exp");
-        localStorage.removeItem("sID");
-        router.push("/");
-      }
-
-      if (
-        err.response.data == "Sem dados na localStorage" &&
-        err.response.status == 401
-      ) {
-        router.push("/");
-      }
-    });
+  try {
+    await api.get("/verify_session");
+  } catch (err: any) {
+    console.log(err);
+    localStorage.removeItem("usID");
+    localStorage.removeItem("exp");
+    localStorage.removeItem("sID");
+    router.push("/");
+  }
 }
 
 async function loadCarteira() {
-  axios
-    .post("http://localhost:3000/carteira_load", {
+  try {
+    const res = await api.post("/carteira_load", {
       userID: localStorage.getItem("usID"),
-    })
-    .then((res) => {
-      nextTick(() => {
-        carteiras.value = res.data;
-      });
-    })
-    .catch((err) => {
-      console.log(err);
     });
+    nextTick(() => {
+      carteiras.value = res.data;
+    });
+  } catch (err) {
+    console.log(err);
+  }
 }
 
-function deleteCarteira(num: number) {
+async function deleteCarteira(num: number) {
   if (confirm("Tem certeza que deseja apagar a carteira?")) {
-    axios
-      .post("http://localhost:3000/carteira_delete", {
+    try {
+      await api.post("/carteira_delete", {
         carteiraID: num,
-      })
-      .then(() => {
-        window.location.reload();
-      })
-      .catch((err) => {
-        console.log(err);
       });
-  } else {
-    console.log("nao");
+      await loadCarteira();
+    } catch (err) {
+      console.log(err);
+    }
   }
 }
 
@@ -123,16 +104,16 @@ function sendID(num: number) {
         <div class="carteiras-grid">
           <div
             v-for="cart in carteiras"
-            :key="cart.carteiraid"
+            :key="cart.CarteiraID"
             class="carteira-card"
           >
             <div class="card-content">
-              <span class="nome">{{ cart.nome }}</span>
+              <span class="nome">{{ cart.Nome }}</span>
               <div class="acoes">
                 <svg
                   @click="
                     ((editCarteira = true), $emit('editarCarteira'));
-                    sendID(cart.carteiraid);
+                    sendID(cart.CarteiraID);
                   "
                   class="icon edit-icon"
                   xmlns="http://www.w3.org/2000/svg"
@@ -164,7 +145,11 @@ function sendID(num: number) {
         </div>
       </div>
       <div class="modal">
-        <Modal v-if="showCarteira" @fecharModal="fecharModal" />
+        <Modal
+          v-if="showCarteira"
+          @fecharModal="fecharModal"
+          @carteiraCriada="handleCarteiraCriada"
+        />
       </div>
     </div>
     <div class="ativos">

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import axios from "axios";
+import api from "../../api/main";
 import Toast from "../UI/Toast.vue";
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
@@ -51,7 +51,7 @@ onMounted(() => {
 
 const loadDadosCarteira = async () => {
   try {
-    const res = await axios.post("http://localhost:3000/carteira_dados", {
+    const res = await api.post("/carteira_dados", {
       cID: sessionStorage.getItem("cID"),
     });
     dadosCarteira.value = res.data;
@@ -62,8 +62,7 @@ const loadDadosCarteira = async () => {
 
 const loadAtivos = async () => {
   try {
-
-    const res = await axios.post("http://localhost:3000/ativos_load", {
+    const res = await api.post("/ativos_load", {
       carteiraid: sessionStorage.getItem("cID")
     });
 
@@ -79,7 +78,7 @@ const loadAtivos = async () => {
 
 const loadDados = async () => {
   try {
-    const res = await axios.post("http://localhost:3000/carteira_name", {
+    const res = await api.post("/carteira_name", {
       userID: localStorage.getItem("usID"),
       cID: sessionStorage.getItem("cID"),
     });
@@ -103,19 +102,19 @@ const cadastroAcao = async () => {
     return exibirToast("Preencha todos os campos!", false);
   }
   try {
-    await axios.post("http://localhost:3000/acoes_cadastro", {
+    await api.post("/acoes_cadastro", {
       quantidade: quantidadeAcao.value,
       valorInvestido: valorInvestidoAcao.value,
       cID: sessionStorage.getItem("cID"),
       acaoID: idAcao.value,
     });
     await loadDadosCarteira();
-    exibirToast("Sucesso!", true);
+    exibirToast("Ativo cadastrado com sucesso!", true);
     idAcao.value = "";
     quantidadeAcao.value = null;
     valorInvestidoAcao.value = null;
   } catch (err) {
-    exibirToast("Erro no cadastro.", false);
+    exibirToast("Erro no cadastro do ativo.", false);
   }
 };
 
@@ -124,19 +123,19 @@ const cadastroFii = async () => {
     return exibirToast("Preencha todos os campos!", false);
   }
   try {
-    await axios.post("http://localhost:3000/fii_cadastro", {
+    await api.post("/fii_cadastro", {
       quantidade: quantidadeFii.value,
       valorInvestido: valoInvestidoFii.value,
       cID: sessionStorage.getItem("cID"),
       fiiID: idFii.value,
     });
     await loadDadosCarteira();
-    exibirToast("Sucesso!", true);
+    exibirToast("FII cadastrado com sucesso!", true);
     idFii.value = "";
     quantidadeFii.value = null;
     valoInvestidoFii.value = null;
   } catch (err) {
-    exibirToast("Erro no cadastro.", false);
+    exibirToast("Erro no cadastro do FII.", false);
   }
 };
 
@@ -149,19 +148,19 @@ const cadastroTesouro = async () => {
     return exibirToast("Preencha todos os campos!", false);
   }
   try {
-    await axios.post("http://localhost:3000/tesouro_cadastro", {
+    await api.post("/tesouro_cadastro", {
       quantidade: quantidadeTesouro.value,
       valorInvestido: valorInvestidoTesouro.value,
       cID: sessionStorage.getItem("cID"),
       tesID: idTesouro.value,
     });
     await loadDadosCarteira();
-    exibirToast("Sucesso!", true);
+    exibirToast("Título cadastrado com sucesso!", true);
     idTesouro.value = "";
     quantidadeTesouro.value = null;
     valorInvestidoTesouro.value = null;
   } catch (err) {
-    exibirToast("Erro no cadastro.", false);
+    exibirToast("Erro no cadastro do título.", false);
   }
 };
 
@@ -360,12 +359,13 @@ const voltar = () => router.push("/menu/carteira");
     </main>
 
     <teleport to="body">
-      <Toast v-if="showToast" :sucesso="isSuccess">{{ toastMessage }}</Toast>
+      <Toast v-if="showToast" :sucesso="isSuccess" position="center">{{ toastMessage }}</Toast>
     </teleport>
   </div>
 </template>
 
 <style scoped>
+/* Estilos permanecem iguais */
 .ativos-page {
   padding: 2rem;
   max-width: 1300px;

@@ -1,34 +1,50 @@
 <script setup lang="ts">
 import { ref, defineEmits } from "vue";
-import axios from "axios";
+import api from "../../api/main";
+import Toast from "./Toast.vue";
 
-const emit = defineEmits(["fecharModal"]);
+const emit = defineEmits(["fecharModal", "carteiraCriada"]);
 
 const nomeCarteira = ref("");
 const userID = ref("");
 const showAlert = ref(false);
 
+const showToast = ref(false);
+const toastMsg = ref("");
+const toastSucesso = ref(false);
+
+function triggerToast(message: string, success: boolean = false) {
+  toastMsg.value = message;
+  toastSucesso.value = success;
+  showToast.value = true;
+  setTimeout(() => {
+    showToast.value = false;
+    if (success) {
+      fecharModal();
+      emit("carteiraCriada");
+    }
+  }, 2000);
+}
+
 function validarCarteira() {
   showAlert.value = nomeCarteira.value.trim() === "";
 }
 
-function cadastroCarteira() {
+async function cadastroCarteira() {
   if (nomeCarteira.value.trim() === "") {
     showAlert.value = true;
   } else {
-    let dados = new URLSearchParams();
-    userID.value = localStorage.getItem("usID") || "";
-    dados.append("carteira", nomeCarteira.value);
-    dados.append("userID", userID.value);
-    axios
-      .post("http://localhost:3000/carteira", dados)
-      .then(() => {
-        fecharModal();
-        window.location.reload();
-      })
-      .catch((err) => {
-        console.log(err);
+    try {
+      userID.value = localStorage.getItem("usID") || "";
+      await api.post("/carteira", {
+        carteira: nomeCarteira.value,
+        userID: userID.value,
       });
+      triggerToast("Carteira criada com sucesso!", true);
+    } catch (err) {
+      console.log(err);
+      triggerToast("Erro ao criar carteira. Tente novamente.", false);
+    }
   }
 }
 
@@ -41,6 +57,10 @@ function fecharModal() {
   <teleport to="body">
     <transition name="fade">
       <div class="modal-overlay" @click.self="fecharModal">
+        <Toast v-if="showToast" :sucesso="toastSucesso" position="center">
+          {{ toastMsg }}
+        </Toast>
+
         <div class="modal-card">
           <button class="btn-close-icon" @click="fecharModal">
             <svg
@@ -71,6 +91,7 @@ function fecharModal() {
                 @input="validarCarteira"
                 placeholder="Ex: Reserva de Emergência"
                 autofocus
+                @keypress.enter="cadastroCarteira"
               />
               <transition name="slide-up">
                 <p class="alert" v-if="showAlert">
