@@ -2,7 +2,9 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import Header from "../UI/Header.vue";
-import axios from "axios";
+import Toast from "../UI/Toast.vue";
+import api from "../../api/main";
+import { Motion } from "@motionone/vue";
 
 const router = useRouter();
 
@@ -18,6 +20,19 @@ let sobrenome = ref("");
 let senha = ref("");
 let senha2 = ref("");
 let showPassword = ref(false);
+
+const showToast = ref(false);
+const toastMsg = ref("");
+const toastSucesso = ref(false);
+
+function triggerToast(message: string, success: boolean = false) {
+  toastMsg.value = message;
+  toastSucesso.value = success;
+  showToast.value = true;
+  setTimeout(() => {
+    showToast.value = false;
+  }, 3000);
+}
 
 function validarCadastrar() {
   maxPass.value = senha.value.length > 20;
@@ -53,27 +68,26 @@ async function register() {
     email.value === "" ||
     senha.value === ""
   ) {
-    alert("Verifique os campos informados e tente novamente!");
+    triggerToast("Verifique os campos informados e tente novamente!");
   } else {
-    let dados = new URLSearchParams();
-    dados.append("email", email.value);
-    dados.append("senha", senha.value);
-    dados.append("nome", nome.value);
-    dados.append("sobrenome", sobrenome.value);
-
-    await axios
-      .post("http://localhost:3000/users_register", dados)
-      .then((res) => {
-        if (res.status == 200) {
-          localStorage.setItem("usID", res.data.usID);
-          localStorage.setItem("exp", res.data.exp);
-          localStorage.setItem("sID", res.data.sID);
-          router.push("menu");
-        }
-      })
-      .catch((err) => {
-        alert(err.response.data);
+    try {
+      const res = await api.post("/users_register", {
+        email: email.value,
+        senha: senha.value,
+        nome: nome.value,
+        sobrenome: sobrenome.value,
       });
+
+      if (res.status == 200) {
+        localStorage.setItem("usID", res.data.usID);
+        localStorage.setItem("exp", res.data.exp);
+        localStorage.setItem("sID", res.data.sID);
+        router.push("menu");
+      }
+    } catch (err: any) {
+      const msg = err.response?.data || "Erro ao realizar cadastro";
+      triggerToast(msg);
+    }
   }
 }
 </script>
@@ -81,6 +95,10 @@ async function register() {
 <template>
   <div class="auth-container">
     <Header />
+
+    <Toast v-if="showToast" :sucesso="toastSucesso" position="center">
+      {{ toastMsg }}
+    </Toast>
 
     <main class="auth-main">
       <Motion
@@ -234,32 +252,40 @@ async function register() {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 40px 20px;
+  padding: 60px 20px;
+  position: relative;
 }
 
 .login-card {
   background: rgba(30, 41, 59, 0.4);
   border: 1px solid rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(12px);
-  padding: 40px;
+  padding: 32px;
   border-radius: 24px;
   width: 100%;
-  max-width: 450px;
+  max-width: 480px;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  margin: auto 0;
 }
 
 .card-header {
-  margin-bottom: 32px;
+  margin-bottom: 24px;
   text-align: center;
 }
 .titulo {
-  font-size: 1.8rem;
+  font-size: 1.6rem;
   font-weight: 700;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 .subtitulo {
   color: #94a3b8;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
+}
+
+.conteudo {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .row-inputs {
@@ -271,22 +297,27 @@ async function register() {
 .input-group {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-bottom: 16px;
+  gap: 6px;
+  margin-bottom: 14px;
+  width: 100%;
 }
 
 .input-group label {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
+  font-weight: 500;
   color: #cbd5e1;
-  padding-left: 4px;
+  padding-left: 2px;
 }
 
 input {
+  box-sizing: border-box;
+  width: 100%;
   background: rgba(15, 23, 42, 0.6);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 12px 16px;
+  padding: 12px 14px;
   border-radius: 12px;
   color: white;
+  font-size: 0.95rem;
   transition: all 0.3s;
 }
 
@@ -306,7 +337,7 @@ input:focus {
 }
 
 .pass-options {
-  margin: 8px 0 24px;
+  margin: 4px 0 20px;
 }
 
 .checkbox-container {
@@ -315,7 +346,8 @@ input:focus {
   gap: 10px;
   cursor: pointer;
   color: #94a3b8;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
+  user-select: none;
 }
 
 .btn-login {
@@ -323,9 +355,10 @@ input:focus {
   background: #3b82f6;
   color: white;
   border: none;
-  padding: 14px;
+  padding: 12px;
   border-radius: 12px;
   font-weight: 700;
+  font-size: 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -338,11 +371,11 @@ input:focus {
 
 .btn-login:hover {
   background-color: #2563eb;
-  transform: scale(1.02);
+  transform: scale(1.01);
 }
 
 .btn-login:active {
-  transform: scale(0.98);
+  transform: scale(0.99);
 }
 
 .login_icon {
@@ -353,40 +386,62 @@ input:focus {
   color: #3b82f6;
   text-decoration: none;
   font-weight: 600;
+  transition: color 0.2s;
+}
+
+.signup-link:hover {
+  color: #60a5fa;
 }
 
 .footer-text {
-  margin-top: 24px;
+  margin-top: 20px;
   text-align: center;
   color: #94a3b8;
+  font-size: 0.9rem;
 }
 
 .back-wrapper {
   position: absolute;
-  top: 40px;
-  left: 40px;
+  top: 30px;
+  left: 30px;
+  z-index: 10;
 }
 
 .btn-back {
-  background: transparent;
-  border: none;
+  background: rgba(30, 41, 59, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   color: #94a3b8;
   display: flex;
   align-items: center;
   gap: 8px;
+  padding: 8px 16px;
+  border-radius: 10px;
   cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.3s;
+}
+
+.btn-back:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #f8fafc;
 }
 
 @media (max-width: 640px) {
   .row-inputs {
     grid-template-columns: 1fr;
+    gap: 0;
   }
   .back-wrapper {
     top: 20px;
     left: 20px;
   }
   .login-card {
-    padding: 30px 20px;
+    padding: 24px 20px;
+    margin-top: 40px;
+  }
+  .auth-main {
+    padding: 20px;
   }
 }
 </style>

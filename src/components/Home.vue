@@ -2,21 +2,34 @@
 import { Motion } from "@motionone/vue";
 import Header from "./UI/Header.vue";
 import Footer from "./UI/Footer.vue";
+import Toast from "./UI/Toast.vue";
 import { ref } from "vue";
 import { onMounted } from "vue";
-import axios from "axios";
+import api from "../api/main";
 import { useRouter } from "vue-router";
+
+const router = useRouter();
 
 onMounted(() => {
   verifyUser();
 });
 
-const router = useRouter();
-const api = axios.create({ baseURL: "http://localhost:3000", withCredentials: true });
-
 let email = ref("");
 let senha = ref("");
 let showPassword = ref(false);
+
+const showToast = ref(false);
+const toastMsg = ref("");
+const toastSucesso = ref(false);
+
+function triggerToast(message: string, success: boolean = false) {
+  toastMsg.value = message;
+  toastSucesso.value = success;
+  showToast.value = true;
+  setTimeout(() => {
+    showToast.value = false;
+  }, 3000);
+}
 
 async function verifyUser() {
   try {
@@ -36,7 +49,7 @@ const togglePassword = () => {
 
 async function login() {
   if (email.value === "" || senha.value === "") {
-    alert("Preencha todos os campos!");
+    triggerToast("Preencha todos os campos!");
     return;
   }
 
@@ -51,7 +64,7 @@ async function login() {
     }
   } catch (err: any) {
     const msg = err.response?.data || "Erro ao conectar ao servidor";
-    alert(msg);
+    triggerToast(msg);
   }
 }
 </script>
@@ -59,6 +72,10 @@ async function login() {
 <template>
   <div class="app-container">
     <Header />
+
+    <Toast v-if="showToast" :sucesso="toastSucesso">
+      {{ toastMsg }}
+    </Toast>
 
     <main class="hero-grid">
       <Motion

@@ -4,11 +4,21 @@ defineProps({
     type: Boolean,
     default: true,
   },
+  position: {
+    type: String,
+    default: "right", // "right" or "center"
+  },
 });
 </script>
 
 <template>
-  <div class="toast" :class="sucesso ? 'toast-success' : 'toast-error'">
+  <div
+    class="toast"
+    :class="[
+      sucesso ? 'toast-success' : 'toast-error',
+      position === 'center' ? 'toast-center' : 'toast-right',
+    ]"
+  >
     <svg
       v-if="sucesso"
       class="toast-icon"
@@ -46,7 +56,6 @@ defineProps({
 .toast {
   position: fixed;
   bottom: 2rem;
-  right: 2rem;
   padding: 12px 20px;
   display: flex;
   align-items: center;
@@ -54,12 +63,21 @@ defineProps({
   border-radius: 16px;
   z-index: 9999;
   min-width: 280px;
-  background: rgba(30, 41, 59, 0.8);
+  background: rgba(30, 41, 59, 0.85);
   backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+}
 
-  animation: slideIn 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+.toast-right {
+  right: 2rem;
+  animation: slideInRight 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+}
+
+.toast-center {
+  left: 50%;
+  transform: translateX(-50%);
+  animation: slideInCenter 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
 }
 
 .toast-content {
@@ -76,7 +94,7 @@ defineProps({
   border-left: 4px solid #f87171;
 }
 
-@keyframes slideIn {
+@keyframes slideInRight {
   from {
     transform: translateY(100px);
     opacity: 0;
@@ -87,12 +105,40 @@ defineProps({
   }
 }
 
+@keyframes slideInCenter {
+  from {
+    transform: translate(-50%, 100px);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
+}
+
 @media (max-width: 480px) {
   .toast {
     right: 1rem;
     left: 1rem;
     bottom: 1rem;
     min-width: auto;
+    transform: none;
+  }
+
+  .toast-center {
+    left: 1rem;
+    transform: none;
+  }
+
+  @keyframes slideInCenter {
+    from {
+      transform: translateY(100px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
   }
 }
 </style>

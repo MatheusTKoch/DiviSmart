@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import axios from "axios";
+import api from "../../api/main";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
@@ -10,8 +10,8 @@ defineProps({
 });
 
 function clearUser() {
-  axios
-    .post("http://localhost:3000/logout")
+  api
+    .post("/logout")
     .then((res) => {
       if (res.status == 200) {
         router.push("/");
