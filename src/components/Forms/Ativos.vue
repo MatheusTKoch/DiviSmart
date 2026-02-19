@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import api from "../../api/main";
 import Toast from "../UI/Toast.vue";
-import { ref, onMounted } from "vue";
-import { useRouter } from "vue-router";
+import { ref, onMounted, computed } from "vue";
+import { useRouter, useRoute } from "vue-router";
 
 interface Acao {
   acaoid: string;
@@ -20,6 +20,9 @@ interface Tesouro {
 }
 
 const router = useRouter();
+const route = useRoute();
+
+const cID_route = computed(() => route.params.cID);
 
 const acoes = ref<Acao[]>([]);
 const fii = ref<Fii[]>([]);
@@ -52,7 +55,7 @@ onMounted(() => {
 const loadDadosCarteira = async () => {
   try {
     const res = await api.post("/carteira_dados", {
-      cID: sessionStorage.getItem("cID"),
+      cID: cID_route.value,
     });
     dadosCarteira.value = res.data;
   } catch (err) {
@@ -77,7 +80,7 @@ const loadAtivos = async () => {
 const loadDados = async () => {
   try {
     const res = await api.post("/carteira_name", {
-      cID: sessionStorage.getItem("cID"),
+      cID: cID_route.value,
     });
     cartNome.value = res.data[0]?.nome || "Minha Carteira";
   } catch (err) {
@@ -102,7 +105,7 @@ const cadastroAcao = async () => {
     await api.post("/acoes_cadastro", {
       quantidade: quantidadeAcao.value,
       valorInvestido: valorInvestidoAcao.value,
-      cID: sessionStorage.getItem("cID"),
+      cID: cID_route.value,
       acaoID: idAcao.value,
     });
     await loadDadosCarteira();
@@ -123,7 +126,7 @@ const cadastroFii = async () => {
     await api.post("/fii_cadastro", {
       quantidade: quantidadeFii.value,
       valorInvestido: valoInvestidoFii.value,
-      cID: sessionStorage.getItem("cID"),
+      cID: cID_route.value,
       fiiID: idFii.value,
     });
     await loadDadosCarteira();
@@ -148,7 +151,7 @@ const cadastroTesouro = async () => {
     await api.post("/tesouro_cadastro", {
       quantidade: quantidadeTesouro.value,
       valorInvestido: valorInvestidoTesouro.value,
-      cID: sessionStorage.getItem("cID"),
+      cID: cID_route.value,
       tesID: idTesouro.value,
     });
     await loadDadosCarteira();

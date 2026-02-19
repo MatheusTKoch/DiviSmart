@@ -77,7 +77,9 @@ async function deleteCarteira(num: number) {
 
 function sendID(num: number) {
   idCarteira.value = num;
-  sessionStorage.setItem("cID", idCarteira.value);
+  api.post("/set_active_carteira", { cID: num }).then(() => {
+    router.push(`/menu/carteira/${num}`);
+  });
 }
 </script>
 

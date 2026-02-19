@@ -18,6 +18,7 @@ const routes = [
     children: [
       { path: "", name: "menuHome", component: MenuView },
       { path: "carteira", name: "carteira", component: CarteiraView },
+      { path: "carteira/:cID", name: "carteiraAtivos", component: CarteiraView, props: true },
       { path: "dividendos", name: "dividendos", component: DividendosView },
       { path: "relatorios", name: "relatorios", component: RelatoriosView },
     ],

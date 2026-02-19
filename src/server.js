@@ -157,9 +157,16 @@ app.get("/get_user_name", authMiddleware, async (req, res) => {
 
 app.get("/verify_session", (req, res) => {
   if (req.session.userId) {
-    return res.status(200).send({ authenticated: true });
+    return res.status(200).send({ authenticated: true, carteiraId: req.session.carteiraId });
   }
   res.status(401).send("Sessão expirada");
+});
+
+app.post("/set_active_carteira", authMiddleware, (req, res) => {
+  const { cID } = req.body;
+  if (!cID) return res.status(400).send("CarteiraID não informado");
+  req.session.carteiraId = cID;
+  res.status(200).send({ message: "Carteira ativa definida", carteiraId: cID });
 });
 
 app.post("/logout", (req, res) => {
