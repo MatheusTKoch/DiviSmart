@@ -175,7 +175,7 @@ async function login() {
               <span class="checkmark"></span>
               Mostrar Senha
             </label>
-            <a href="#" class="forgot-link">Esqueceu a senha?</a>
+            <RouterLink to="/forgot-password" class="forgot-link">Esqueceu a senha?</RouterLink>
           </div>
 
           <button class="btn-login" type="submit">

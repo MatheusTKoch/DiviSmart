@@ -9,6 +9,9 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { createClient } from "redis";
 import { RedisStore } from "connect-redis";
+import bcrypt from "bcrypt";
+import nodemailer from "nodemailer";
+import crypto from "crypto";
 
 //Configuração do .env e express
 const __filename = fileURLToPath(import.meta.url);
@@ -72,6 +75,17 @@ const queryDatabase = async (text, params) => {
   return res.rows;
 };
 
+// Configuração do Nodemailer
+const transporter = nodemailer.createTransport({
+  host: process.env.VITE_EMAIL_HOST,
+  port: process.env.VITE_EMAIL_PORT,
+  secure: process.env.VITE_EMAIL_SECURE === 'true', 
+  auth: {
+    user: process.env.VITE_EMAIL_USER,
+    pass: process.env.VITE_EMAIL_PASS,
+  },
+});
+
 // --- MIDDLEWARE ---
 
 const authMiddleware = (req, res, next) => {
@@ -97,13 +111,14 @@ app.post("/users_register", async (req, res) => {
     if (emailResult.length > 0)
       return res.status(400).send("O email informado já foi utilizado!");
 
+    // Refatorar para usar bcrypt aqui
     const registroSql =
       "INSERT INTO users (email, nome, sobrenome, password) VALUES ($1, $2, $3, $4) RETURNING userid";
     const registroResult = await queryDatabase(registroSql, [
       email,
       nome,
       sobrenome,
-      senha,
+      senha, 
     ]);
 
     if (registroResult.length > 0) {
@@ -112,6 +127,7 @@ app.post("/users_register", async (req, res) => {
       res.status(200).send({ message: "Registro realizado com sucesso" });
     }
   } catch (err) {
+    console.error("Erro no registro:", err);
     res.status(500).send("Erro interno no servidor");
   }
 });
@@ -125,18 +141,116 @@ app.post("/users_login", async (req, res) => {
       [email],
     );
 
-    if (userResult.length === 0 || userResult[0].password !== senha)
+    if (userResult.length === 0)
       return res.status(401).send("Credenciais inválidas");
 
     const user = userResult[0];
+
+    // Refatorar para usar bcrypt aqui
+    if (user.password !== senha) 
+      return res.status(401).send("Credenciais inválidas");
 
     req.session.userId = user.userid;
 
     res.status(200).send({ message: "Login successful" });
   } catch (err) {
+    console.error("Erro no login:", err);
     res.status(500).send("Erro interno no servidor");
   }
 });
+
+app.post("/forgot-password", async (req, res) => {
+  try {
+    const { email } = req.body;
+    const userResult = await queryDatabase(
+      "SELECT userid FROM users WHERE email = $1",
+      [email],
+    );
+
+    if (userResult.length === 0) {
+      return res.status(200).send("Se o email estiver registrado, um link de redefinição foi enviado.");
+    }
+
+    const userId = userResult[0].userid;
+    const token = crypto.randomBytes(32).toString("hex");
+    const tokenHash = await bcrypt.hash(token, 10);
+    const expiresAt = new Date(Date.now() + 3600000); 
+
+    await queryDatabase(
+      `INSERT INTO password_resets ("userId", token_hash, expires_at) VALUES ($1, $2, $3)
+       ON CONFLICT ("userId") DO UPDATE SET token_hash = EXCLUDED.token_hash, expires_at = EXCLUDED.expires_at, created_at = NOW()`,
+      [userId, tokenHash, expiresAt],
+    );
+
+    const resetUrl = `http://localhost:5173/reset-password?token=${token}`; // Use your frontend URL
+
+    await transporter.sendMail({
+      from: process.env.VITE_EMAIL_USER,
+      to: email,
+      subject: "Redefinição de Senha - DiviSmart",
+      html: `
+        <p>Você solicitou uma redefinição de senha para sua conta DiviSmart.</p>
+        <p>Por favor, clique no link abaixo para redefinir sua senha:</p>
+        <p><a href="${resetUrl}">Redefinir Senha</a></p>
+        <p>Este link expirará em 1 hora.</p>
+        <p>Se você não solicitou isso, por favor, ignore este email.</p>
+      `,
+    });
+
+    res.status(200).send("Se o email estiver registrado, um link de redefinição foi enviado.");
+  } catch (err) {
+    console.error("Erro no forgot-password:", err);
+    res.status(500).send("Erro interno no servidor ao solicitar redefinição de senha.");
+  }
+});
+
+app.post("/reset-password", async (req, res) => {
+  try {
+    const { token, password } = req.body;
+
+    if (!token || !password) {
+      return res.status(400).send("Token e nova senha são obrigatórios.");
+    }
+
+    const resetEntry = await queryDatabase(
+      `SELECT pr."userId", pr.token_hash, pr.expires_at, u.email
+       FROM password_resets pr
+       JOIN users u ON pr."userId" = u.userid
+       WHERE pr.expires_at > NOW()`, 
+    );
+
+    let foundToken = null;
+    for (const entry of resetEntry) {
+        const isMatch = await bcrypt.compare(token, entry.token_hash);
+        if (isMatch) {
+            foundToken = entry;
+            break;
+        }
+    }
+
+    if (!foundToken) {
+      return res.status(400).send("Token de redefinição inválido ou expirado.");
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    await queryDatabase(
+      "UPDATE users SET password = $1 WHERE userid = $2",
+      [hashedPassword, foundToken.userId],
+    );
+
+    await queryDatabase(
+      `DELETE FROM password_resets WHERE "userId" = $1`,
+      [foundToken.userId],
+    );
+
+    res.status(200).send("Sua senha foi redefinida com sucesso!");
+  } catch (err) {
+    console.error("Erro no reset-password:", err);
+    res.status(500).send("Erro interno no servidor ao redefinir a senha.");
+  }
+});
+
 
 app.get("/get_user_name", authMiddleware, async (req, res) => {
   try {

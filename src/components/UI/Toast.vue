@@ -118,15 +118,18 @@ defineProps({
 
 @media (max-width: 480px) {
   .toast {
-    right: 1rem;
-    left: 1rem;
     bottom: 1rem;
     min-width: auto;
-    transform: none;
+  }
+
+  .toast-right {
+    right: 1rem;
+    left: auto;
   }
 
   .toast-center {
     left: 1rem;
+    right: 1rem;
     transform: none;
   }
 
