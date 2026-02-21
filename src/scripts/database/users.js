@@ -22,7 +22,7 @@ async function createAuthTables() {
             email VARCHAR(50) NOT NULL,
             nome VARCHAR(50) NOT NULL,
             sobrenome VARCHAR(100) NOT NULL,
-            password VARCHAR(20) NOT NULL 
+            password VARCHAR(100) NOT NULL 
         );
     `;
 

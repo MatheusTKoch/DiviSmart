@@ -111,14 +111,14 @@ app.post("/users_register", async (req, res) => {
     if (emailResult.length > 0)
       return res.status(400).send("O email informado já foi utilizado!");
 
-    // Refatorar para usar bcrypt aqui
+    const hashedPassword = await bcrypt.hash(senha, 10);
     const registroSql =
       "INSERT INTO users (email, nome, sobrenome, password) VALUES ($1, $2, $3, $4) RETURNING userid";
     const registroResult = await queryDatabase(registroSql, [
       email,
       nome,
       sobrenome,
-      senha, 
+      hashedPassword,
     ]);
 
     if (registroResult.length > 0) {
@@ -146,8 +146,8 @@ app.post("/users_login", async (req, res) => {
 
     const user = userResult[0];
 
-    // Refatorar para usar bcrypt aqui
-    if (user.password !== senha) 
+    const isMatch = await bcrypt.compare(senha, user.password);
+    if (!isMatch) 
       return res.status(401).send("Credenciais inválidas");
 
     req.session.userId = user.userid;
