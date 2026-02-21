@@ -9,6 +9,7 @@ const __dirname = path.dirname(__filename);
 const ORDEM_DATABASE = [
   "database.js",
   "users.js",
+  "password_resets_table.js", 
   "diversos.js",
   "acoes_table.js",
   "fii_table.js",
