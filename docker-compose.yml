@@ -33,16 +33,44 @@ services:
       timeout: 5s
       retries: 5
 
+  # Serviço de Setup do Banco de Dados
+  db-setup:
+    build: .
+    container_name: db_setup
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    command: npm run db:setup
+
+  # Serviço dos Scrapers
+  scraper:
+    build: .
+    container_name: scraper
+    depends_on:
+      db-setup:
+        condition: service_completed_successfully
+    env_file:
+      - .env
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    command: npm run scrape
+
   # Serviço do Servidor Express
-  api:
+  app:
     build: .
     container_name: express_server
     restart: always
     ports:
       - "${VITE_PORT}:${VITE_PORT}"
     depends_on:
-      db:
-        condition: service_healthy
+      db-setup:
+        condition: service_completed_successfully
       redis:
         condition: service_started
     env_file:
@@ -52,3 +80,4 @@ services:
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
+    command: npm start

@@ -6,7 +6,10 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc -b && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "node src/server.js",
+    "db:setup": "node src/scripts/run-db-setup.js",
+    "scrape": "node src/scripts/run-scrapers.js"
   },
   "dependencies": {
     "@motionone/vue": "^10.16.4",

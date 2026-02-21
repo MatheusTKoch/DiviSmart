@@ -6,8 +6,6 @@ import fs from "fs";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const DB_LOCK_FILE = path.join(__dirname, ".last_run_date.lock");
-
 const ORDEM_DATABASE = [
   "database.js",
   "users.js",
@@ -44,21 +42,16 @@ async function rodarScript(diretorio, arquivo) {
   });
 }
 
-async function executarScripts() {
+async function executarSetupBanco() {
   try {
-    const hoje = new Date().toISOString().split("T")[0];
     const DB_INITIALIZED_LOCK = path.join(
       __dirname,
       ".database_initialized.lock",
     );
-    const SCRAPER_LAST_RUN_LOCK = path.join(
-      __dirname,
-      ".scraper_last_run.lock",
-    );
 
     if (!fs.existsSync(DB_INITIALIZED_LOCK)) {
       console.log(
-        "=== 🛠️ Inicializando Banco de Dados (Primeira Execução) ===",
+        "=== Inicializando Banco de Dados (Primeira Execução) ===",
       );
       for (const arquivo of ORDEM_DATABASE) {
         const pastaDatabase = path.join(__dirname, "database");
@@ -70,54 +63,19 @@ async function executarScripts() {
         DB_INITIALIZED_LOCK,
         `Banco criado em: ${new Date().toISOString()}`,
       );
-      console.log("✓ Tabelas criadas com sucesso.");
+      console.log(" Tabelas criadas com sucesso.");
     } else {
-      console.log("=== Estrutura do banco de dados já existente ===");
+      console.log("=== Estrutura do banco de dados já existente. Pulando. ===");
     }
 
-    let ultimaExecucao = "";
-    if (fs.existsSync(SCRAPER_LAST_RUN_LOCK)) {
-      ultimaExecucao = fs.readFileSync(SCRAPER_LAST_RUN_LOCK, "utf8").trim();
-    }
-
-    if (ultimaExecucao === hoje) {
-      console.log(
-        `\n=== Scrapers já executados hoje (${hoje}). Pulando atualização de dados... ===\n`,
-      );
-    } else {
-      console.log(
-        `\n=== Iniciando Scrapers (Primeira execução do dia: ${hoje}) ===`,
-      );
-      const pastaScrapers = path.join(__dirname, "scrapers");
-
-      if (fs.existsSync(pastaScrapers)) {
-        const arquivosScrapers = fs
-          .readdirSync(pastaScrapers)
-          .filter((file) => file.endsWith(".js"));
-
-        for (const arquivo of arquivosScrapers) {
-          await rodarScript("scrapers", arquivo);
-        }
-
-        fs.writeFileSync(SCRAPER_LAST_RUN_LOCK, hoje);
-        console.log(
-          `\n Todos os scrapers foram finalizados e registrados para ${hoje}!`,
-        );
-      }
-    }
-
-    console.log("=== Fluxo de execução finalizado! ===");
+    console.log("=== Fluxo de setup de banco de dados finalizado! ===");
   } catch (error) {
-    console.error("FALHA NA EXECUÇÃO:", error);
+    console.error("FALHA NA EXECUÇÃO DO SETUP DO BANCO:", error);
     process.exit(1);
   }
 }
 
-executarScripts()
-  .then(() => {
-    console.log("Fluxo de inicialização completo.");
-  })
-  .catch((err) => {
-    console.error("Erro no fluxo:", err);
-    process.exit(1);
-  });
+executarSetupBanco().catch((err) => {
+  console.error("Erro no fluxo de setup do banco:", err);
+  process.exit(1);
+});
