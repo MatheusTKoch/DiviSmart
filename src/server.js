@@ -10,7 +10,6 @@ import { fileURLToPath } from "url";
 import { createClient } from "redis";
 import { RedisStore } from "connect-redis";
 import bcrypt from "bcrypt";
-import nodemailer from "nodemailer";
 import crypto from "crypto";
 
 //Configuração do .env e express
@@ -75,16 +74,37 @@ const queryDatabase = async (text, params) => {
   return res.rows;
 };
 
-// Configuração do Nodemailer
-const transporter = nodemailer.createTransport({
-  host: process.env.VITE_EMAIL_HOST,
-  port: process.env.VITE_EMAIL_PORT,
-  secure: process.env.VITE_EMAIL_SECURE === 'true', 
-  auth: {
-    user: process.env.VITE_EMAIL_USER,
-    pass: process.env.VITE_EMAIL_PASS,
-  },
-});
+// Configuração do Resend API
+const sendEmail = async (to, subject, html) => {
+  try {
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.VITE_EMAIL_PASS}`,
+      },
+      body: JSON.stringify({
+        from: `"DiviSmart" <${process.env.VITE_EMAIL_FROM}>`,
+        to,
+        subject,
+        html,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('Erro ao enviar email:', errorData);
+      throw new Error('Falha no envio do email');
+    }
+
+    const data = await response.json();
+    console.log('Email enviado com sucesso:', data);
+    return data;
+  } catch (error) {
+    console.error("Erro ao enviar email:", error);
+    throw error;
+  }
+};
 
 // --- MIDDLEWARE ---
 
@@ -182,20 +202,19 @@ app.post("/forgot-password", async (req, res) => {
       [userId, tokenHash, expiresAt],
     );
 
-    const resetUrl = `http://localhost:5173/reset-password?token=${token}`; // Use your frontend URL
+    const resetUrl = `http://localhost:5173/reset-password?token=${token}`; 
 
-    await transporter.sendMail({
-      from: process.env.VITE_EMAIL_USER,
-      to: email,
-      subject: "Redefinição de Senha - DiviSmart",
-      html: `
+    await sendEmail(
+      email,
+      "Redefinição de Senha - DiviSmart",
+      `
         <p>Você solicitou uma redefinição de senha para sua conta DiviSmart.</p>
         <p>Por favor, clique no link abaixo para redefinir sua senha:</p>
         <p><a href="${resetUrl}">Redefinir Senha</a></p>
         <p>Este link expirará em 1 hora.</p>
         <p>Se você não solicitou isso, por favor, ignore este email.</p>
       `,
-    });
+    );
 
     res.status(200).send("Se o email estiver registrado, um link de redefinição foi enviado.");
   } catch (err) {
@@ -242,6 +261,16 @@ app.post("/reset-password", async (req, res) => {
     await queryDatabase(
       `DELETE FROM password_resets WHERE "userId" = $1`,
       [foundToken.userId],
+    );
+
+    await sendEmail(
+      foundToken.email,
+      "Sua senha foi redefinida - DiviSmart",
+      `
+        <p>Olá,</p>
+        <p>Sua senha da conta DiviSmart foi redefinida com sucesso.</p>
+        <p>Se você não realizou esta alteração, por favor, entre em contato conosco imediatamente.</p>
+      `,
     );
 
     res.status(200).send("Sua senha foi redefinida com sucesso!");
