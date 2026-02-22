@@ -567,6 +567,61 @@ app.post("/dividendos_load", authMiddleware, async (req, res) => {
     res.status(500).send("Erro interno no servidor");
   }
 });
+
+app.post("/chart_dividendos", authMiddleware, async (req, res) => {
+  try {
+    const { cID, dataInicial, dataFinal } = req.body;
+
+    const sql_acoes_dividendos_chart = `
+      SELECT
+        TO_CHAR(da.datapagamento, 'YYYY-MM-DD') AS data,
+        SUM(da.valorpagamento * aa.quantidade) AS valor
+      FROM dividendos_acoes da
+      JOIN ativos_acoes aa ON da.acaoid = aa.acaoid
+      WHERE aa.carteiraid = $1
+        AND aa.deletedat IS NULL
+        AND da.datapagamento >= $2
+        AND da.datapagamento <= $3
+      GROUP BY TO_CHAR(da.datapagamento, 'YYYY-MM-DD')
+      ORDER BY data;
+    `;
+
+    const sql_fii_dividendos_chart = `
+      SELECT
+        TO_CHAR(df.datapagamento, 'YYYY-MM-DD') AS data,
+        SUM(df.valorpagamento * af.quantidade) AS valor
+      FROM dividendos_fii df
+      JOIN ativos_fii af ON df.fiid = af.fiid
+      WHERE af.carteiraid = $1
+        AND af.deletedat IS NULL
+        AND df.datapagamento >= $2
+        AND df.datapagamento <= $3
+      GROUP BY TO_CHAR(df.datapagamento, 'YYYY-MM-DD')
+      ORDER BY data;
+    `;
+
+    const acoesDividendos = await queryDatabase(sql_acoes_dividendos_chart, [cID, dataInicial, dataFinal]);
+    const fiiDividendos = await queryDatabase(sql_fii_dividendos_chart, [cID, dataInicial, dataFinal]);
+
+    const combinedDividends = {};
+    acoesDividendos.forEach(item => {
+      combinedDividends[item.data] = (combinedDividends[item.data] || 0) + parseFloat(item.valor);
+    });
+    fiiDividendos.forEach(item => {
+      combinedDividends[item.data] = (combinedDividends[item.data] || 0) + parseFloat(item.valor);
+    });
+
+    const sortedCombinedDividends = Object.keys(combinedDividends)
+      .sort()
+      .map(date => ({ data: date, valor: combinedDividends[date] }));
+
+    res.status(200).send(sortedCombinedDividends);
+
+  } catch (err) {
+    console.error("Erro ao carregar dados de dividendos para o gráfico: ", err);
+    res.status(500).send("Erro interno no servidor");
+  }
+});
 app.post("/ativos_load", authMiddleware, async (req, res) => {
   try {
     const acoes = await queryDatabase(
