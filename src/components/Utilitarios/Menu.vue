@@ -20,9 +20,6 @@ async function verifyUser() {
     if (res.status === 200 && res.data.authenticated) {
       await getUserName();
       loadHorario();
-      if (res.data.carteiraId && route.path === "/menu") {
-        router.push(`/menu/carteira/${res.data.carteiraId}`);
-      }
     } else {
       router.push("/");
     }
