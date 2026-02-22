@@ -523,29 +523,34 @@ app.post("/dividendos_load", authMiddleware, async (req, res) => {
     const { cID, dataInicial, dataFinal } = req.body;
 
     const sql_dividendos_acoes = `
-      SELECT 
-        da.*, 
-        a.ticker, 
-        a.descricao
+      SELECT
+        da.datapagamento AS "DataPagamento",
+        da.valorpagamento AS "ValorPagamento",
+        aa.quantidade AS "Quantidade",
+        a.ticker AS "Ticker",
+        a.descricao AS "Descricao"
       FROM dividendos_acoes da
       JOIN acoes a ON da.acaoid = a.acaoid
       JOIN ativos_acoes aa ON a.acaoid = aa.acaoid
-      WHERE aa.carteiraid = $1 
+      WHERE aa.carteiraid = $1
         AND aa.deletedat IS NULL
-        AND da.datapagamento >= $2 
+        AND da.datapagamento >= $2
         AND da.datapagamento <= $3
       ORDER BY da.datapagamento DESC`;
 
     const sql_dividendos_fii = `
-      SELECT 
-        df.*, 
-        f.ticker
+      SELECT
+        df.datapagamento AS "DataPagamento",
+        df.valorpagamento AS "ValorPagamento",
+        af.quantidade AS "Quantidade",
+        f.ticker AS "Ticker",
+        f.segmento AS "Descricao"
       FROM dividendos_fii df
       JOIN fundo_imobiliario f ON df.fiid = f.fundoimobiliarioid
       JOIN ativos_fii af ON f.fundoimobiliarioid = af.fiid
-      WHERE af.carteiraid = $1 
+      WHERE af.carteiraid = $1
         AND af.deletedat IS NULL
-        AND df.datapagamento >= $2 
+        AND df.datapagamento >= $2
         AND df.datapagamento <= $3
       ORDER BY df.datapagamento DESC`;
 
@@ -562,7 +567,6 @@ app.post("/dividendos_load", authMiddleware, async (req, res) => {
     res.status(500).send("Erro interno no servidor");
   }
 });
-
 app.post("/ativos_load", authMiddleware, async (req, res) => {
   try {
     const acoes = await queryDatabase(
