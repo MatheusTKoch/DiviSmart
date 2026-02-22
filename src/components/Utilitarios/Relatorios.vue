@@ -4,7 +4,7 @@ import { nextTick, onMounted, onBeforeUnmount, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import Spinner from "../UI/Spinner.vue";
 import * as echarts from 'echarts';
-import type { ECharts, ECUnitOption } from 'echarts';
+import type { ECharts } from 'echarts';
 
 const router = useRouter();
 let idCarteira = ref();
@@ -156,7 +156,7 @@ async function updateChart() {
       seriesData = chartData.map((item: { data: string; valor: number }) => item.valor);
     }
 
-    const option: ECUnitOption = {
+    const option = {
       title: {
         text: chartTitle,
         left: 'center',
