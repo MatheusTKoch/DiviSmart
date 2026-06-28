@@ -1,10 +1,11 @@
 # DiviSmart
 
-DiviSmart é uma aplicação web desenvolvida em [**VueJS**](https://vuejs.org/) que centraliza o gerenciamento e análise de ativos financeiros. O sistema possibilita o cadastro e a visualização de ações, fundos imobiliários, tesouro direto e dividendos, gerando também relatórios de valorização dos ativos. Os dados dos ativos e dividendos são armazenados em [**MySQL**](https://www.mysql.com/), enquanto informações atualizadas – como cotações e dados de valorização – são obtidas por web scraping com [**Cheerio**](https://cheerio.js.org/).
+DiviSmart é uma aplicação web para gestão e análise de ativos financeiros. A solução foi organizada como uma SPA em [Vue 3](https://vuejs.org/) com [Vite](https://vitejs.dev/), uma API em [Express](https://expressjs.com/) e uma camada de persistência em [PostgreSQL](https://www.postgresql.org/) com [Redis](https://redis.io/) para sessões. Os dados de mercado são atualizados por scripts de scraping com [Cheerio](https://cheerio.js.org/) e [Axios](https://axios-http.com/), enquanto o fluxo de autenticação usa sessões persistidas no Redis e envio de e-mail para redefinição de senha via Resend.
 
 ## Tabela de Conteúdos
 
 - [Visão Geral](#visão-geral)
+- [Arquitetura](#arquitetura)
 - [Recursos](#recursos)
 - [Tecnologias](#tecnologias)
 - [Pré-requisitos](#pré-requisitos)
@@ -19,25 +20,40 @@ DiviSmart oferece uma interface moderna e responsiva para:
 - **Web Scraping:** Coleta automatizada de cotações e dados financeiros de fontes confiáveis.
 - **Relatórios de Valorização:** Geração de relatórios detalhados para análise do desempenho dos ativos.
 
+## Arquitetura
+
+A arquitetura do projeto foi definida para separar claramente interface, regras de negócio e persistência:
+
+- **Front-end SPA:** a interface é construída em Vue 3, com roteamento cliente a cliente via Vue Router.
+- **Back-end HTTP:** a API em Express concentra autenticação, recuperação de senha e acesso aos dados.
+- **Persistência principal:** PostgreSQL armazena usuários, carteiras, ativos, dividendos e demais registros do domínio.
+- **Sessões e estado efêmero:** Redis é usado como store de sessão com `connect-redis`.
+- **Atualização de dados externos:** scripts Node executam setup do banco e scraping de fontes financeiras.
+- **Execução em containers:** o ambiente é orquestrado com Docker Compose, com serviços separados para app, banco, Redis, setup e scraper.
+- **Segurança de credenciais:** senhas são armazenadas com hash bcrypt e o fluxo de recuperação usa token temporário com expiração.
+
 ## Recursos
 
 - **Interface VueJS:** Front-end dinâmico e responsivo.
-- **Banco de Dados MySQL:** Armazenamento seguro e eficiente dos dados.
+- **Banco de Dados PostgreSQL:** Armazenamento dos dados de domínio.
+- **Redis:** Gerenciamento de sessões e estado temporário.
 - **Scraping com Cheerio:** Coleta de dados financeiros e cotações atualizadas.
-- **Relatórios Financeiros:** Visualização de valorização e desempenho dos ativos. (Em progresso)
+- **Relatórios Financeiros:** Visualização de valorização e desempenho dos ativos.
 
 ## Tecnologias
 
-- **Front-end:** VueJS, Vite
-- **Back-end/Scripts:** Node.js
-- **Banco de Dados:** MySQL
+- **Front-end:** Vue 3, Vite, Vue Router
+- **Back-end/Scripts:** Node.js, Express
+- **Banco de Dados:** PostgreSQL, Redis
 - **Web Scraping:** Cheerio, Axios
+- **Autenticação e sessão:** express-session, connect-redis, bcrypt
+- **Containerização:** Docker, Docker Compose
 
 ## Pré-requisitos
 
 - [Node.js](https://nodejs.org/) (v14 ou superior)
 - [npm](https://www.npmjs.com/)
-- Servidor MySQL (local ou na nuvem)
+- [Docker](https://www.docker.com/) e Docker Compose, ou PostgreSQL e Redis instalados localmente
 - Configuração de fontes para web scraping (conforme políticas de uso das fontes escolhidas)
 
 ## Instalação
@@ -49,39 +65,45 @@ git clone https://github.com/MatheusTKoch/DiviSmart.git
 cd DiviSmart
 ```
 
-### 2. Instale as Dependências do Front-end
+### 2. Instale as Dependências
 
 ```bash
 npm install
 ```
 
-### 3. Execução dos Scripts de Banco
+### 3. Suba a infraestrutura
 
-Na pasta database você encontrará os arquivos para criação das tabelas (com final table.js) e scripts para inserir dados iniciais (com final dados.js). Para executar a configuração do banco:
-
-Acesse a pasta database:
+Se preferir executar tudo em containers, use:
 
 ```bash
-cd src
-cd scripts
-cd database
+docker compose up --build
 ```
 
-Execute o script principal:
+Isso inicia os serviços de PostgreSQL, Redis, setup do banco, scraper e a aplicação Express.
+
+### 4. Execução local dos scripts de banco e scraping
+
+O projeto também possui scripts para preparar o banco e atualizar os dados externos:
 
 ```bash
-    node script.js
+npm run db:setup
 ```
 
-Este comando irá:
+Esse comando cria as tabelas na primeira execução. Para rodar a atualização dos scrapers manualmente:
 
-- Criar o banco de dados
-- Criar todas as tabelas necessárias
-- Inserir dados iniciais via web scraping
+```bash
+npm run scrape
+```
 
-### 4. Próximos Passos
+Para iniciar a API localmente:
 
-- **Finalizar a Seção de Relatórios:** Implementar gráficos interativos e exportação de dados.
-- **Atualização Automática de Cotações:** Configurar web scraping periódico para atualização dos valores dos ativos.
-- **Aprimoramento da UX/UI:** Melhorar a responsividade, adicionar animações e feedbacks visuais.
-- **Hospedagem Pública:** Planejar a implantação para que o projeto seja acessível publicamente.
+```bash
+npm start
+```
+
+### 5. Próximos Passos
+
+- **Finalizar a seção de relatórios:** ampliar a visualização dos dados com gráficos e exportação.
+- **Automatizar o scraping:** evoluir o fluxo de atualização periódica dos dados de mercado.
+- **Aprimorar a UX/UI:** refinar responsividade, animações e feedbacks visuais.
+- **Evoluir a camada de API:** expandir regras de negócio e validações de domínio.
