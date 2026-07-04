@@ -1,15 +1,17 @@
 # DiviSmart
 
-DiviSmart é uma aplicação web para gestão e análise de ativos financeiros. A solução foi organizada como uma SPA em [Vue 3](https://vuejs.org/) com [Vite](https://vitejs.dev/), uma API em [Express](https://expressjs.com/) e uma camada de persistência em [PostgreSQL](https://www.postgresql.org/) com [Redis](https://redis.io/) para sessões. Os dados de mercado são atualizados por scripts de scraping com [Cheerio](https://cheerio.js.org/) e [Axios](https://axios-http.com/), enquanto o fluxo de autenticação usa sessões persistidas no Redis e envio de e-mail para redefinição de senha via Resend.
+DiviSmart é uma aplicação web desenvolvida para gestão e análise de ativos financeiros, construída com uma stack de tecnologia moderna. Ela oferece uma interface responsiva para rastrear investimentos, automatizar a coleta de dados de mercado e gerar relatórios de desempenho.
 
-## Tabela de Conteúdos
+## Table of Contents
 
 - [Visão Geral](#visão-geral)
 - [Arquitetura](#arquitetura)
 - [Recursos](#recursos)
 - [Tecnologias](#tecnologias)
 - [Pré-requisitos](#pré-requisitos)
-- [Instalação](#instalação)
+- [Configuração de Ambiente](#configuração-de-ambiente)
+- [Instalação e Execução](#instalação-e-execução)
+- [Screenshots](#screenshots)
 - [Próximos Passos](#próximos-passos)
 
 ## Visão Geral
@@ -51,12 +53,47 @@ A arquitetura do projeto foi definida para separar claramente interface, regras 
 
 ## Pré-requisitos
 
-- [Node.js](https://nodejs.org/) (v14 ou superior)
-- [npm](https://www.npmjs.com/)
-- [Docker](https://www.docker.com/) e Docker Compose, ou PostgreSQL e Redis instalados localmente
-- Configuração de fontes para web scraping (conforme políticas de uso das fontes escolhidas)
+Para executar o DiviSmart, você precisará ter instalado:
 
-## Instalação
+- [Node.js](https://nodejs.org/) (v14 ou superior) e [npm](https://www.npmjs.com/)
+- [Docker](https://www.docker.com/) e Docker Compose (recomendado para um ambiente de desenvolvimento completo), ou [PostgreSQL](https://www.postgresql.org/) e [Redis](https://redis.io/) instalados localmente.
+
+## Configuração de Ambiente
+
+Crie um arquivo `.env` na raiz do projeto, baseado no `.env.example`, e preencha as variáveis de ambiente:
+
+```
+VITE_DATABASE_DB=
+VITE_USER_DB=
+VITE_PASSWORD_DB=
+VITE_HOST_DB=
+VITE_PORT_DB=
+VITE_SESSION_SECRET=
+VITE_PORT=
+VITE_URL_ACOES=
+VITE_URL_FII=
+VITE_URL_TESOURO=
+VITE_URL_COTACOES=
+VITE_URL_ACOES_DIVIDENDOS=
+VITE_URL_FII_DIVIDENDOS=
+VITE_EMAIL_HOST=
+VITE_EMAIL_PORT=
+VITE_EMAIL_SECURE=
+VITE_EMAIL_USER=
+VITE_EMAIL_PASS=
+VITE_EMAIL_FROM=
+```
+*   `VITE_DATABASE_DB`: Nome do banco de dados PostgreSQL.
+*   `VITE_USER_DB`: Usuário do banco de dados PostgreSQL.
+*   `VITE_PASSWORD_DB`: Senha do banco de dados PostgreSQL.
+*   `VITE_HOST_DB`: Host do banco de dados PostgreSQL.
+*   `VITE_PORT_DB`: Porta do banco de dados PostgreSQL.
+*   `VITE_SESSION_SECRET`: Chave secreta para as sessões do Express.
+*   `VITE_PORT`: Porta para a API do Express.
+*   `VITE_URL_ACOES`, `VITE_URL_FII`, `VITE_URL_TESOURO`, `VITE_URL_COTACOES`, `VITE_URL_ACOES_DIVIDENDOS`, `VITE_URL_FII_DIVIDENDOS`: URLs para os scrapers.
+*   `VITE_EMAIL_HOST`, `VITE_EMAIL_PORT`, `VITE_EMAIL_SECURE`, `VITE_EMAIL_USER`, `VITE_EMAIL_PASS`, `VITE_EMAIL_FROM`: Configurações para o serviço de envio de e-mail (Resend).
+
+## Instalação e Execução
 
 ### 1. Clone o Repositório
 
@@ -67,13 +104,13 @@ cd DiviSmart
 
 ### 2. Instale as Dependências
 
+Instale as dependências do projeto:
+
 ```bash
 npm install
 ```
 
-### 3. Suba a infraestrutura
-
-Se preferir executar tudo em containers, use:
+### 3. Suba a infraestrutura com Docker Compose (Recomendado)
 
 ```bash
 docker compose up --build
@@ -81,27 +118,31 @@ docker compose up --build
 
 Isso inicia os serviços de PostgreSQL, Redis, setup do banco, scraper e a aplicação Express.
 
-### 4. Execução local dos scripts de banco e scraping
+### 4. Execução local (Alternativa sem Docker Compose)
 
-O projeto também possui scripts para preparar o banco e atualizar os dados externos:
+#### Configuração do Banco de Dados e Scraping
+
+Para preparar o banco de dados e atualizar os dados externos:
 
 ```bash
 npm run db:setup
-```
-
-Esse comando cria as tabelas na primeira execução. Para rodar a atualização dos scrapers manualmente:
-
-```bash
 npm run scrape
 ```
 
-Para iniciar a API localmente:
+#### Iniciar a API do Express
 
 ```bash
 npm start
 ```
 
-### 5. Próximos Passos
+#### Iniciar o Frontend (Vue.js)
+
+```bash
+npm run dev
+```
+O aplicativo estará disponível em `http://localhost:3000` (ou a porta configurada no Vite).
+
+## Próximos Passos
 
 - **Finalizar a seção de relatórios:** ampliar a visualização dos dados com gráficos e exportação.
 - **Automatizar o scraping:** evoluir o fluxo de atualização periódica dos dados de mercado.
