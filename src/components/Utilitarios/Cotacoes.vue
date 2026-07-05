@@ -23,7 +23,7 @@ function loadCotacoes() {
 </script>
 
 <template>
-  <div class="cotacoes-card">
+  <div class="cotacoes-card compact-card">
     <h3>
       <svg
         style="vertical-align: middle; margin-right: 8px"
@@ -51,17 +51,14 @@ function loadCotacoes() {
 
 <style scoped>
 .cotacoes-card {
-  background: rgba(30, 41, 59, 0.95);
-  border: 1px solid #3b82f6;
-  border-radius: 18px;
-  box-shadow: 0 4px 24px 0 rgba(59, 130, 246, 0.1);
-  padding: 24px 32px;
-  position: absolute;
-  top: 120px;
-  right: 50px;
-  min-width: 260px;
+  width: min(100%, 360px);
+  margin-left: auto;
+  margin-bottom: 1.5rem;
+  border-color: rgba(59, 130, 246, 0.18);
   color: #f8fafc;
-  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
 }
 
 .cotacoes-card h3 {
@@ -94,5 +91,12 @@ function loadCotacoes() {
 .valor {
   font-weight: 700;
   color: #3b82f6;
+}
+
+@media screen and (max-width: 768px) {
+  .cotacoes-card {
+    width: 100%;
+    margin-left: 0;
+  }
 }
 </style>

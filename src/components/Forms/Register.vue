@@ -90,7 +90,7 @@ async function register() {
 </script>
 
 <template>
-  <div class="auth-container">
+  <div class="page-center app-shell">
     <Header />
 
     <Toast v-if="showToast" :sucesso="toastSucesso" position="center">
@@ -121,7 +121,7 @@ async function register() {
 
       <Motion
         tag="div"
-        class="login-card"
+        class="login-card auth-card centered-card"
         :initial="{ opacity: 0, y: 20 }"
         :animate="{ opacity: 1, y: 0 }"
         :transition="{ duration: 0.6 }"
@@ -131,51 +131,55 @@ async function register() {
           <p class="subtitulo">Junte-se ao DiviSmart hoje</p>
         </div>
 
-        <form class="conteudo" @submit.prevent="register">
-          <div class="input-group">
-            <label for="email">E-mail</label>
+        <form class="conteudo stack" @submit.prevent="register">
+          <div class="field-group input-group">
+            <label for="email" class="field-label">E-mail</label>
             <input
               type="email"
               id="email"
               v-model="email"
               placeholder="seu@email.com"
+              class="field-input"
               required
             />
           </div>
 
           <div class="row-inputs">
-            <div class="input-group">
-              <label for="nome">Nome</label>
+            <div class="field-group input-group">
+              <label for="nome" class="field-label">Nome</label>
               <input
                 type="text"
                 id="nome"
                 v-model="nome"
                 @input="validarCadastrar"
                 placeholder="Nome"
+                class="field-input"
                 required
               />
             </div>
-            <div class="input-group">
-              <label for="sobrenome">Sobrenome</label>
+            <div class="field-group input-group">
+              <label for="sobrenome" class="field-label">Sobrenome</label>
               <input
                 type="text"
                 id="sobrenome"
                 v-model="sobrenome"
                 @input="validarCadastrar"
                 placeholder="Sobrenome"
+                class="field-input"
                 required
               />
             </div>
           </div>
 
-          <div class="input-group">
-            <label for="password">Senha</label>
+          <div class="field-group input-group">
+            <label for="password" class="field-label">Senha</label>
             <input
               :type="showPassword ? 'text' : 'password'"
               id="password"
               v-model="senha"
               @input="validarCadastrar"
               placeholder="Mínimo 8 caracteres"
+              class="field-input"
               required
             />
             <div class="alerts-container">
@@ -187,14 +191,17 @@ async function register() {
             </div>
           </div>
 
-          <div class="input-group">
-            <label for="password_confirm">Confirmar Senha</label>
+          <div class="field-group input-group">
+            <label for="password_confirm" class="field-label">
+              Confirmar Senha
+            </label>
             <input
               :type="showPassword ? 'text' : 'password'"
               id="password_confirm"
               v-model="senha2"
               @input="validarCadastrar"
               placeholder="Repita sua senha"
+              class="field-input"
               required
             />
             <p class="alert" v-show="like">As senhas não coincidem.</p>
@@ -208,7 +215,7 @@ async function register() {
             </label>
           </div>
 
-          <button class="btn-login" type="submit">
+          <button class="button-primary btn-login" type="submit">
             Cadastrar
             <svg
               class="login_icon"

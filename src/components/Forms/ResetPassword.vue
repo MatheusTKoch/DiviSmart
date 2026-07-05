@@ -65,14 +65,14 @@ async function resetPassword() {
 </script>
 
 <template>
-  <div class="auth-container">
+  <div class="page-center app-shell">
     <Toast v-if="showToast" :sucesso="toastSucesso" position="center">
       {{ toastMsg }}
     </Toast>
 
     <Motion
       tag="div"
-      class="reset-password-card"
+      class="auth-card centered-card"
       :initial="{ opacity: 0, y: 20 }"
       :animate="{ opacity: 1, y: 0 }"
       :transition="{ duration: 0.6 }"
@@ -82,53 +82,40 @@ async function resetPassword() {
         <p class="subtitulo">Crie uma nova senha para sua conta.</p>
       </div>
 
-      <form class="conteudo" @submit.prevent="resetPassword">
-        <div class="input-group">
-          <label for="password">Nova Senha</label>
+      <form class="stack" @submit.prevent="resetPassword">
+        <div class="field-group">
+          <label for="password" class="field-label">Nova Senha</label>
           <input
             type="password"
             id="password"
             v-model="password"
             placeholder="••••••••"
+            class="field-input"
             required
           />
         </div>
-        <div class="input-group">
-          <label for="passwordConfirm">Confirmar Nova Senha</label>
+        <div class="field-group">
+          <label for="passwordConfirm" class="field-label">
+            Confirmar Nova Senha
+          </label>
           <input
             type="password"
             id="passwordConfirm"
             v-model="passwordConfirm"
             placeholder="••••••••"
+            class="field-input"
             required
           />
         </div>
 
-        <button class="btn-primary" type="submit">Redefinir Senha</button>
+        <button class="button-primary" type="submit">Redefinir Senha</button>
       </form>
     </Motion>
   </div>
 </template>
 
 <style scoped>
-.auth-container {
-  background-color: #020617;
-  color: #f8fafc;
-  height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.reset-password-card {
-  background: rgba(30, 41, 59, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(12px);
-  padding: 32px;
-  border-radius: 20px;
-  width: 100%;
-  max-width: 420px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+.card-header {
   text-align: center;
 }
 
@@ -141,59 +128,5 @@ async function resetPassword() {
   font-size: 0.95rem;
   color: #94a3b8;
   margin-bottom: 24px;
-}
-
-.input-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: 22px;
-  width: 100%;
-}
-
-.input-group label {
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: #cbd5e1;
-  text-align: left;
-  padding-left: 4px;
-}
-
-input[type="password"] {
-  box-sizing: border-box;
-  background: rgba(15, 23, 42, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 12px 14px;
-  border-radius: 12px;
-  color: white;
-  font-size: 1rem;
-  transition: all 0.3s;
-  width: 100%;
-}
-
-input:focus {
-  outline: none;
-  border-color: #3b82f6;
-  background: rgba(15, 23, 42, 0.8);
-  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.08);
-}
-
-.btn-primary {
-  width: 100%;
-  background: #3b82f6;
-  color: white;
-  border: none;
-  padding: 12px;
-  border-radius: 12px;
-  font-weight: 700;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.btn-primary:hover {
-  background: #2563eb;
-  transform: scale(1.02);
-  box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3);
 }
 </style>

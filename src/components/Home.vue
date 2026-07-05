@@ -70,7 +70,7 @@ async function login() {
 </script>
 
 <template>
-  <div class="app-container">
+  <div class="app-shell">
     <Header />
 
     <Toast v-if="showToast" :sucesso="toastSucesso">
@@ -133,7 +133,7 @@ async function login() {
 
       <Motion
         tag="div"
-        class="login-card"
+        class="login-card auth-card centered-card"
         :initial="{ opacity: 0, y: 20 }"
         :animate="{ opacity: 1, y: 0 }"
         :transition="{ duration: 0.6 }"
@@ -143,20 +143,21 @@ async function login() {
           <p class="subtitulo">Acesse sua conta DiviSmart</p>
         </div>
 
-        <form class="conteudo" @submit.prevent="login">
-          <div class="input-group">
-            <label for="email">E-mail</label>
+        <form class="conteudo stack" @submit.prevent="login">
+          <div class="field-group input-group">
+            <label for="email" class="field-label">E-mail</label>
             <input
               type="email"
               id="email"
               v-model="email"
               placeholder="seu@email.com.br"
+              class="field-input"
               required
             />
           </div>
 
-          <div class="input-group">
-            <label for="password">Senha</label>
+          <div class="field-group input-group">
+            <label for="password" class="field-label">Senha</label>
             <div class="password-wrapper">
               <input
                 :type="showPassword ? 'text' : 'password'"
@@ -164,6 +165,7 @@ async function login() {
                 v-model="senha"
                 @keypress.enter="login"
                 placeholder="••••••••"
+                class="field-input"
                 required
               />
             </div>
@@ -178,7 +180,7 @@ async function login() {
             <RouterLink to="/forgot-password" class="forgot-link">Esqueceu a senha?</RouterLink>
           </div>
 
-          <button class="btn-login" type="submit">
+          <button class="button-primary btn-login" type="submit">
             Entrar
             <svg
               class="login_icon"

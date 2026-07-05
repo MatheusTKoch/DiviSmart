@@ -185,7 +185,7 @@ function carregarRelatorio() {
   <div v-if="loading">
     <Spinner></Spinner>
   </div>
-  <div v-else class="conteudo">
+  <div v-else class="conteudo page-panel">
     <div class="header-section">
       <div class="titulo">Dividendos</div>
       <div class="descricao">
@@ -251,11 +251,10 @@ function carregarRelatorio() {
 
 <style scoped>
 .conteudo {
-  position: absolute;
-  top: 20%;
-  left: 30%;
+  position: relative;
   color: #f8fafc;
-  max-width: 70vw;
+  width: min(100%, 1100px);
+  margin: 2rem auto 0;
 }
 
 .header-section {

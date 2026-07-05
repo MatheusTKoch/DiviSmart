@@ -1,6 +1,6 @@
 <template>
   <div class="confirmation-modal-overlay">
-    <div class="confirmation-modal">
+    <div class="confirmation-modal page-panel centered-card">
       <div class="confirmation-modal-header">
         <h3>{{ title }}</h3>
       </div>
@@ -8,8 +8,8 @@
         <p>{{ message }}</p>
       </div>
       <div class="confirmation-modal-footer">
-        <button @click="cancel" class="btn btn-cancel">Cancelar</button>
-        <button @click="confirm" class="btn btn-confirm">Confirmar</button>
+        <button @click="cancel" class="button-secondary btn btn-cancel">Cancelar</button>
+        <button @click="confirm" class="button-primary btn btn-confirm">Confirmar</button>
       </div>
     </div>
   </div>
@@ -54,15 +54,7 @@ const cancel = () => {
 }
 
 .confirmation-modal {
-  background: #1e293b; /* Dark background */
-  color: #f8fafc; /* Light text */
-  padding: 2rem;
-  border-radius: 16px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-  width: 90%;
-  max-width: 400px;
   text-align: center;
-  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .confirmation-modal-header h3 {
@@ -88,35 +80,24 @@ const cancel = () => {
 
 .btn {
   padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 12px;
   font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
   flex: 1;
 }
 
 .btn-cancel {
-  background: rgba(255, 255, 255, 0.05);
   color: #f8fafc;
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .btn-cancel:hover {
-  background: rgba(255, 255, 255, 0.1);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
 }
 
 .btn-confirm {
-  background: linear-gradient(135deg, #3b82f6, #1e40af);
   color: #f8fafc;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
 .btn-confirm:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
 }
 </style>

@@ -58,7 +58,7 @@ function fecharModal() {
           {{ toastMsg }}
         </Toast>
 
-        <div class="modal-card">
+        <div class="modal-card page-panel centered-card">
           <button class="btn-close-icon" @click="fecharModal">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -99,8 +99,8 @@ function fecharModal() {
           </div>
 
           <div class="modal-footer">
-            <button class="btn-voltar" @click="fecharModal">Cancelar</button>
-            <button class="btn-cadastrar" @click="cadastroCarteira">
+            <button class="button-secondary btn-voltar" @click="fecharModal">Cancelar</button>
+            <button class="button-primary btn-cadastrar" @click="cadastroCarteira">
               Criar Carteira
             </button>
           </div>
@@ -126,14 +126,7 @@ function fecharModal() {
 }
 
 .modal-card {
-  background: #1e293b;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 32px;
-  border-radius: 24px;
-  width: 90%;
-  max-width: 400px;
   position: relative;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
 }
 
 .modal-header {
@@ -203,24 +196,18 @@ button {
 }
 
 .btn-cadastrar {
-  background: #3b82f6;
   color: white;
-  border: none;
 }
 
 .btn-cadastrar:hover {
-  background: #2563eb;
   transform: translateY(-1px);
 }
 
 .btn-voltar {
-  background: transparent;
   color: #94a3b8;
-  border: 1px solid rgba(148, 163, 184, 0.3);
 }
 
 .btn-voltar:hover {
-  background: rgba(148, 163, 184, 0.1);
   color: #f8fafc;
 }
 

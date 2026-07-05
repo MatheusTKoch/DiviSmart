@@ -107,7 +107,7 @@ function sendID(num: number) {
   <div v-if="loading">
     <Spinner></Spinner>
   </div>
-  <div v-else class="conteudo">
+  <div v-else class="conteudo page-panel">
     <div v-if="!editCarteira">
       <div class="header-section">
         <div class="titulo">Carteiras</div>
@@ -189,11 +189,10 @@ function sendID(num: number) {
 
 <style scoped>
 .conteudo {
-  position: absolute;
-  top: 20%;
-  transform: translateX(30%);
+  position: relative;
   color: #f8fafc;
-  max-width: 70vw;
+  width: min(100%, 1100px);
+  margin: 2rem auto 0;
 }
 
 .header-section {
@@ -301,13 +300,13 @@ function sendID(num: number) {
 }
 
 .ativos {
-  position: absolute;
-  transform: translateX(2vw);
+  position: relative;
+  margin-top: 2rem;
 }
 
 .modal {
   position: relative;
-  bottom: 28vh;
+  bottom: auto;
 }
 
 @media (max-width: 768px) {

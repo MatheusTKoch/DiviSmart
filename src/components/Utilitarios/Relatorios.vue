@@ -284,7 +284,7 @@ async function generateReport() {
   <div v-if="loading">
     <Spinner></Spinner>
   </div>
-  <div v-else class="conteudo">
+  <div v-else class="conteudo page-panel">
     <div class="header-section">
       <div class="titulo">Relatórios</div>
       <div class="descricao">
@@ -363,109 +363,3 @@ async function generateReport() {
     </div>
   </div>
 </template>
-
-<style scoped>
-.conteudo {
-  position: absolute;
-  top: 20%;
-  left: 30%;
-  color: #f8fafc;
-  max-width: 70vw;
-}
-
-.header-section {
-  text-align: center;
-  margin-bottom: 2rem;
-}
-
-.titulo {
-  font-size: 2.5rem;
-  font-weight: 800;
-  background: linear-gradient(135deg, #3b82f6, #1e40af);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  margin-bottom: 0.5rem;
-}
-
-.descricao {
-  font-size: 1.2rem;
-  color: #94a3b8;
-}
-
-.form-section {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  margin-bottom: 2rem;
-  justify-content: center;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  min-width: 200px;
-}
-
-label {
-  font-size: 0.9rem;
-  color: #f8fafc;
-  margin-bottom: 0.5rem;
-}
-
-.input-field {
-  padding: 0.75rem;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.02);
-  color: #f8fafc;
-  font-size: 1rem;
-}
-
-.btn-search {
-  background: linear-gradient(135deg, #3b82f6, #1e40af);
-  border: none;
-  color: #f8fafc;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-  transition: all 0.3s ease;
-  align-self: flex-end;
-  text-decoration: none;
-  display: inline-block;
-}
-
-.btn-search:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
-}
-
-.result-section {
-  margin-top: 1rem;
-  display: flex;
-  justify-content: center;
-}
-
-.chart-message {
-  margin-top: 2rem;
-  text-align: center;
-  color: #ffcc00; 
-  font-size: 1.1rem;
-}
-
-@media (max-width: 768px) {
-  .conteudo {
-    left: 5%;
-    max-width: 90vw;
-  }
-  .titulo {
-    font-size: 2rem;
-  }
-  .form-section {
-    flex-direction: column;
-  }
-}
-</style>

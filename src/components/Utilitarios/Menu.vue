@@ -85,87 +85,29 @@ watch(
 </script>
 
 <template>
-  <div>
+  <div class="menu-shell">
     <Header showPerfil />
-    <Sidebar />
-    <Cotacoes v-if="route.path === '/menu'" />
-    <div v-if="loading">
-      <Spinner />
-    </div>
-    <div v-else>
-      <div v-if="route.path === '/menu'" class="conteudo">
-        <div class="texto-titulo">Olá {{ nome }}, {{ horario }}!</div>
-        <div class="text">
-          Inicie sua carteira para fazer o acompanhamento clicando no botão
-          abaixo, e após tenha acesso a relatórios personalizados!
+    <div class="menu-layout">
+      <Sidebar />
+      <main class="menu-main">
+        <Cotacoes v-if="route.path === '/menu'" />
+        <div v-if="loading" class="menu-state">
+          <Spinner />
         </div>
-        <button class="carteira" @click="router.push('/menu/carteira')">
-          Criar/Acompanhar Carteira
-        </button>
-      </div>
-      <RouterView v-else />
+        <div v-else>
+          <div v-if="route.path === '/menu'" class="conteudo page-panel">
+            <div class="texto-titulo">Olá {{ nome }}, {{ horario }}!</div>
+            <div class="text">
+              Inicie sua carteira para fazer o acompanhamento clicando no botão
+              abaixo, e após tenha acesso a relatórios personalizados!
+            </div>
+            <button class="button-primary carteira" @click="router.push('/menu/carteira')">
+              Criar/Acompanhar Carteira
+            </button>
+          </div>
+          <RouterView v-else />
+        </div>
+      </main>
     </div>
   </div>
 </template>
-
-<style scoped>
-button.carteira {
-  background-color: transparent;
-  font-size: large;
-  margin-top: 5%;
-  margin-left: 6rem;
-  background: linear-gradient(135deg, #3b82f6, #1e40af);
-  border: none;
-  color: #f8fafc;
-  padding: 0.75rem 1.5rem;
-  border-radius: 12px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-  transition: all 0.3s ease;
-}
-
-button.carteira:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
-}
-
-div.conteudo {
-  position: absolute;
-  top: 20%;
-  left: 30%;
-  color: ghostwhite;
-}
-
-div.text {
-  font-size: medium;
-  padding-top: 10%;
-}
-
-div.texto-titulo {
-  position: relative;
-  font-size: xx-large;
-  left: 5%;
-  padding-bottom: 2vh;
-  font-weight: 800;
-  background: linear-gradient(135deg, #3b82f6, #1e40af);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-@media screen and (max-width: 480px) {
-  div.texto-titulo {
-    font-size: large;
-  }
-
-  div.text {
-    font-size: small;
-  }
-
-  button.carteira {
-    font-size: small;
-  }
-}
-</style>
