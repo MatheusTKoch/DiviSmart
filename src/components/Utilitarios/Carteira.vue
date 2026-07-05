@@ -5,6 +5,7 @@ import api from "../../api/main";
 import { ref, onMounted, nextTick } from "vue";
 import { useRouter } from "vue-router";
 import Spinner from "../UI/Spinner.vue";
+import ConfirmationModal from "../UI/ConfirmationModal.vue";
 
 const router = useRouter();
 let showCarteira = ref(false);
@@ -13,8 +14,33 @@ let editCarteira = ref(false);
 let idCarteira = ref();
 let loading = ref(true);
 
+let showDeleteConfirmation = ref(false);
+let carteiraIdToDelete = ref<number | null>(null);
+
 function abrirModal() {
   showCarteira.value = true;
+}
+
+async function confirmDeleteCarteira() {
+  if (carteiraIdToDelete.value !== null) {
+    try {
+      await api.post("/carteira_delete", {
+        carteiraID: carteiraIdToDelete.value,
+      });
+      await loadCarteira();
+      showDeleteConfirmation.value = false;
+      carteiraIdToDelete.value = null;
+    } catch (err) {
+      console.log(err);
+      showDeleteConfirmation.value = false; 
+      carteiraIdToDelete.value = null;
+    }
+  }
+}
+
+function cancelDeleteCarteira() {
+  showDeleteConfirmation.value = false;
+  carteiraIdToDelete.value = null;
 }
 
 function fecharModal() {
@@ -22,7 +48,9 @@ function fecharModal() {
 }
 
 function handleCarteiraCriada() {
-  loadCarteira();
+  loadCarteira().then(() => {
+    fecharModal();
+  });
 }
 
 defineProps({
@@ -62,17 +90,9 @@ async function loadCarteira() {
   }
 }
 
-async function deleteCarteira(num: number) {
-  if (confirm("Tem certeza que deseja apagar a carteira?")) {
-    try {
-      await api.post("/carteira_delete", {
-        carteiraID: num,
-      });
-      await loadCarteira();
-    } catch (err) {
-      console.log(err);
-    }
-  }
+function deleteCarteira(num: number) {
+  carteiraIdToDelete.value = num;
+  showDeleteConfirmation.value = true;
 }
 
 function sendID(num: number) {
@@ -150,6 +170,13 @@ function sendID(num: number) {
           @carteiraCriada="handleCarteiraCriada"
         />
       </div>
+      <ConfirmationModal
+        v-if="showDeleteConfirmation"
+        title="Confirmar Exclusão"
+        message="Tem certeza que deseja apagar esta carteira? Esta ação não pode ser desfeita."
+        @confirm="confirmDeleteCarteira"
+        @cancel="cancelDeleteCarteira"
+      />
     </div>
     <div class="ativos">
       <Ativos
