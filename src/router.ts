@@ -10,6 +10,7 @@ import MenuView from "./components/Utilitarios/Menu.vue";
 import CarteiraView from "./components/Utilitarios/Carteira.vue";
 import DividendosView from "./components/Utilitarios/Dividendos.vue";
 import RelatoriosView from "./components/Utilitarios/Relatorios.vue";
+import AcompanhamentoView from "./components/Utilitarios/Acompanhamento.vue";
 
 const routes = [
   { path: "/", name: "home", component: HomeView },
@@ -27,6 +28,7 @@ const routes = [
       { path: "carteira/:cID", name: "carteiraAtivos", component: CarteiraView, props: true },
       { path: "dividendos", name: "dividendos", component: DividendosView },
       { path: "relatorios", name: "relatorios", component: RelatoriosView },
+      { path: "acompanhamento", name: "acompanhamento", component: AcompanhamentoView}
     ],
   },
   { path: "/not-found", name: "notFound", component: NotFoundView },

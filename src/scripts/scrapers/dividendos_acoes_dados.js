@@ -135,7 +135,7 @@ function delay(ms) {
 
 async function executar() {
   let client;
-  const GLOBAL_TIMEOUT_MS = 1000 * 60 * 20;
+  const GLOBAL_TIMEOUT_MS = 1000000 * 60 * 20;
   const timeoutHandle = setTimeout(() => {
     console.error("Tempo máximo de execução atingido. Forçando saída.");
     process.exit(1);

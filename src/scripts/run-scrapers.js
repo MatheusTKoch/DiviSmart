@@ -77,9 +77,11 @@ async function executarScrapers() {
       }
     }
 
-    for (const arquivo of arquivosParaRodar) {
-      await rodarScript(arquivo);
-    }
+    console.log(`> Iniciando a execução paralela de ${arquivosParaRodar.length} scrapers...`);
+    
+    const promessas = arquivosParaRodar.map(arquivo => rodarScript(arquivo));
+    
+    await Promise.all(promessas);
 
     if (lockFile) {
       fs.writeFileSync(lockFile, hoje);
