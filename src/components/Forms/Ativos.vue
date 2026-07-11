@@ -71,7 +71,6 @@ const loadAtivos = async () => {
     fii.value = res.data.fii;
     tesouro.value = res.data.tesouro;
 
-    console.log("Ativos carregados com sucesso!");
   } catch (err) {
     console.error("Erro ao carregar ativos:", err);
   }

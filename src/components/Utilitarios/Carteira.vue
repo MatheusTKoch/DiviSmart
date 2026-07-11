@@ -54,7 +54,7 @@ function handleCarteiraCriada() {
 }
 
 defineProps({
-  cID: Number,
+  cID: [Number, String]
 });
 
 onMounted(async () => {
