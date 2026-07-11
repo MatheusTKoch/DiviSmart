@@ -243,13 +243,31 @@ onMounted(async () => {
     }
 
     await loadCarteiras();
-    await loadResumo();
+    if (selectedCarteira.value) {
+      const res = await api.post("/carteira_dados", {
+        cID: selectedCarteira.value,
+      });
+
+      resumo.value = {
+        valores: Number(res.data?.valores || 0),
+        quantidade: Number(res.data?.quantidade || 0),
+        rendaFixa: Number(res.data?.rendaFixa || 0),
+        acoes: Number(res.data?.acoes || 0),
+        fii: Number(res.data?.fii || 0),
+        rendaFixaQuantidade: Number(res.data?.rendaFixaQuantidade || 0),
+        acoesQuantidade: Number(res.data?.acoesQuantidade || 0),
+        fiiQuantidade: Number(res.data?.fiiQuantidade || 0),
+      };
+    }
+    
     window.addEventListener("resize", resizeChart);
   } catch (error) {
     console.error("Erro ao carregar acompanhamento:", error);
     router.push("/");
   } finally {
     loading.value = false;
+    await nextTick();
+    renderChart();
   }
 });
 
@@ -278,7 +296,7 @@ onBeforeUnmount(() => {
       <div class="field-group carteira-select">
         <label class="field-label" for="carteira">Carteira</label>
         <select id="carteira" v-model="selectedCarteira" class="field-input">
-          <option value="" disabled>Selecione uma carteira</option>
+          <option value="">Selecione uma carteira</option>
           <option v-for="cart in carteiras" :key="cart.CarteiraID" :value="cart.CarteiraID">
             {{ cart.Nome }}
           </option>
