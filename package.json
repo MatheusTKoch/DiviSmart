@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "start": "node src/server.js",
     "db:setup": "node src/scripts/run-db-setup.js",
-    "scrape": "node src/scripts/run-scrapers.js"
+    "scrape:diario": "node ./src/scripts/run-scrapers.js --mode=diario",
+    "scrape:frequente": "node ./src/scripts/run-scrapers.js --mode=frequente"
   },
   "dependencies": {
     "@motionone/vue": "^10.16.4",

@@ -6,15 +6,20 @@ import fs from "fs";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-async function rodarScript(diretorio, arquivo) {
-  const caminhoCompleto = path.join(__dirname, diretorio, arquivo);
+//Configuração de execução diaria/frequente
+const args = process.argv.slice(2);
+const modeArg = args.find(arg => arg.startsWith("--mode="));
+const modo = modeArg ? modeArg.split("=")[1] : "all";
+
+async function rodarScript(arquivo) {
+  const caminhoCompleto = path.join(__dirname, "scrapers", arquivo);
   console.log(`> Executando scraper: ${arquivo}`);
 
   return new Promise((resolve, reject) => {
     const child = spawn("node", [caminhoCompleto], { stdio: "inherit" });
 
     child.on("error", (err) => {
-      console.error(`Erro ao spawn do script ${arquivo}:`, err.message);
+      console.error(`Erro ao iniciar o script ${arquivo}:`, err.message);
       reject(err);
     });
 
@@ -23,11 +28,7 @@ async function rodarScript(diretorio, arquivo) {
         console.log(`Scraper ${arquivo} finalizado com sucesso.`);
         resolve();
       } else {
-        reject(
-          new Error(
-            `Scraper ${arquivo} terminou com código ${code} e sinal ${signal}`,
-          ),
-        );
+        reject(new Error(`Scraper ${arquivo} terminou com código ${code} e sinal ${signal}`));
       }
     });
   });
@@ -36,47 +37,55 @@ async function rodarScript(diretorio, arquivo) {
 async function executarScrapers() {
   try {
     const hoje = new Date().toISOString().split("T")[0];
-    const SCRAPER_LAST_RUN_LOCK = path.join(
-      __dirname,
-      ".scraper_last_run.lock",
-    );
+    
+    // Definição dos blocos de arquivos
+    const scrapersDiarios = [
+      "acoes_dados.js",
+      "cotacoes_dados.js",
+      "tesouro_dados.js",
+      "fii_dados.js"
+    ];
 
-    let ultimaExecucao = "";
-    if (fs.existsSync(SCRAPER_LAST_RUN_LOCK)) {
-      ultimaExecucao = fs.readFileSync(SCRAPER_LAST_RUN_LOCK, "utf8").trim();
+    const scrapersFrequentes = [
+      "dividendos_acoes_dados.js",
+      "dividendos_fii_dados.js",
+      "cotacoes_dados.js"
+    ];
+
+    let arquivosParaRodar = [];
+    let lockFile = null;
+
+    // Define o escopo com base no modo
+    if (modo === "diario") {
+      arquivosParaRodar = scrapersDiarios;
+      lockFile = path.join(__dirname, ".scraper_daily_last_run.lock");
+      console.log(`\n=== Iniciando Scrapers Diários (Modo: ${modo}) ===`);
+    } else if (modo === "frequente") {
+      arquivosParaRodar = scrapersFrequentes;
+      console.log(`\n=== Iniciando Scrapers Frequentes (Modo: ${modo}) ===`);
+    } else {
+      arquivosParaRodar = [...new Set([...scrapersDiarios, ...scrapersFrequentes])];
+      lockFile = path.join(__dirname, ".scraper_last_run.lock");
+      console.log(`\n=== Iniciando TODOS os Scrapers (Modo: Geral) ===`);
     }
 
-    if (ultimaExecucao === hoje) {
-      console.log(
-        `
-=== Scrapers já executados hoje (${hoje}). Pulando atualização de dados... ===
-`,
-      );
-    } else {
-      console.log(
-        `
-=== Iniciando Scrapers (Primeira execução do dia: ${hoje}) ===`,
-      );
-      const pastaScrapers = path.join(__dirname, "scrapers");
-
-      if (fs.existsSync(pastaScrapers)) {
-        const arquivosScrapers = fs
-          .readdirSync(pastaScrapers)
-          .filter((file) => file.endsWith(".js"));
-
-        for (const arquivo of arquivosScrapers) {
-          await rodarScript("scrapers", arquivo);
-        }
-
-        fs.writeFileSync(SCRAPER_LAST_RUN_LOCK, hoje);
-        console.log(
-          `
-   Todos os scrapers foram finalizados e registrados para ${hoje}!`,
-        );
+    if (lockFile && fs.existsSync(lockFile)) {
+      const ultimaExecucao = fs.readFileSync(lockFile, "utf8").trim();
+      if (ultimaExecucao === hoje) {
+        console.log(`=== Scrapers já executados hoje (${hoje}). Pulando execução... ===\n`);
+        return;
       }
     }
 
-    console.log("=== Fluxo de scraping finalizado! ===");
+    for (const arquivo of arquivosParaRodar) {
+      await rodarScript(arquivo);
+    }
+
+    if (lockFile) {
+      fs.writeFileSync(lockFile, hoje);
+    }
+
+    console.log(`\n=== Fluxo de scraping [${modo}] finalizado com sucesso para ${hoje}! ===`);
   } catch (error) {
     console.error("FALHA NA EXECUÇÃO DOS SCRAPERS:", error);
     process.exit(1);

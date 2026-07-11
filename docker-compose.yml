@@ -48,9 +48,9 @@ services:
     command: npm run db:setup
 
   # Serviço dos Scrapers
-  scraper:
+  scraper-daily:
     build: .
-    container_name: scraper
+    container_name: scraper_daily
     depends_on:
       db-setup:
         condition: service_completed_successfully
@@ -59,7 +59,20 @@ services:
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
-    command: npm run scrape
+    command: npm run scrape:diario
+
+  scraper-frequent:
+    build: .
+    container_name: scraper_frequent
+    depends_on:
+      db-setup:
+        condition: service_completed_successfully
+    env_file:
+      - .env
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    command: npm run scrape:frequente
 
   # Serviço do Servidor Express
   app:

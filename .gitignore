@@ -28,3 +28,4 @@ DIVISMART_CONTEXT.md
 
 postgres_data/
 src/scripts/.database_initialized.lock
+src/scripts/.scraper_daily_last_run.lock
