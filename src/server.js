@@ -565,7 +565,7 @@ app.post("/fii_cadastro", authMiddleware, async (req, res) => {
 app.post("/tesouro_cadastro", authMiddleware, async (req, res) => {
   try {
     const sql =
-      "INSERT INTO ativos_fii (quantidade, valorinvestido, datacadastro, carteiraid, fiid) values ($1, $2, now(), $3, $4)";
+      "INSERT INTO ativos_tesouro (quantidade, valorinvestido, datacadastro, carteiraid, tesouroid) values ($1, $2, now(), $3, $4)";
     await queryDatabase(sql, [
       req.body.quantidade,
       req.body.valorInvestido,
