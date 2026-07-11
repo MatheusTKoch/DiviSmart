@@ -436,6 +436,7 @@ app.post("/carteira_name", authMiddleware, async (req, res) => {
 app.post("/carteira_dados", authMiddleware, async (req, res) => {
   try {
     const cID = req.body.cID;
+    
     const totalAcao =
       (
         await queryDatabase(
@@ -486,12 +487,22 @@ app.post("/carteira_dados", authMiddleware, async (req, res) => {
         )[0].count,
       ) || 0;
 
+    const vAcao = parseFloat(totalAcao) || 0;
+    const vFii = parseFloat(totalFii) || 0;
+    const vTesouro = parseFloat(totalTesouro) || 0;
+
     res.status(200).send({
-      valores:
-        parseFloat(totalAcao) + parseFloat(totalFii) + parseFloat(totalTesouro),
+      valores: vAcao + vFii + vTesouro,
       quantidade: countAcao + countFii + countTesouro,
+      acoes: vAcao,
+      fii: vFii,
+      rendaFixa: vTesouro,
+      acoesQuantidade: countAcao,
+      fiiQuantidade: countFii,
+      rendaFixaQuantidade: countTesouro
     });
   } catch (err) {
+    console.error("Erro na rota /carteira_dados:", err);
     res.status(500).send("Erro interno no servidor");
   }
 });
