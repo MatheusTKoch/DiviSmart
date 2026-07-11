@@ -280,6 +280,65 @@ app.post("/reset-password", async (req, res) => {
   }
 });
 
+app.get("/profile_load", authMiddleware, async (req, res) => {
+  try {
+    const userResult = await queryDatabase(
+      "SELECT email, nome, sobrenome FROM users WHERE userid = $1",
+      [req.session.userId],
+    );
+
+    if (userResult.length === 0) {
+      return res.status(404).send("Usuário não encontrado");
+    }
+
+    res.status(200).send(userResult[0]);
+  } catch (err) {
+    console.error("Erro ao carregar perfil:", err);
+    res.status(500).send("Erro interno no servidor");
+  }
+});
+
+app.put("/users_update", authMiddleware, async (req, res) => {
+  try {
+    const email = String(req.body.email || "").trim();
+    const nome = String(req.body.nome || "").trim();
+    const sobrenome = String(req.body.sobrenome || "").trim();
+
+    if (!email || !nome || !sobrenome) {
+      return res.status(400).send("Email, nome e sobrenome são obrigatórios.");
+    }
+
+    const emailResult = await queryDatabase(
+      "SELECT userid FROM users WHERE email = $1 AND userid <> $2",
+      [email, req.session.userId],
+    );
+
+    if (emailResult.length > 0) {
+      return res.status(400).send("O email informado já foi utilizado!");
+    }
+
+    const updateResult = await queryDatabase(
+      `UPDATE users
+       SET email = $1, nome = $2, sobrenome = $3
+       WHERE userid = $4
+       RETURNING userid, email, nome, sobrenome`,
+      [email, nome, sobrenome, req.session.userId],
+    );
+
+    if (updateResult.length === 0) {
+      return res.status(404).send("Usuário não encontrado");
+    }
+
+    res.status(200).send({
+      message: "Perfil atualizado com sucesso",
+      user: updateResult[0],
+    });
+  } catch (err) {
+    console.error("Erro ao atualizar perfil:", err);
+    res.status(500).send("Erro interno no servidor");
+  }
+});
+
 
 app.get("/get_user_name", authMiddleware, async (req, res) => {
   try {

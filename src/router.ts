@@ -5,6 +5,7 @@ import NotFoundView from "./components/Utilitarios/NotFound.vue";
 import RegisterView from "./components/Forms/Register.vue";
 import ForgotPasswordView from "./components/Forms/ForgotPassword.vue";
 import ResetPasswordView from "./components/Forms/ResetPassword.vue";
+import EditProfileView from "./forms/EditProfile.vue";
 import MenuView from "./components/Utilitarios/Menu.vue";
 import CarteiraView from "./components/Utilitarios/Carteira.vue";
 import DividendosView from "./components/Utilitarios/Dividendos.vue";
@@ -21,6 +22,7 @@ const routes = [
     component: MenuView,
     children: [
       { path: "", name: "menuHome", component: MenuView },
+      { path: "edit-profile", name: "editProfile", component: EditProfileView },
       { path: "carteira", name: "carteira", component: CarteiraView },
       { path: "carteira/:cID", name: "carteiraAtivos", component: CarteiraView, props: true },
       { path: "dividendos", name: "dividendos", component: DividendosView },
