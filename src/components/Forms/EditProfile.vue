@@ -2,9 +2,9 @@
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import { Motion } from "@motionone/vue";
-import api from "../api/main";
-import Toast from "../components/UI/Toast.vue";
-import Spinner from "../components/UI/Spinner.vue";
+import api from "../../api/main.ts";
+import Toast from "../UI/Toast.vue";
+import Spinner from "../UI/Spinner.vue";
 
 const router = useRouter();
 

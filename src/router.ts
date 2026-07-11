@@ -5,7 +5,7 @@ import NotFoundView from "./components/Utilitarios/NotFound.vue";
 import RegisterView from "./components/Forms/Register.vue";
 import ForgotPasswordView from "./components/Forms/ForgotPassword.vue";
 import ResetPasswordView from "./components/Forms/ResetPassword.vue";
-import EditProfileView from "./forms/EditProfile.vue";
+import EditProfileView from "./components/Forms/EditProfile.vue";
 import MenuView from "./components/Utilitarios/Menu.vue";
 import CarteiraView from "./components/Utilitarios/Carteira.vue";
 import DividendosView from "./components/Utilitarios/Dividendos.vue";
