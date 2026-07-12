@@ -11,6 +11,7 @@ import { createClient } from "redis";
 import { RedisStore } from "connect-redis";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
+import PDFDocument from "pdfkit";
 
 //Configuração do .env e express
 const __filename = fileURLToPath(import.meta.url);
@@ -714,6 +715,161 @@ app.post("/ativos_load", authMiddleware, async (req, res) => {
   } catch (err) {
     console.error("Erro ao carregar ativos de referência:", err);
     res.status(500).send("Erro interno no servidor ao carregar dados.");
+  }
+});
+
+//Rotas de relatório
+
+//Helper
+const formatCurrency = (value) => {
+  return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value || 0);
+};
+
+const fetchReportData = async (cID, dataInicial, dataFinal) => {
+  const acoes = await queryDatabase(
+    `SELECT aa.quantidade, aa.valorinvestido, a.ticker, a.descricao 
+     FROM ativos_acoes aa 
+     JOIN acoes a ON aa.acaoid = a.acaoid 
+     WHERE aa.carteiraid = $1 AND aa.deletedat IS NULL AND aa.datacadastro BETWEEN $2 AND $3`,
+    [cID, dataInicial, dataFinal]
+  );
+
+  const fiis = await queryDatabase(
+    `SELECT af.quantidade, af.valorinvestido, f.ticker, f.segmento as descricao 
+     FROM ativos_fii af 
+     JOIN fundo_imobiliario f ON af.fiid = f.fundoimobiliarioid 
+     WHERE af.carteiraid = $1 AND af.deletedat IS NULL AND af.datacadastro BETWEEN $2 AND $3`,
+    [cID, dataInicial, dataFinal]
+  );
+
+  const tesouro = await queryDatabase(
+    `SELECT at.quantidade, at.valorinvestido, t.descricao 
+     FROM ativos_tesouro at 
+     JOIN tesouro_direto t ON at.tesouroid = t.tesouroid 
+     WHERE at.carteiraid = $1 AND at.deletedat IS NULL AND at.datacadastro BETWEEN $2 AND $3`,
+    [cID, dataInicial, dataFinal]
+  );
+
+  return { acoes, fiis, tesouro };
+};
+
+app.post("/relatorios_load", authMiddleware, async (req, res) => {
+  try {
+    const { cID, tipo, dataInicial, dataFinal } = req.body;
+
+    if (!cID || !tipo || !dataInicial || !dataFinal) {
+      return res.status(400).json({ message: "Parâmetros incompletos para geração de relatório." });
+    }
+
+    const carteiraResult = await queryDatabase(
+      "SELECT nome FROM carteiras WHERE carteiraid = $1 AND userid = $2",
+      [cID, req.session.userId]
+    );
+
+    if (carteiraResult.length === 0) {
+      return res.status(404).json({ message: "Carteira não encontrada." });
+    }
+
+    const nomeCarteira = carteiraResult[0].nome;
+    const { acoes, fiis, tesouro } = await fetchReportData(cID, dataInicial, dataFinal);
+
+    if (acoes.length === 0 && fiis.length === 0 && tesouro.length === 0) {
+      return res.status(200).header("Content-Type", "application/json").json({
+        message: "Nenhuma movimentação ou ativo encontrado para o período selecionado.",
+      });
+    }
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `attachment; filename=relatorio_${tipo}.pdf`);
+
+    const doc = new PDFDocument({ margin: 50 });
+    doc.pipe(res);
+
+    doc.fontSize(22).fillColor("#1e293b").text("DiviSmart - Relatório Financeiro", { align: "center" });
+    doc.moveDown(0.5);
+    doc.fontSize(12).fillColor("#64748b").text(`Carteira: ${nomeCarteira}`, { align: "left" });
+    doc.text(`Período analisado: ${dataInicial} até ${dataFinal}`);
+    doc.moveDown();
+    doc.moveTo(50, doc.y).lineTo(550, doc.y).strokeColor("#e2e8f0").stroke();
+    doc.moveDown();
+
+    if (tipo === "pdf_resumo") {
+      doc.fontSize(16).fillColor("#0f172a").text("Resumo Executivo de Alocação", { underline: true });
+      doc.moveDown();
+
+      const totalAcoes = acoes.reduce((sum, item) => sum + parseFloat(item.valorinvestido || 0), 0);
+      const totalFiis = fiis.reduce((sum, item) => sum + parseFloat(item.valorinvestido || 0), 0);
+      const totalTesouro = tesouro.reduce((sum, item) => sum + parseFloat(item.valorinvestido || 0), 0);
+      const totalGeral = totalAcoes + totalFiis + totalTesouro;
+
+      doc.fontSize(12).fillColor("#334155");
+      doc.text(`Total Alocado em Ações: ${formatCurrency(totalAcoes)}`);
+      doc.text(`Total Alocado em FIIs: ${formatCurrency(totalFiis)}`);
+      doc.text(`Total Alocado em Renda Fixa: ${formatCurrency(totalTesouro)}`);
+      doc.moveDown();
+      doc.fontSize(14).text(`Valor Total da Carteira no Período: ${formatCurrency(totalGeral)}`, { bold: true });
+    } 
+    
+    else if (tipo === "pdf_detalhado") {
+      doc.fontSize(16).fillColor("#0f172a").text("Detalhamento de Ativos por Classe", { underline: true });
+      doc.moveDown();
+
+      if (acoes.length > 0) {
+        doc.fontSize(14).fillColor("#3b82f6").text("Ações");
+        acoes.forEach(item => {
+          doc.fontSize(11).fillColor("#334155").text(`  • ${item.ticker} (${item.descricao}) | Qtd: ${item.quantidade} | Investido: ${formatCurrency(item.valorinvestido)}`);
+        });
+        doc.moveDown(0.5);
+      }
+
+      if (fiis.length > 0) {
+        doc.fontSize(14).fillColor("#10b981").text("Fundos Imobiliários (FIIs)");
+        fiis.forEach(item => {
+          doc.fontSize(11).fillColor("#334155").text(`  • ${item.ticker} (${item.descricao}) | Qtd: ${item.quantidade} | Investido: ${formatCurrency(item.valorinvestido)}`);
+        });
+        doc.moveDown(0.5);
+      }
+
+      if (tesouro.length > 0) {
+        doc.fontSize(14).fillColor("#f59e0b").text("Renda Fixa / Tesouro Direto");
+        tesouro.forEach(item => {
+          doc.fontSize(11).fillColor("#334155").text(`  • ${item.descricao} | Qtd: ${item.quantidade} | Investido: ${formatCurrency(item.valorinvestido)}`);
+        });
+      }
+    } 
+    
+    else if (tipo === "pdf_fluxo") {
+      doc.fontSize(16).fillColor("#0f172a").text("Histórico de Fluxo e Aportes", { underline: true });
+      doc.moveDown();
+
+      let totalAportes = 0;
+      doc.fontSize(11).fillColor("#334155");
+
+      acoes.forEach(item => {
+        totalAportes += parseFloat(item.valorinvestido);
+        doc.text(`[Compra Ação] ${item.ticker} - Quantidade: ${item.quantidade} | Total: ${formatCurrency(item.valorinvestido)}`);
+      });
+
+      fiis.forEach(item => {
+        totalAportes += parseFloat(item.valorinvestido);
+        doc.text(`[Compra FII] ${item.ticker} - Quantidade: ${item.quantidade} | Total: ${formatCurrency(item.valorinvestido)}`);
+      });
+
+      tesouro.forEach(item => {
+        totalAportes += parseFloat(item.valorinvestido);
+        doc.text(`[Aporte Renda Fixa] ${item.descricao} - Vol: ${item.quantidade} | Total: ${formatCurrency(item.valorinvestido)}`);
+      });
+
+      doc.moveDown();
+      doc.fontSize(13).fillColor("#0f172a").text(`Total de Entrada/Fluxo no Período: ${formatCurrency(totalAportes)}`);
+    }
+
+    doc.end();
+
+  } catch (err) {
+    console.error("Erro interno ao gerar PDF no servidor:", err);
+    if (res.headersSent) return;
+    res.status(500).json({ message: "Erro interno no servidor ao processar relatório." });
   }
 });
 
