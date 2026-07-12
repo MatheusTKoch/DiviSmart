@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import Header from "../UI/Header.vue";
 import Toast from "../UI/Toast.vue";
 import api from "../../api/main";
 import { Motion } from "@motionone/vue";
@@ -91,185 +90,135 @@ async function register() {
 
 <template>
   <div class="page-center app-shell">
-    <Header />
-
     <Toast v-if="showToast" :sucesso="toastSucesso" position="center">
       {{ toastMsg }}
     </Toast>
 
-    <main class="auth-main">
-      <Motion
-        :initial="{ opacity: 0, x: -20 }"
-        :animate="{ opacity: 1, x: 0 }"
-        class="back-wrapper"
-      >
-        <button @click="router.push('/')" class="btn-back">
+    <Motion
+      tag="div"
+      class="auth-card centered-card register-card"
+      :initial="{ opacity: 0, y: 20 }"
+      :animate="{ opacity: 1, y: 0 }"
+      :transition="{ duration: 0.6 }"
+    >
+      <div class="card-header">
+        <h1 class="titulo">Crie sua conta</h1>
+        <p class="subtitulo">Junte-se ao DiviSmart hoje</p>
+      </div>
+
+      <form class="stack" @submit.prevent="register">
+        <div class="field-group">
+          <label for="email" class="field-label">E-mail</label>
+          <input
+            type="email"
+            id="email"
+            v-model="email"
+            placeholder="seu@email.com"
+            class="field-input"
+            required
+          />
+        </div>
+
+        <div class="row-inputs">
+          <div class="field-group">
+            <label for="nome" class="field-label">Nome</label>
+            <input
+              type="text"
+              id="nome"
+              v-model="nome"
+              @input="validarCadastrar"
+              placeholder="Nome"
+              class="field-input"
+              required
+            />
+          </div>
+          <div class="field-group">
+            <label for="sobrenome" class="field-label">Sobrenome</label>
+            <input
+              type="text"
+              id="sobrenome"
+              v-model="sobrenome"
+              @input="validarCadastrar"
+              placeholder="Sobrenome"
+              class="field-input"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label for="password" class="field-label">Senha</label>
+          <input
+            :type="showPassword ? 'text' : 'password'"
+            id="password"
+            v-model="senha"
+            @input="validarCadastrar"
+            placeholder="Mínimo 8 caracteres"
+            class="field-input"
+            required
+          />
+          <div class="alerts-container">
+            <p class="alert" v-show="maxPass">Máximo 20 caracteres.</p>
+            <p class="alert" v-show="minPass">Mínimo 8 caracteres.</p>
+            <p class="alert" v-show="numLetter">
+              Use uma letra maiúscula e um número.
+            </p>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label for="password_confirm" class="field-label">
+            Confirmar Senha
+          </label>
+          <input
+            :type="showPassword ? 'text' : 'password'"
+            id="password_confirm"
+            v-model="senha2"
+            @input="validarCadastrar"
+            placeholder="Repita sua senha"
+            class="field-input"
+            required
+          />
+          <p class="alert" v-show="like">As senhas não coincidem.</p>
+        </div>
+
+        <div class="pass-options">
+          <label class="checkbox-container">
+            <input type="checkbox" @change="togglePassword" />
+            <span class="checkmark"></span>
+            Mostrar Senha
+          </label>
+        </div>
+
+        <button class="button-primary btn-login" type="submit">
+          Cadastrar
           <svg
+            class="login_icon"
             xmlns="http://www.w3.org/2000/svg"
-            height="24"
+            height="20"
             viewBox="0 -960 960 960"
-            width="24"
+            width="20"
             fill="currentColor"
           >
             <path
-              d="m287-446.67 240 240L480-160 160-480l320-320 47 46.67-240 240h513v66.66H287Z"
+              d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z"
             />
           </svg>
-          <span>Voltar</span>
         </button>
-      </Motion>
+      </form>
 
-      <Motion
-        tag="div"
-        class="login-card auth-card centered-card"
-        :initial="{ opacity: 0, y: 20 }"
-        :animate="{ opacity: 1, y: 0 }"
-        :transition="{ duration: 0.6 }"
-      >
-        <div class="card-header">
-          <h1 class="titulo">Crie sua conta</h1>
-          <p class="subtitulo">Junte-se ao DiviSmart hoje</p>
-        </div>
-
-        <form class="conteudo stack" @submit.prevent="register">
-          <div class="field-group input-group">
-            <label for="email" class="field-label">E-mail</label>
-            <input
-              type="email"
-              id="email"
-              v-model="email"
-              placeholder="seu@email.com"
-              class="field-input"
-              required
-            />
-          </div>
-
-          <div class="row-inputs">
-            <div class="field-group input-group">
-              <label for="nome" class="field-label">Nome</label>
-              <input
-                type="text"
-                id="nome"
-                v-model="nome"
-                @input="validarCadastrar"
-                placeholder="Nome"
-                class="field-input"
-                required
-              />
-            </div>
-            <div class="field-group input-group">
-              <label for="sobrenome" class="field-label">Sobrenome</label>
-              <input
-                type="text"
-                id="sobrenome"
-                v-model="sobrenome"
-                @input="validarCadastrar"
-                placeholder="Sobrenome"
-                class="field-input"
-                required
-              />
-            </div>
-          </div>
-
-          <div class="field-group input-group">
-            <label for="password" class="field-label">Senha</label>
-            <input
-              :type="showPassword ? 'text' : 'password'"
-              id="password"
-              v-model="senha"
-              @input="validarCadastrar"
-              placeholder="Mínimo 8 caracteres"
-              class="field-input"
-              required
-            />
-            <div class="alerts-container">
-              <p class="alert" v-show="maxPass">Máximo 20 caracteres.</p>
-              <p class="alert" v-show="minPass">Mínimo 8 caracteres.</p>
-              <p class="alert" v-show="numLetter">
-                Use uma letra maiúscula e um número.
-              </p>
-            </div>
-          </div>
-
-          <div class="field-group input-group">
-            <label for="password_confirm" class="field-label">
-              Confirmar Senha
-            </label>
-            <input
-              :type="showPassword ? 'text' : 'password'"
-              id="password_confirm"
-              v-model="senha2"
-              @input="validarCadastrar"
-              placeholder="Repita sua senha"
-              class="field-input"
-              required
-            />
-            <p class="alert" v-show="like">As senhas não coincidem.</p>
-          </div>
-
-          <div class="pass-options">
-            <label class="checkbox-container">
-              <input type="checkbox" @change="togglePassword" />
-              <span class="checkmark"></span>
-              Mostrar Senha
-            </label>
-          </div>
-
-          <button class="button-primary btn-login" type="submit">
-            Cadastrar
-            <svg
-              class="login_icon"
-              xmlns="http://www.w3.org/2000/svg"
-              height="20"
-              viewBox="0 -960 960 960"
-              width="20"
-              fill="currentColor"
-            >
-              <path
-                d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z"
-              />
-            </svg>
-          </button>
-        </form>
-
-        <p class="footer-text">
-          Já tem uma conta?
-          <RouterLink to="/" class="signup-link">Faça login</RouterLink>
-        </p>
-      </Motion>
-    </main>
+      <p class="footer-text">
+        Já tem uma conta?
+        <RouterLink to="/" class="signup-link">Faça login</RouterLink>
+      </p>
+    </Motion>
   </div>
 </template>
 
 <style scoped>
-.auth-container {
-  background-color: #020617;
-  min-height: 100vh;
-  color: #f8fafc;
-  display: flex;
-  flex-direction: column;
-}
-
-.auth-main {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 60px 20px;
-  position: relative;
-}
-
-.login-card {
-  background: rgba(30, 41, 59, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(12px);
-  padding: 32px;
-  border-radius: 24px;
+.register-card {
   width: 100%;
-  max-width: 480px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-  margin: auto 0;
+  max-width: 520px;
 }
 
 .card-header {
@@ -286,49 +235,10 @@ async function register() {
   font-size: 0.9rem;
 }
 
-.conteudo {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
 .row-inputs {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
-}
-
-.input-group {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-bottom: 14px;
-  width: 100%;
-}
-
-.input-group label {
-  font-size: 0.8rem;
-  font-weight: 500;
-  color: #cbd5e1;
-  padding-left: 2px;
-}
-
-input {
-  box-sizing: border-box;
-  width: 100%;
-  background: rgba(15, 23, 42, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 12px 14px;
-  border-radius: 12px;
-  color: white;
-  font-size: 0.95rem;
-  transition: all 0.3s;
-}
-
-input:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
 }
 
 .alerts-container {
@@ -404,48 +314,16 @@ input:focus {
   font-size: 0.9rem;
 }
 
-.back-wrapper {
-  position: absolute;
-  top: 30px;
-  left: 30px;
-  z-index: 10;
-}
-
-.btn-back {
-  background: rgba(30, 41, 59, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #94a3b8;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  border-radius: 10px;
-  cursor: pointer;
-  font-size: 0.85rem;
-  font-weight: 500;
-  transition: all 0.3s;
-}
-
-.btn-back:hover {
-  background: rgba(255, 255, 255, 0.05);
-  color: #f8fafc;
-}
-
 @media (max-width: 640px) {
   .row-inputs {
     grid-template-columns: 1fr;
     gap: 0;
   }
-  .back-wrapper {
-    top: 20px;
-    left: 20px;
+  .register-card {
+    max-width: 100%;
   }
-  .login-card {
-    padding: 24px 20px;
-    margin-top: 40px;
-  }
-  .auth-main {
-    padding: 20px;
+  .card-header .titulo {
+    font-size: 1.5rem;
   }
 }
 </style>
