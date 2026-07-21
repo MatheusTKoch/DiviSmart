@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Modal from "../UI/Modal.vue";
+import Modal from "../UI/ModalCarteira.vue";
 import Ativos from "../Forms/Ativos.vue";
 import api from "../../api/main";
 import { ref, onMounted, nextTick } from "vue";

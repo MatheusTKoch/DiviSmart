@@ -5,7 +5,7 @@ import api from "../../api/main";
 import Toast from "../UI/Toast.vue";
 import { Motion } from "@motionone/vue";
 
-const route = useRoute();
+const route = useRoute(); 
 const router = useRouter();
 
 const token = ref("");
@@ -17,7 +17,7 @@ const toastMsg = ref("");
 const toastSucesso = ref(false);
 
 onMounted(() => {
-  const routeToken = route.query.token;
+  const routeToken = route.query.token?.toString;
   if (routeToken) {
     token.value = Array.isArray(routeToken) ? routeToken[0] : routeToken;
   } else {

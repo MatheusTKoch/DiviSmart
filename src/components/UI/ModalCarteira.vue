@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import api from "../../api/main";
+import api from "../../api/main.ts";
 import Toast from "./Toast.vue";
 
 const emit = defineEmits(["fecharModal", "carteiraCriada"]);

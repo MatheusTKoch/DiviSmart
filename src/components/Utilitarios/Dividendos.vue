@@ -4,6 +4,7 @@ import { nextTick, onMounted, ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import Spinner from "../UI/Spinner.vue";
 import DividendosChart from "../UI/DividendosChart.vue";
+import Toast from "../UI/Toast.vue";
 
 interface DADOSGRAFICO {
   data: number;
@@ -21,6 +22,9 @@ let dadosAcoes = ref();
 let dadosFii = ref();
 let showGraph = ref(false);
 let loading = ref(true);
+const showToast = ref(false);
+const toastMsg = ref("");
+const toastSucesso = ref(false);
 
 let dadosRelatorioAcao = computed(() => {
   let mesDadosMap = new Map<string, DADOSGRAFICO>();
@@ -156,9 +160,9 @@ function carregarRelatorio() {
     dataInicial.value == undefined ||
     dataFinal.value == undefined
   ) {
-    alert("Verifique os campos informados e tente novamente!");
+    triggerToast("Verifique os campos informados e tente novamente!");
   } else if (dataInicial.value > dataFinal.value) {
-    alert("Data inicial maior que a final, verifique os dados!");
+    triggerToast("Data inicial maior que a final, verifique os dados!");
   } else {
     api
       .post("/dividendos_load", {
@@ -179,6 +183,16 @@ function carregarRelatorio() {
       });
   }
 }
+
+function triggerToast(message: string, success: boolean = false) {
+  toastMsg.value = message;
+  toastSucesso.value = success;
+  showToast.value = true;
+  setTimeout(() => {
+    showToast.value = false;
+  }, 3000);
+}
+
 </script>
 
 <template>
@@ -247,6 +261,9 @@ function carregarRelatorio() {
       </div>
     </div>
   </div>
+  <Toast v-if="showToast" :sucesso="toastSucesso">
+      {{ toastMsg }}
+  </Toast>
 </template>
 
 <style scoped>

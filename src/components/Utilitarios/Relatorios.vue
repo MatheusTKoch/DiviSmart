@@ -6,6 +6,8 @@ import Spinner from "../UI/Spinner.vue";
 import * as echarts from "echarts";
 import type { ECharts } from "echarts";
 import { generateClientPdf } from "../../scripts/utils/reportGenerator";
+import Toast from "../UI/Toast.vue";
+
 const router = useRouter();
 let idCarteira = ref("");
 let carteiras = ref<any[]>([]);
@@ -18,6 +20,9 @@ let pdfReportUrl = ref<string | undefined>();
 
 let chartInstance: ECharts | null = null;
 const chartDom = ref<HTMLElement | null>(null);
+const showToast = ref(false);
+const toastMsg = ref("");
+const toastSucesso = ref(false);
 
 onMounted(async () => {
   try {
@@ -144,11 +149,11 @@ async function updateChart() {
 
 async function generateReport() {
   if (!idCarteira.value || !dataInicial.value || !dataFinal.value || !tipoRelatorio.value) {
-    alert("Preencha todos os campos antes de pesquisar.");
+    triggerToast("Preencha todos os campos antes de pesquisar.");
     return;
   }
   if (dataInicial.value > dataFinal.value) {
-    alert("Data inicial maior que a final, verifique os dados!");
+    triggerToast("Data inicial maior que a final, verifique os dados!");
     return;
   }
 
@@ -189,7 +194,7 @@ async function generateReport() {
 
     if (contentType.includes("application/json")) {
       const json = await new Response(res.data).json();
-      alert(json.message || "Resposta recebida do servidor.");
+      triggerToast(json.message || "Resposta recebida do servidor.");
       showPdfReport.value = false;
       pdfReportUrl.value = undefined;
     } else {
@@ -200,8 +205,17 @@ async function generateReport() {
     }
   } catch (err) {
     console.error(err);
-    alert("Erro ao carregar relatório do servidor.");
+    triggerToast("Erro ao carregar relatório do servidor.");
   }
+}
+
+function triggerToast(message: string, success: boolean = false) {
+  toastMsg.value = message;
+  toastSucesso.value = success;
+  showToast.value = true;
+  setTimeout(() => {
+    showToast.value = false;
+  }, 3000);
 }
 </script>
 
@@ -263,4 +277,7 @@ async function generateReport() {
       <div v-else ref="chartDom" id="echarts-container" style="width: 100%; height: 400px;"></div>
     </div>
   </div>
+  <Toast v-if="showToast" :sucesso="toastSucesso">
+      {{ toastMsg }}
+  </Toast>
 </template>

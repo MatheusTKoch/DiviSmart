@@ -1,7 +1,13 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
+import { useRoute } from "vue-router";
 
-const activeItem = ref("menu");
+let activeItem = ref("menu");
+const route = useRoute();
+
+onMounted(() => {
+  activeItem.value = (route.path === '/menu' ? 'menu' : route.path.replace('/menu/', ''));
+});
 </script>
 
 <template>
