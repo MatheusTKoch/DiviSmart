@@ -20,7 +20,11 @@ async function createFiiSchema() {
         CREATE TABLE IF NOT EXISTS fundo_imobiliario (
             fundoimobiliarioid SERIAL PRIMARY KEY,
             ticker VARCHAR(7) NOT NULL UNIQUE,
-            segmento TEXT NOT NULL
+            segmento TEXT NOT NULL,
+            precoatual NUMERIC(15, 2),
+            pvp NUMERIC(10, 2),
+            dividendyield NUMERIC(6, 2),
+            dataatualizacao TIMESTAMP WITHOUT TIME ZONE
         );
     `;
 

@@ -20,7 +20,12 @@ async function createTablesIfNotExists() {
         CREATE TABLE IF NOT EXISTS acoes (
             acaoid SERIAL PRIMARY KEY,
             ticker VARCHAR(6) NOT NULL UNIQUE,
-            descricao TEXT NOT NULL
+            descricao TEXT NOT NULL,
+            precoatual NUMERIC(15, 2),
+            pl NUMERIC(10, 2),
+            pvp NUMERIC(10, 2),
+            dividendyield NUMERIC(6, 2),
+            dataatualizacao TIMESTAMP WITHOUT TIME ZONE
         );
     `;
 
