@@ -43,13 +43,14 @@ async function executarScrapers() {
       "acoes_dados.js",
       "cotacoes_dados.js",
       "tesouro_dados.js",
-      "fii_dados.js"
+      "fii_dados.js",
+      "dividendos_acoes_dados.js",
+      "dividendos_fii_dados.js"
     ];
 
     const scrapersFrequentes = [
-      "dividendos_acoes_dados.js",
-      "dividendos_fii_dados.js",
-      "cotacoes_dados.js"
+      "cotacoes_dados.js",
+      "acoes_fii_indicadores.js"
     ];
 
     let arquivosParaRodar = [];
