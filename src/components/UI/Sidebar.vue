@@ -101,7 +101,7 @@ onMounted(() => {
 
         <li :class="{ active: activeItem === 'analise-ativos' }">
           <RouterLink
-            to="/menu/analise-ativos"
+            to="/menu/analiseativos"
             @click="activeItem = 'analise-ativos'"
             class="nav-link"
           >

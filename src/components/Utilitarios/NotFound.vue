@@ -1,5 +1,14 @@
 <script setup lang="ts">
 import Header from "../UI/Header.vue";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
+
+const retornarMenu = async () => {
+  await router.push("/menu");
+  router.go(0);
+};
+
 </script>
 
 <template>
@@ -9,7 +18,7 @@ import Header from "../UI/Header.vue";
     <div class="titulo">Ooops!</div>
     <div class="subtitulo">404 - Página não Encontrada</div>
     <p class="mensagem">
-      Por favor, retorne para a <RouterLink to="/">página inicial</RouterLink>
+      Por favor, retorne para a <a href="#" @click.prevent="retornarMenu">página inicial</a>
     </p>
     </div>
   </div>
