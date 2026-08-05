@@ -718,6 +718,63 @@ app.post("/ativos_load", authMiddleware, async (req, res) => {
   }
 });
 
+//Analise de ativos
+
+app.post("/carteira_ativos", authMiddleware, async (req, res) => {
+  try {
+    const { cID } = req.body;
+
+    if (!cID) {
+      return res.status(400).send("ID da carteira é obrigatório.");
+    }
+
+    const sqlAcoes = `
+      SELECT 
+        a.acaoid AS id,
+        a.ticker,
+        a.descricao,
+        a.precoatual,
+        a.pl,
+        a.pvp,
+        a.dividendyield,
+        a.dataatualizacao,
+        aa.quantidade,
+        aa.valorinvestido,
+        'Ações' AS tipo
+      FROM ativos_acoes aa
+      JOIN acoes a ON aa.acaoid = a.acaoid
+      WHERE aa.carteiraid = $1 AND aa.deletedat IS NULL
+    `;
+
+    const sqlFiis = `
+      SELECT 
+        f.fundoimobiliarioid AS id,
+        f.ticker,
+        f.segmento AS descricao,
+        f.precoatual,
+        NULL AS pl,
+        f.pvp,
+        f.dividendyield,
+        f.dataatualizacao,
+        af.quantidade,
+        af.valorinvestido,
+        'FIIs' AS tipo
+      FROM ativos_fii af
+      JOIN fundo_imobiliario f ON af.fiid = f.fundoimobiliarioid
+      WHERE af.carteiraid = $1 AND af.deletedat IS NULL
+    `;
+
+    const acoes = await queryDatabase(sqlAcoes, [cID]);
+    const fiis = await queryDatabase(sqlFiis, [cID]);
+
+    const result = [...acoes, ...fiis];
+
+    res.status(200).send(result);
+  } catch (err) {
+    res.status(500).send("Erro interno no servidor ao buscar ativos.");
+  }
+});
+
 //Rotas de relatório
 
 //Helper
