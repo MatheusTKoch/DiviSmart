@@ -82,7 +82,7 @@ app.use(
     saveUninitialized: false,
     proxy: true,
     cookie: {
-      secure: isProduction;
+      secure: isProduction,
       httpOnly: true,
       maxAge: 10 * 3600000,
       sameSite: isProduction ? 'none' : 'lax'
