@@ -19,16 +19,15 @@ services:
     env_file:
       - .env
     environment:
-      POSTGRES_USER: ${VITE_USER_DB}
-      POSTGRES_PASSWORD: ${VITE_PASSWORD_DB}
-      POSTGRES_DB: ${VITE_DATABASE_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
-      - "5433:5432"
+      - "5432:5432"
     volumes:
-      - ./postgres_data:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test:
-        ["CMD-SHELL", "pg_isready -U ${VITE_USER_DB} -d ${VITE_DATABASE_DB}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -80,7 +79,7 @@ services:
     container_name: express_server
     restart: always
     ports:
-      - "${VITE_PORT}:${VITE_PORT}"
+      - "${V_PORT:-3001}:3001"
     depends_on:
       db-setup:
         condition: service_completed_successfully
@@ -94,3 +93,6 @@ services:
       - .:/usr/src/app
       - /usr/src/app/node_modules
     command: npm start
+
+volumes:
+  pgdata:

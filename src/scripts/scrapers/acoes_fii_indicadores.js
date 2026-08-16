@@ -9,13 +9,13 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.resolve(__dirname, "../../../.env") });
 
-const isDocker = process.env.VITE_HOST_DB === "db";
+const isDocker = process.env.POSTGRES_HOST_DB === "db";
 const db = new Pool({
-  database: process.env.VITE_DATABASE_DB,
-  user: process.env.VITE_USER_DB,
-  password: process.env.VITE_PASSWORD_DB,
-  host: process.env.VITE_HOST_DB,
-  port: isDocker ? 5432 : Number(process.env.VITE_PORT_DB) || 5433,
+  database: process.env.POSTGRES_DB,
+  user: process.env.POSTGRES_USER,
+  password: process.env.POSTGRES_PASSWORD,
+  host: process.env.POSTGRES_HOST_DB,
+  port: isDocker ? 5432 : Number(process.env.PORT) || 5433,
 });
 
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));

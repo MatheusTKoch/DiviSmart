@@ -23,10 +23,10 @@ const app = express();
 
 // Configuração de pool Postgres
 const pool = new Pool({
-  user: process.env.VITE_USER_DB,
-  host: process.env.VITE_HOST_DB,
-  database: process.env.VITE_DATABASE_DB,
-  password: process.env.VITE_PASSWORD_DB,
+  user: process.env.POSTGRES_USER,
+  host: process.env.POSTGRES_HOST_DB,
+  database: process.env.POSTGRES_DB,
+  password: process.env.POSTGRES_PASSWORD,
   port: 5432,
 });
 
@@ -58,11 +58,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use(
   session({
     store: redisStore,
-    secret: process.env.VITE_SESSION_SECRET,
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: false, //Em produção alterar para true
+      secure: true, //Em produção alterar para true
       httpOnly: true,
       maxAge: 10 * 3600000,
       sameSite: 'lax'
@@ -930,7 +930,7 @@ app.post("/relatorios_load", authMiddleware, async (req, res) => {
   }
 });
 
-const PORT = process.env.VITE_PORT || 3001;
+const PORT = process.env.V_PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Server rodando na porta ${PORT}.`);
 });

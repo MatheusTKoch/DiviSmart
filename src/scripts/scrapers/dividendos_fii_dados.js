@@ -10,13 +10,13 @@ const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.resolve(__dirname, "../../../.env") });
 
 const db = new Pool({
-  host: process.env.VITE_HOST_DB,
-  user: process.env.VITE_USER_DB,
-  password: process.env.VITE_PASSWORD_DB,
-  database: process.env.VITE_DATABASE_DB,
+  host: process.env.POSTGRES_HOST_DB,
+  user: process.env.POSTGRES_USER,
+  password: process.env.POSTGRES_PASSWORD,
+  database: process.env.POSTGRES_DB,
 });
 
-const DIVIDENDOS_URL = process.env.VITE_URL_FII_DIVIDENDOS;
+const DIVIDENDOS_URL = process.env.URL_FII_DIVIDENDOS;
 
 function parseDate(dateStr) {
   if (!dateStr || !/^\d{2}\/\d{2}\/\d{4}$/.test(dateStr)) {

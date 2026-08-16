@@ -10,13 +10,13 @@ const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.resolve(__dirname, "../../../.env") });
 
 const db = new Pool({
-  database: process.env.VITE_DATABASE_DB,
-  user: process.env.VITE_USER_DB,
-  password: process.env.VITE_PASSWORD_DB,
-  host: process.env.VITE_HOST_DB,
+  database: process.env.POSTGRES_DB,
+  user: process.env.POSTGRES_USER,
+  password: process.env.POSTGRES_PASSWORD,
+  host: process.env.POSTGRES_HOST_DB,
 });
 
-const BASE_URL_COTACOES = process.env.VITE_URL_COTACOES;
+const BASE_URL_COTACOES = process.env.URL_COTACOES;
 
 const ATIVOS_YAHOO = {
   "Ouro/USD": "GC=F",
@@ -56,7 +56,7 @@ async function upsertQuote(client, ativo, valor, dataAtualizacao) {
 
 async function scrapeAndUpsertYahooQuote(client, ativo, ticker) {
   if (!BASE_URL_COTACOES) {
-    console.error("Erro: VITE_URL_COTACOES não configurada.");
+    console.error("Erro: URL_COTACOES não configurada.");
     return;
   }
 

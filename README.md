@@ -63,19 +63,19 @@ Para executar o DiviSmart, você precisará ter instalado:
 Crie um arquivo `.env` na raiz do projeto, baseado no `.env.example`, e preencha as variáveis de ambiente:
 
 ```
-VITE_DATABASE_DB=
-VITE_USER_DB=
-VITE_PASSWORD_DB=
-VITE_HOST_DB=
-VITE_PORT_DB=
-VITE_SESSION_SECRET=
-VITE_PORT=
-VITE_URL_ACOES=
-VITE_URL_FII=
-VITE_URL_TESOURO=
-VITE_URL_COTACOES=
-VITE_URL_ACOES_DIVIDENDOS=
-VITE_URL_FII_DIVIDENDOS=
+POSTGRES_DB=
+POSTGRES_USER=
+POSTGRES_PASSWORD=
+POSTGRES_HOST_DB=
+PORT=
+SESSION_SECRET=
+V_PORT=
+URL_ACOES=
+URL_FII=
+URL_TESOURO=
+URL_COTACOES=
+URL_ACOES_DIVIDENDOS=
+URL_FII_DIVIDENDOS=
 VITE_EMAIL_HOST=
 VITE_EMAIL_PORT=
 VITE_EMAIL_SECURE=
@@ -83,14 +83,14 @@ VITE_EMAIL_USER=
 VITE_EMAIL_PASS=
 VITE_EMAIL_FROM=
 ```
-*   `VITE_DATABASE_DB`: Nome do banco de dados PostgreSQL.
-*   `VITE_USER_DB`: Usuário do banco de dados PostgreSQL.
-*   `VITE_PASSWORD_DB`: Senha do banco de dados PostgreSQL.
-*   `VITE_HOST_DB`: Host do banco de dados PostgreSQL.
-*   `VITE_PORT_DB`: Porta do banco de dados PostgreSQL.
-*   `VITE_SESSION_SECRET`: Chave secreta para as sessões do Express.
-*   `VITE_PORT`: Porta para a API do Express.
-*   `VITE_URL_ACOES`, `VITE_URL_FII`, `VITE_URL_TESOURO`, `VITE_URL_COTACOES`, `VITE_URL_ACOES_DIVIDENDOS`, `VITE_URL_FII_DIVIDENDOS`: URLs para os scrapers.
+*   `POSTGRES_DB`: Nome do banco de dados PostgreSQL.
+*   `POSTGRES_USER`: Usuário do banco de dados PostgreSQL.
+*   `POSTGRES_PASSWORD`: Senha do banco de dados PostgreSQL.
+*   `POSTGRES_HOST_DB`: Host do banco de dados PostgreSQL.
+*   `PORT`: Porta do banco de dados PostgreSQL.
+*   `SESSION_SECRET`: Chave secreta para as sessões do Express.
+*   `V_PORT`: Porta para a API do Express.
+*   `URL_ACOES`, `URL_FII`, `URL_TESOURO`, `URL_COTACOES`, `URL_ACOES_DIVIDENDOS`, `URL_FII_DIVIDENDOS`: URLs para os scrapers.
 *   `VITE_EMAIL_HOST`, `VITE_EMAIL_PORT`, `VITE_EMAIL_SECURE`, `VITE_EMAIL_USER`, `VITE_EMAIL_PASS`, `VITE_EMAIL_FROM`: Configurações para o serviço de envio de e-mail (Resend).
 
 ## Instalação e Execução

@@ -10,13 +10,13 @@ const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.resolve(__dirname, "../../../.env") });
 
 const db = new Pool({
-  host: process.env.VITE_HOST_DB,
-  user: process.env.VITE_USER_DB,
-  password: process.env.VITE_PASSWORD_DB,
-  database: process.env.VITE_DATABASE_DB,
+  host: process.env.POSTGRES_HOST_DB,
+  user: process.env.POSTGRES_USER,
+  password: process.env.POSTGRES_PASSWORD,
+  database: process.env.POSTGRES_DB,
 });
 
-const ACOES_URL = process.env.VITE_URL_ACOES_DIVIDENDOS;
+const ACOES_URL = process.env.URL_ACOES_DIVIDENDOS;
 
 // CONFIGURAÇÕES
 const MAX_RETRIES = 3; // Número máximo de tentativas por ticker
