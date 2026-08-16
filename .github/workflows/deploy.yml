@@ -28,7 +28,7 @@ jobs:
         with:
           context: ./
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/divismart-backend:latest
+          tags: ghcr.io/matheustkoch/divismart-backend:latest
 
       - name: Deploy na VPS via SSH
         uses: appleboy/ssh-action@v1.0.3
@@ -38,7 +38,7 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           port: ${{ secrets.VPS_PORT }}
           script: |
-            cd /caminho/para/seu/projeto/divismart
+            cd /var/www/divismart
             echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             docker compose pull
             docker compose up -d
