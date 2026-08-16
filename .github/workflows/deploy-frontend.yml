@@ -27,6 +27,8 @@ jobs:
 
       - name: Gerar build do Frontend
         run: npm run build
+        env:
+            VITE_API_URL: ${{ secrets.API_URL }}
 
       - name: Deploy para a branch gh-pages
         uses: JamesIves/github-pages-deploy-action@v4
