@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import axios from "axios";
+import api from "../../api/main";
 import { ref, onMounted, nextTick } from "vue";
 
 let dadosCotacao = ref();
@@ -9,8 +9,8 @@ onMounted(() => {
 });
 
 function loadCotacoes() {
-  axios
-    .post("http://localhost:3000/cotacoes_load", {}, {withCredentials: true})
+  api
+    .post("/cotacoes_load", {})
     .then((res) => {
       nextTick(() => {
         dadosCotacao.value = res.data;

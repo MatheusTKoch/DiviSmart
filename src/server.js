@@ -12,6 +12,7 @@ import { RedisStore } from "connect-redis";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
 import PDFDocument from "pdfkit";
+import helmet from "helmet";
 
 //Configuração do .env e express
 const __filename = fileURLToPath(import.meta.url);
@@ -20,6 +21,11 @@ const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
 const app = express();
+
+// Configuração do Helmet
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
 
 // Configuração de pool Postgres
 const pool = new Pool({
@@ -46,8 +52,19 @@ const redisStore = new RedisStore({
 //Configuração do server
 
 //CORS
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://matheustkoch.github.io"
+];
+
 app.use(cors({ 
-  origin: "http://localhost:5173",
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Bloqueado pelo CORS'));
+    }
+  },
   credentials: true 
 }));
 
@@ -55,17 +72,20 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+const isProduction = process.env.NODE_ENV === 'production';
+
 app.use(
   session({
     store: redisStore,
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
+    proxy: true,
     cookie: {
-      secure: true, //Em produção alterar para true
+      secure: isProduction;
       httpOnly: true,
       maxAge: 10 * 3600000,
-      sameSite: 'lax'
+      sameSite: isProduction ? 'none' : 'lax'
     },
   }),
 );
@@ -203,7 +223,8 @@ app.post("/forgot-password", async (req, res) => {
       [userId, tokenHash, expiresAt],
     );
 
-    const resetUrl = `http://localhost:5173/reset-password?token=${token}`; 
+    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+    const resetUrl = `${frontendUrl}/reset-password?token=${token}`;
 
     await sendEmail(
       email,
