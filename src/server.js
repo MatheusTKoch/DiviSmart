@@ -50,6 +50,7 @@ const redisStore = new RedisStore({
 });
 
 //Configuração do server
+app.set('trust proxy', 1);
 
 //CORS
 const allowedOrigins = [
