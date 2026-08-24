@@ -7,7 +7,7 @@ import * as cheerio from "cheerio";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-dotenv.config({ path: path.resolve(__dirname, "../../../.env") });
+dotenv.config({ path: path.resolve(process.cwd(), ".env") });
 
 const isDocker = process.env.POSTGRES_HOST_DB === "db";
 const db = new Pool({

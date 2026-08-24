@@ -5,15 +5,15 @@ import { Pool } from "pg";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-dotenv.config({ path: path.resolve(__dirname, "../../../.env") });
+dotenv.config({ path: path.resolve(process.cwd(), ".env") });
 
 const db = new Pool({
   database: process.env.POSTGRES_DB,
   user: process.env.POSTGRES_USER,
   password: process.env.POSTGRES_PASSWORD,
-  host: process.env.POSTGRES_HOST_DB,
+  host: process.env.POSTGRES_HOST_DB || "db",
+  port: process.env.POSTGRES_PORT || 5432,
 });
-
 async function createAuthTables() {
   // Users
   const sql_users = `

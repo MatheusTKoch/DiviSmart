@@ -1,40 +1,62 @@
 import dotenv from "dotenv";
 import path from "path";
-import { fileURLToPath } from "url";
 import { Pool } from "pg";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-dotenv.config({ path: path.resolve(__dirname, "../../../.env") });
+dotenv.config({ path: path.resolve(process.cwd(), ".env") });
 
-const db = new Pool({
+const dbAdmin = new Pool({
   user: process.env.POSTGRES_USER,
   password: process.env.POSTGRES_PASSWORD,
-  host: process.env.POSTGRES_HOST_DB,
-  database: "postgres",
+  host: process.env.POSTGRES_HOST_DB || "db",
+  database: "template1",
+  port: process.env.POSTGRES_PORT || 5432,
 });
 
-db.connect()
-  .then(async (client) => {
-    console.log("Conectado com sucesso");
-    const sql = `
-            CREATE DATABASE divismart;
-        `;
-    try {
-      return await client.query(sql);
-    } finally {
-      client.release();
+async function createCustomUser(client, username, password) {
+  const userCheck = await client.query(
+    `SELECT 1 FROM pg_roles WHERE rolname = $1;`,
+    [username]
+  );
+
+  if (userCheck.rowCount === 0) {
+    await client.query(`CREATE USER "${username}" WITH PASSWORD '${password}';`);
+    await client.query(`GRANT ALL PRIVILEGES ON DATABASE "${process.env.POSTGRES_DB}" TO "${username}";`);
+    console.log(`Usuário "${username}" criado com sucesso!`);
+  } else {
+    console.log(`O usuário "${username}" já existe.`);
+  }
+}
+
+async function setupDatabase() {
+  let client;
+  try {
+    client = await dbAdmin.connect();
+
+    const dbName = process.env.POSTGRES_DB || "divismart";
+    const dbCheck = await client.query(
+      `SELECT 1 FROM pg_database WHERE datname = $1;`,
+      [dbName]
+    );
+
+    if (dbCheck.rowCount === 0) {
+      await client.query(`CREATE DATABASE "${dbName}";`);
+      console.log(`Banco de dados "${dbName}" criado com sucesso!`);
     }
-  })
-  .then(() => {
-    console.log("Banco Criado!");
-    db.end();
-  })
-  .catch((err) => {
-    if (err.code === "42P04") {
-      console.warn('Atenção: O banco de dados "divismart" já existe.');
-    } else {
-      console.error("Erro no comando:", err.message);
+
+    const newAppUser = process.env.APP_USER;
+    const newAppPass = process.env.APP_PASSWORD;
+
+    if (newAppUser && newAppPass) {
+      await createCustomUser(client, newAppUser, newAppPass);
     }
-    db.end();
-  });
+
+  } catch (err) {
+    console.error("Erro no setup do banco:", err.message);
+    process.exit(1);
+  } finally {
+    if (client) client.release();
+    await dbAdmin.end();
+  }
+}
+
+setupDatabase();

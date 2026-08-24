@@ -5,13 +5,14 @@ import { Pool } from "pg";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-dotenv.config({ path: path.resolve(__dirname, "../../../.env") });
+dotenv.config({ path: path.resolve(process.cwd(), ".env") });
 
 const db = new Pool({
   database: process.env.POSTGRES_DB,
   user: process.env.POSTGRES_USER,
   password: process.env.POSTGRES_PASSWORD,
-  host: process.env.POSTGRES_HOST_DB,
+  host: process.env.POSTGRES_HOST_DB || "db",
+  port: process.env.POSTGRES_PORT || 5432,
 });
 
 async function createTablesIfNotExists() {
@@ -89,12 +90,3 @@ createTablesIfNotExists().catch((err) => {
   process.exit(1);
 });
 
-// db.connect((err) => {
-//     if (err) throw err;
-//     let sql = 'CREATE TABLE IF NOT EXISTS acoes (AcaoID int NOT NULL AUTO_INCREMENT, Ticker varchar(6) NOT NULL, Descricao TEXT NOT NULL, PRIMARY KEY(AcaoID))'
-//     db.query(sql, (err) => {
-//         if (err) throw err;
-//         console.log("Tabela criada!");
-//         db.end();
-//     })
-// });
