@@ -55,6 +55,8 @@ services:
         condition: service_completed_successfully
     env_file:
       - .env
+    environment:
+      - NODE_OPTIONS=--max-http-header-size=65536  
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
@@ -68,6 +70,8 @@ services:
         condition: service_completed_successfully
     env_file:
       - .env
+    environment:
+      - NODE_OPTIONS=--max-http-header-size=65536
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
@@ -88,7 +92,8 @@ services:
     env_file:
       - .env
     environment:
-      REDIS_URL: redis://redis:6379
+      - REDIS_URL=redis://redis:6379
+      - NODE_OPTIONS=--max-http-header-size=65536
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
