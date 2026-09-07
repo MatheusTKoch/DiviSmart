@@ -7,13 +7,14 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const ORDEM_DATABASE = [
+  "noticias_table.js",
   "database.js",
   "users.js",
   "password_resets_table.js", 
   "diversos.js",
   "acoes_table.js",
   "fii_table.js",
-  "tesouro_table.js",
+  "tesouro_table.js"
 ];
 
 async function rodarScript(diretorio, arquivo) {

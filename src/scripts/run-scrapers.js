@@ -40,6 +40,7 @@ async function executarScrapers() {
     
     // Definição dos blocos de arquivos
     const scrapersDiarios = [
+      "noticias_dados.js",
       "acoes_dados.js",
       "cotacoes_dados.js",
       "tesouro_dados.js",

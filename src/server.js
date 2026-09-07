@@ -799,6 +799,21 @@ app.post("/carteira_ativos", authMiddleware, async (req, res) => {
   }
 });
 
+//Notícias
+
+app.get("/noticias", authMiddleware, async (req, res) => {
+  try {
+    const noticias = await queryDatabase(
+      "SELECT noticiaid, titulo, resumo, fonte, link, dataatualizacao FROM noticias ORDER BY dataatualizacao DESC LIMIT 10"
+    );
+    res.status(200).json(noticias);
+  } catch (err) {
+    console.error("Erro ao buscar notícias:", err);
+    res.status(500).send("Erro interno ao buscar notícias");
+  }
+});
+
+
 //Rotas de relatório
 
 //Helper
