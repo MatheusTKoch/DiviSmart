@@ -26,6 +26,7 @@ async function createTablesIfNotExists() {
             pl NUMERIC(10, 2),
             pvp NUMERIC(10, 2),
             dividendyield NUMERIC(6, 2),
+            beta NUMERIC(10, 2),
             dataatualizacao TIMESTAMP WITHOUT TIME ZONE
         );
     `;
@@ -65,7 +66,9 @@ async function createTablesIfNotExists() {
 
     console.log('Criando "acoes"...');
     await db.query(sql_acoes);
-    console.log('Tabela "ativos_acoes" criada ou já existente!');
+    //Colunas novas
+    await db.query(`ALTER TABLE acoes ADD COLUMN IF NOT EXISTS beta NUMERIC(10, 2);`);
+    console.log('Tabela "acoes" criada ou já existente!');
 
     console.log('Criando "ativos_acoes"...');
     await db.query(sql_ativos_acoes);

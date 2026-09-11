@@ -4,6 +4,7 @@ import { fileURLToPath } from "url";
 import { Pool } from "pg";
 import axios from "axios";
 import * as cheerio from "cheerio";
+import { obterBetaAtivo } from "../utils/betaCalculator.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -65,16 +66,28 @@ async function insertDados() {
     client = await db.connect();
 
     const sql = `
-            INSERT INTO acoes (ticker, descricao) 
-            VALUES ($1, $2)
+            INSERT INTO acoes (ticker, descricao, beta) 
+            VALUES ($1, $2, $3)
             ON CONFLICT (ticker) 
-            DO UPDATE SET descricao = EXCLUDED.descricao;
+            DO UPDATE SET 
+              descricao = EXCLUDED.descricao,
+              beta = EXCLUDED.beta;
         `;
 
     const dadosFinal = await consultaDadosFundamentusDetalhes();
 
     for (const stock of dadosFinal) {
       await client.query(sql, [stock.ticker, stock.descricao]);
+    }
+
+    //Calculo do beta
+    for (const stock of dadosFinal) {
+      console.log(`Calculando Beta para ${stock.ticker}...`);
+      
+      const betaCalculado = await obterBetaAtivo(stock.ticker);
+
+      await client.query(sql, [stock.ticker, stock.descricao, betaCalculado]);
+      console.log(`Salvo: ${stock.ticker} | Beta: ${betaCalculado}`);
     }
 
     console.log("Todos os dados inseridos/atualizados com sucesso!");
