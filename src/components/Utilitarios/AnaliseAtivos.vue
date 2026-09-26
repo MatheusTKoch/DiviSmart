@@ -11,6 +11,7 @@ interface Asset {
   precoatual: number | string;
   pl: number | string | null;
   pvp: number | string;
+  beta: number | string | null;
   dividendyield: number | string;
   dataatualizacao: string;
   quantidade: number;
@@ -203,6 +204,14 @@ onMounted(async () => {
                   <span class="metric-label">Dividend Yield</span>
                   <strong class="metric-value">{{ formatNumber(selectedAsset.dividendyield) }}%</strong>
                   <span class="metric-sub">Indicador Anual</span>
+                </div>
+
+                <div class="metric-card highlight">
+                  <span class="metric-label">Beta</span>
+                  <strong class="metric-value">
+                    {{ formatNumber(selectedAsset.beta, 4) }}
+                  </strong>
+                  <span class="metric-sub">Sensibilidade ao Ibovespa</span>
                 </div>
 
                 <div class="metric-card">
