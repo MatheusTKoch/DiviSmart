@@ -14,6 +14,10 @@ function toggleDropdown() {
 defineProps({
   showLogin: Boolean,
   showPerfil: Boolean,
+  showLogout: {
+    type: Boolean,
+    default: true,
+  },
 });
 
 function clearUser() {
@@ -46,7 +50,7 @@ function clearUser() {
           Login
         </button>
 
-                <div v-if="showPerfil" class="profile-dropdown-container">
+                <div v-if="showPerfil && showLogout" class="profile-dropdown-container">
           <button class="profile-button" @click="toggleDropdown">
             <span>Perfil</span>
             <svg

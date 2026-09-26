@@ -127,7 +127,9 @@ async function login() {
               >Criar Conta Gratuita</RouterLink
             >
           </Motion>
-          <button class="btn-secondary">Ver Demonstração</button>
+          <button class="btn-secondary" @click="router.push('/demo')">
+            Ver Demonstração
+          </button>
         </div>
       </Motion>
 

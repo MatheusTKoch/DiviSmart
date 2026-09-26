@@ -33,6 +33,10 @@ async function createAuthTables() {
     console.log('Tentando criar a tabela "users"...');
     await db.query(sql_users);
     console.log('Tabela "users" criada ou já existente!');
+    
+    // Campos novos
+    await db.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS is_demo BOOLEAN NOT NULL DEFAULT FALSE`);
+    await db.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS can_logout BOOLEAN NOT NULL DEFAULT TRUE`)
 
     console.log("--- Criação de Tabelas Concluída ---");
   } catch (err) {

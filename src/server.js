@@ -140,6 +140,23 @@ const authMiddleware = (req, res, next) => {
   }
 };
 
+const demoReadOnlyMiddleware = async (req, res, next) => {
+  if (!req.session.userId) {
+    return res.status(401).send("Usuário não autenticado");
+  }
+
+  const userResult = await queryDatabase(
+    "SELECT is_demo FROM users WHERE userid = $1",
+    [req.session.userId]
+  );
+
+  if (userResult[0]?.is_demo) {
+    return res.status(403).send("Conta demonstrativa: somente leitura.");
+  }
+
+  next();
+};
+
 // --- ROTAS ---
 
 //Rotas de login e autenticação
@@ -382,11 +399,30 @@ app.get("/get_user_name", authMiddleware, async (req, res) => {
   }
 });
 
-app.get("/verify_session", (req, res) => {
-  if (req.session.userId) {
-    return res.status(200).send({ authenticated: true, carteiraId: req.session.carteiraId });
+app.get("/verify_session", async (req, res) => {
+  if (!req.session.userId) {
+    return res.status(401).send("Sessão expirada");
   }
-  res.status(401).send("Sessão expirada");
+
+  try {
+    const userResult = await queryDatabase(
+      "SELECT is_demo, can_logout FROM users WHERE userid = $1",
+      [req.session.userId],
+    );
+
+    const isDemo = userResult[0]?.is_demo === true;
+    const canLogout = userResult[0]?.can_logout !== false;
+
+    return res.status(200).send({
+      authenticated: true,
+      carteiraId: req.session.carteiraId,
+      isDemo,
+      canLogout
+    });
+  } catch (err) {
+    console.error("Erro ao verificar sessão:", err);
+    return res.status(500).send("Erro interno no servidor");
+  }
 });
 
 app.post("/set_active_carteira", authMiddleware, (req, res) => {
@@ -419,7 +455,7 @@ app.get("/users_load", authMiddleware, async (req, res) => {
 });
 
 //Rotas de carteira
-app.post("/carteira", authMiddleware, async (req, res) => {
+app.post("/carteira", authMiddleware, demoReadOnlyMiddleware, async (req, res) => {
   try {
     const sql = "INSERT INTO carteiras (nome, userId) values ($1, $2)";
     await queryDatabase(sql, [req.body.carteira, req.session.userId]);
@@ -429,7 +465,7 @@ app.post("/carteira", authMiddleware, async (req, res) => {
   }
 });
 
-app.post("/carteira_load", authMiddleware, async (req, res) => {
+app.post("/carteira_load", authMiddleware, demoReadOnlyMiddleware, async (req, res) => {
   try {
     const sql =
       "SELECT * FROM carteiras where userId = $1 and deletedAt IS NULL";
@@ -447,7 +483,7 @@ app.post("/carteira_load", authMiddleware, async (req, res) => {
   }
 });
 
-app.post("/carteira_name", authMiddleware, async (req, res) => {
+app.post("/carteira_name", authMiddleware, demoReadOnlyMiddleware, async (req, res) => {
   try {
     const sql =
       "SELECT * FROM carteiras where userId = $1 and CarteiraID = $2 and deletedAt IS NULL";
@@ -458,7 +494,7 @@ app.post("/carteira_name", authMiddleware, async (req, res) => {
   }
 });
 
-app.post("/carteira_dados", authMiddleware, async (req, res) => {
+app.post("/carteira_dados", authMiddleware, demoReadOnlyMiddleware, async (req, res) => {
   try {
     const cID = req.body.cID;
     
@@ -532,7 +568,7 @@ app.post("/carteira_dados", authMiddleware, async (req, res) => {
   }
 });
 
-app.post("/carteira_delete", authMiddleware, async (req, res) => {
+app.post("/carteira_delete", authMiddleware, demoReadOnlyMiddleware, async (req, res) => {
   try {
     const id = req.body.carteiraID;
     await queryDatabase(
@@ -555,7 +591,7 @@ app.post("/carteira_delete", authMiddleware, async (req, res) => {
 
 
 //Rotas de ativos/dividendos
-app.post("/acoes_cadastro", authMiddleware, async (req, res) => {
+app.post("/acoes_cadastro", authMiddleware, demoReadOnlyMiddleware, async (req, res) => {
   try {
     const sql =
       "INSERT INTO ativos_acoes (quantidade, valorinvestido, datacadastro, carteiraid, acaoid) values ($1, $2, now(), $3, $4)";
@@ -571,7 +607,7 @@ app.post("/acoes_cadastro", authMiddleware, async (req, res) => {
   }
 });
 
-app.post("/fii_cadastro", authMiddleware, async (req, res) => {
+app.post("/fii_cadastro", authMiddleware, demoReadOnlyMiddleware, async (req, res) => {
   try {
     const sql =
       "INSERT INTO ativos_fii (quantidade, valorinvestido, datacadastro, carteiraid, fiid) values ($1, $2, now(), $3, $4)";
@@ -587,7 +623,7 @@ app.post("/fii_cadastro", authMiddleware, async (req, res) => {
   }
 });
 
-app.post("/tesouro_cadastro", authMiddleware, async (req, res) => {
+app.post("/tesouro_cadastro", authMiddleware, demoReadOnlyMiddleware, async (req, res) => {
   try {
     const sql =
       "INSERT INTO ativos_tesouro (quantidade, valorinvestido, datacadastro, carteiraid, tesouroid) values ($1, $2, now(), $3, $4)";
@@ -603,7 +639,7 @@ app.post("/tesouro_cadastro", authMiddleware, async (req, res) => {
   }
 });
 
-app.post("/cotacoes_load", authMiddleware, async (req, res) => {
+app.post("/cotacoes_load", authMiddleware, demoReadOnlyMiddleware, async (req, res) => {
   try {
     const sql = "SELECT ativo, valoratual FROM cotacoes ORDER BY ativo";
     const result = await queryDatabase(sql);
@@ -613,7 +649,7 @@ app.post("/cotacoes_load", authMiddleware, async (req, res) => {
   }
 });
 
-app.post("/dividendos_load", authMiddleware, async (req, res) => {
+app.post("/dividendos_load", authMiddleware, demoReadOnlyMiddleware, async (req, res) => {
   try {
     const { cID, dataInicial, dataFinal } = req.body;
 
@@ -663,7 +699,7 @@ app.post("/dividendos_load", authMiddleware, async (req, res) => {
   }
 });
 
-app.post("/chart_dividendos", authMiddleware, async (req, res) => {
+app.post("/chart_dividendos", authMiddleware, demoReadOnlyMiddleware, async (req, res) => {
   try {
     const { cID, dataInicial, dataFinal } = req.body;
 
@@ -717,7 +753,7 @@ app.post("/chart_dividendos", authMiddleware, async (req, res) => {
     res.status(500).send("Erro interno no servidor");
   }
 });
-app.post("/ativos_load", authMiddleware, async (req, res) => {
+app.post("/ativos_load", authMiddleware, demoReadOnlyMiddleware, async (req, res) => {
   try {
     const acoes = await queryDatabase(
       "SELECT acaoid, ticker, descricao FROM acoes ORDER BY ticker ASC",
@@ -744,7 +780,7 @@ app.post("/ativos_load", authMiddleware, async (req, res) => {
 
 //Analise de ativos
 
-app.post("/carteira_ativos", authMiddleware, async (req, res) => {
+app.post("/carteira_ativos", authMiddleware, demoReadOnlyMiddleware, async (req, res) => {
   try {
     const { cID } = req.body;
 
@@ -799,6 +835,80 @@ app.post("/carteira_ativos", authMiddleware, async (req, res) => {
   }
 });
 
+//Rota de acesso demo
+app.post("/users_demo_login", async (req, res) => {
+  try {
+    const demoEmail = process.env.DEMO_USER_EMAIL || "demo@divismart.com";
+
+    const userResult = await pool.query(
+      "SELECT userid, nome, email, is_demo, can_logout FROM users WHERE email = $1",
+      [demoEmail]
+    );
+
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({ message: "Usuário de demonstração não encontrado." });
+    }
+
+    const demoUser = userResult.rows[0];
+
+    req.session.userId = demoUser.userid;
+    req.session.userName = demoUser.nome;
+    req.session.isDemo = true;
+    req.session.canLogout = false;
+
+    const walletNames = ["Conservadora", "Moderada", "Arrojada"];
+
+    for (const nomeCarteira of walletNames) {
+      const existing = await pool.query(
+        `SELECT 1
+         FROM carteiras
+         WHERE userid = $1
+           AND nome = $2
+           AND deletedat IS NULL`,
+        [demoUser.userid, nomeCarteira]
+      );
+
+      if (existing.rows.length === 0) {
+        await pool.query(
+          `INSERT INTO carteiras (nome, userid)
+           VALUES ($1, $2)`,
+          [nomeCarteira, demoUser.userid]
+        );
+      }
+    }
+
+    const carteirasResult = await pool.query(
+      `SELECT carteiraid
+       FROM carteiras
+       WHERE userid = $1 AND deletedat IS NULL
+       ORDER BY carteiraid ASC
+       LIMIT 1`,
+      [demoUser.userid]
+    );
+
+    if (carteirasResult.rows.length > 0) {
+      req.session.carteiraId = carteirasResult.rows[0].carteiraid;
+    }
+
+    req.session.save((err) => {
+      if (err) {
+        console.error("Erro ao salvar sessão de demo:", err);
+        return res.status(500).json({ message: "Erro ao criar sessão." });
+      }
+
+      return res.status(200).json({
+        message: "Login de demonstração realizado com sucesso.",
+        carteiraId: req.session.carteiraId || null,
+        isDemo: true,
+        canLogout: false
+      });
+    });
+  } catch (err) {
+    console.error("Erro na rota /users_demo_login:", err);
+    return res.status(500).json({ message: "Erro interno no servidor." });
+  }
+});
+
 //Notícias
 
 app.get("/noticias", authMiddleware, async (req, res) => {
@@ -849,7 +959,7 @@ const fetchReportData = async (cID, dataInicial, dataFinal) => {
   return { acoes, fiis, tesouro };
 };
 
-app.post("/relatorios_load", authMiddleware, async (req, res) => {
+app.post("/relatorios_load", authMiddleware, demoReadOnlyMiddleware, async (req, res) => {
   try {
     const { cID, tipo, dataInicial, dataFinal } = req.body;
 
