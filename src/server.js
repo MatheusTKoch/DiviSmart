@@ -13,6 +13,8 @@ import bcrypt from "bcrypt";
 import crypto from "crypto";
 import PDFDocument from "pdfkit";
 import helmet from "helmet";
+import nodemailer from "nodemailer";
+import TemplatePasswordResetEmail from "./api/template_mail.js";
 
 //Configuração do .env e express
 const __filename = fileURLToPath(import.meta.url);
@@ -98,36 +100,24 @@ const queryDatabase = async (text, params) => {
   return res.rows;
 };
 
-// Configuração do Resend API
-const sendEmail = async (to, subject, html) => {
-  try {
-    const response = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.VITE_EMAIL_PASS}`,
-      },
-      body: JSON.stringify({
-        from: `"DiviSmart" <${process.env.VITE_EMAIL_FROM}>`,
-        to,
-        subject,
-        html,
-      }),
-    });
+const mailTransporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST,
+  port: Number(process.env.SMTP_PORT || 587),
+  secure: process.env.SMTP_SECURE === "true",
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASSWORD,
+  },
+});
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error('Erro ao enviar email:', errorData);
-      throw new Error('Falha no envio do email');
-    }
-
-    const data = await response.json();
-    console.log('Email enviado com sucesso:', data);
-    return data;
-  } catch (error) {
-    console.error("Erro ao enviar email:", error);
-    throw error;
-  }
+const sendEmail = async ({ to, subject, html, text }) => {
+  return mailTransporter.sendMail({
+    from: process.env.SMTP_FROM || process.env.SMTP_USER,
+    to,
+    subject,
+    html,
+    text,
+  });
 };
 
 // --- MIDDLEWARE ---
@@ -222,46 +212,63 @@ app.post("/users_login", async (req, res) => {
 
 app.post("/forgot-password", async (req, res) => {
   try {
-    const { email } = req.body;
+    const email = String(req.body.email || "").trim().toLowerCase();
+
+    if (!email) {
+      return res.status(400).json({
+        message: "Informe um e-mail válido.",
+      });
+    }
+
     const userResult = await queryDatabase(
-      "SELECT userid FROM users WHERE email = $1",
+      "SELECT userid, nome, email FROM users WHERE LOWER(email) = $1",
       [email],
     );
 
+    const genericMessage =
+      "Se o e-mail estiver registrado, um link de redefinição foi enviado.";
+
     if (userResult.length === 0) {
-      return res.status(200).send("Se o email estiver registrado, um link de redefinição foi enviado.");
+      return res.status(200).json({ message: genericMessage });
     }
 
-    const userId = userResult[0].userid;
+    const user = userResult[0];
     const token = crypto.randomBytes(32).toString("hex");
     const tokenHash = await bcrypt.hash(token, 10);
-    const expiresAt = new Date(Date.now() + 3600000); 
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
 
     await queryDatabase(
-      `INSERT INTO password_resets ("userId", token_hash, expires_at) VALUES ($1, $2, $3)
-       ON CONFLICT ("userId") DO UPDATE SET token_hash = EXCLUDED.token_hash, expires_at = EXCLUDED.expires_at, created_at = NOW()`,
-      [userId, tokenHash, expiresAt],
+      `INSERT INTO password_resets ("userId", token_hash, expires_at)
+       VALUES ($1, $2, $3)
+       ON CONFLICT ("userId")
+       DO UPDATE SET
+         token_hash = EXCLUDED.token_hash,
+         expires_at = EXCLUDED.expires_at,
+         created_at = NOW()`,
+      [user.userid, tokenHash, expiresAt],
     );
 
-    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
-    const resetUrl = `${frontendUrl}/reset-password?token=${token}`;
+    const frontendUrl = process.env.FRONTEND_URL;
+    const resetUrl =
+      `${frontendUrl}/reset-password?token=${encodeURIComponent(token)}`;
 
-    await sendEmail(
-      email,
-      "Redefinição de Senha - DiviSmart",
-      `
-        <p>Você solicitou uma redefinição de senha para sua conta DiviSmart.</p>
-        <p>Por favor, clique no link abaixo para redefinir sua senha:</p>
-        <p><a href="${resetUrl}">Redefinir Senha</a></p>
-        <p>Este link expirará em 1 hora.</p>
-        <p>Se você não solicitou isso, por favor, ignore este email.</p>
-      `,
-    );
+    await sendEmail({
+      to: user.email,
+      subject: "Redefinição de senha - DiviSmart",
+      html: TemplatePasswordResetEmail({
+        name: user.nome,
+        resetUrl,
+      }),
+      text: `Olá, ${user.nome}. Acesse este link para redefinir sua senha: ${resetUrl}`,
+    });
 
-    res.status(200).send("Se o email estiver registrado, um link de redefinição foi enviado.");
-  } catch (err) {
-    console.error("Erro no forgot-password:", err);
-    res.status(500).send("Erro interno no servidor ao solicitar redefinição de senha.");
+    return res.status(200).json({ message: genericMessage });
+  } catch (error) {
+    console.error("Erro ao solicitar redefinição:", error);
+
+    return res.status(500).json({
+      message: "Não foi possível processar a solicitação.",
+    });
   }
 });
 
@@ -309,10 +316,11 @@ app.post("/reset-password", async (req, res) => {
       foundToken.email,
       "Sua senha foi redefinida - DiviSmart",
       `
-        <p>Olá,</p>
-        <p>Sua senha da conta DiviSmart foi redefinida com sucesso.</p>
-        <p>Se você não realizou esta alteração, por favor, entre em contato conosco imediatamente.</p>
+        <h1 style="color:#2563eb;">DiviSmart</h1>
+        <p>Sua senha foi redefinida com sucesso.</p>
+        <p>Se você não realizou esta alteração, entre em contato conosco.</p>
       `,
+      "Sua senha foi redefinida com sucesso.",
     );
 
     res.status(200).send("Sua senha foi redefinida com sucesso!");
@@ -857,7 +865,7 @@ app.post("/users_demo_login", async (req, res) => {
     req.session.isDemo = true;
     req.session.canLogout = false;
 
-    const walletNames = ["Conservadora", "Moderada", "Arrojada"];
+    const walletNames = ["Carteira Conservadora", "Carteira Moderada", "Carteira Arrojada"];
 
     for (const nomeCarteira of walletNames) {
       const existing = await pool.query(

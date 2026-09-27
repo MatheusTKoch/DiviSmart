@@ -17,9 +17,10 @@ const toastMsg = ref("");
 const toastSucesso = ref(false);
 
 onMounted(() => {
-  const routeToken = route.query.token?.toString;
+  const routeToken = route.query.token?.toString();
+
   if (routeToken) {
-    token.value = Array.isArray(routeToken) ? routeToken[0] : routeToken;
+    token.value = routeToken;
   } else {
     triggerToast("Token de redefinição inválido ou ausente.");
   }
