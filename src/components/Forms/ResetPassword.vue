@@ -16,6 +16,9 @@ const showToast = ref(false);
 const toastMsg = ref("");
 const toastSucesso = ref(false);
 
+const showPassword = ref(false);
+const showPasswordConfirm = ref(false);
+
 onMounted(() => {
   const routeToken = route.query.token?.toString();
 
@@ -87,26 +90,36 @@ async function resetPassword() {
         <div class="field-group">
           <label for="password" class="field-label">Nova Senha</label>
           <input
-            type="password"
+            :type="showPassword ? 'text' : 'password'"
             id="password"
             v-model="password"
             placeholder="••••••••"
             class="field-input"
             required
           />
+          <label class="checkbox-container">
+            <input type="checkbox" v-model="showPassword" />
+            <span class="checkmark"></span>
+            Mostrar senha
+          </label>
         </div>
         <div class="field-group">
           <label for="passwordConfirm" class="field-label">
             Confirmar Nova Senha
           </label>
           <input
-            type="password"
+            :type="showPasswordConfirm ? 'text' : 'password'"
             id="passwordConfirm"
             v-model="passwordConfirm"
             placeholder="••••••••"
             class="field-input"
             required
           />
+          <label class="checkbox-container">
+            <input type="checkbox" v-model="showPasswordConfirm" />
+            <span class="checkmark"></span>
+            Mostrar senha
+          </label>
         </div>
 
         <button class="button-primary" type="submit">Redefinir Senha</button>

@@ -312,18 +312,18 @@ app.post("/reset-password", async (req, res) => {
       [foundToken.userId],
     );
 
-    await sendEmail(
-      foundToken.email,
-      "Sua senha foi redefinida - DiviSmart",
-      `
+    await sendEmail({
+      to: foundToken.email,
+      subject: "Sua senha foi redefinida - DiviSmart",
+      html: `
         <h1 style="color:#2563eb;">DiviSmart</h1>
         <p>Sua senha foi redefinida com sucesso.</p>
         <p>Se você não realizou esta alteração, entre em contato conosco.</p>
       `,
-      "Sua senha foi redefinida com sucesso.",
-    );
+      text: "Sua senha foi redefinida com sucesso!",
+    });
 
-    res.status(200).send("Sua senha foi redefinida com sucesso!");
+    return res.status(200).json({ message: "Sua senha foi redefinida com sucesso!" });
   } catch (err) {
     console.error("Erro no reset-password:", err);
     res.status(500).send("Erro interno no servidor ao redefinir a senha.");
