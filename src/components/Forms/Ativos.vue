@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import api from "../../api/main";
 import Toast from "../UI/Toast.vue";
+import Spinner from "../UI/Spinner.vue";
 import { ref, onMounted, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
 
@@ -19,6 +20,11 @@ interface Tesouro {
   descricao: string;
 }
 
+interface DadosCarteira {
+  valores: number;
+  quantidade: number;
+}
+
 const router = useRouter();
 const route = useRoute();
 
@@ -28,7 +34,10 @@ const acoes = ref<Acao[]>([]);
 const fii = ref<Fii[]>([]);
 const tesouro = ref<Tesouro[]>([]);
 const cartNome = ref("");
-const dadosCarteira = ref({ valores: 0, quantidade: 0 });
+const dadosCarteira = ref<DadosCarteira>({
+  valores: 0,
+  quantidade: 0,
+});
 
 const idAcao = ref("");
 const quantidadeAcao = ref();
@@ -46,11 +55,38 @@ const showToast = ref(false);
 const isSuccess = ref(false);
 const toastMessage = ref("");
 
-onMounted(() => {
-  loadAtivos();
-  loadDados();
-  loadDadosCarteira();
+const loading = ref(true);
+const erro = ref("");
+
+const saving = ref(false);
+
+onMounted(async () => {
+  if (!cID_route.value) {
+    erro.value = "Carteira inválida.";
+    loading.value = false;
+    return;
+  }
+
+  try {
+    await Promise.all([
+      loadAtivos(),
+      loadDados(),
+      loadDadosCarteira(),
+    ]);
+  } catch (err) {
+    console.error("Erro ao carregar dados da carteira:", err);
+    throw err;
+  } finally {
+    loading.value = false;
+  }
 });
+
+function formatCurrency(value: number | string | null) {
+  return new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  }).format(Number(value || 0));
+}
 
 const loadDadosCarteira = async () => {
   try {
@@ -100,6 +136,8 @@ const cadastroAcao = async () => {
   if (!idAcao.value || !quantidadeAcao.value || !valorInvestidoAcao.value) {
     return exibirToast("Preencha todos os campos!", false);
   }
+  saving.value = true;
+
   try {
     await api.post("/acoes_cadastro", {
       quantidade: quantidadeAcao.value,
@@ -112,8 +150,10 @@ const cadastroAcao = async () => {
     idAcao.value = "";
     quantidadeAcao.value = null;
     valorInvestidoAcao.value = null;
-  } catch (err) {
+  } catch {
     exibirToast("Erro no cadastro do ativo.", false);
+  } finally {
+    saving.value = false;
   }
 };
 
@@ -121,6 +161,8 @@ const cadastroFii = async () => {
   if (!idFii.value || !quantidadeFii.value || !valoInvestidoFii.value) {
     return exibirToast("Preencha todos os campos!", false);
   }
+  saving.value = true;
+
   try {
     await api.post("/fii_cadastro", {
       quantidade: quantidadeFii.value,
@@ -135,6 +177,8 @@ const cadastroFii = async () => {
     valoInvestidoFii.value = null;
   } catch (err) {
     exibirToast("Erro no cadastro do FII.", false);
+  } finally {
+    saving.value = false;
   }
 };
 
@@ -146,6 +190,8 @@ const cadastroTesouro = async () => {
   ) {
     return exibirToast("Preencha todos os campos!", false);
   }
+  saving.value = true;
+
   try {
     await api.post("/tesouro_cadastro", {
       quantidade: quantidadeTesouro.value,
@@ -160,6 +206,8 @@ const cadastroTesouro = async () => {
     valorInvestidoTesouro.value = null;
   } catch (err) {
     exibirToast("Erro no cadastro do título.", false);
+  } finally {
+    saving.value = false;
   }
 };
 
@@ -187,9 +235,9 @@ const voltar = () => router.push("/menu/carteira");
       <div class="resumo-box">
         <div class="resumo-item">
           <span class="label">Total Investido</span>
-          <span class="valor highlight"
-            >R$ {{ dadosCarteira?.valores || "0,00" }}</span
-          >
+          <span class="valor highlight">
+            {{ formatCurrency(dadosCarteira.valores) }}
+          </span>
         </div>
         <div class="divider"></div>
         <div class="resumo-item">
@@ -199,7 +247,15 @@ const voltar = () => router.push("/menu/carteira");
       </div>
     </header>
 
-    <main class="ativos-container">
+    <div v-if="loading">
+      <Spinner />
+    </div>
+
+    <div v-else-if="erro" class="error-state">
+      {{ erro }}
+    </div>
+
+    <main v-else class="ativos-container">
       <div class="title-section">
         <h1 class="page-title">
           Gerenciar Ativos: <span>{{ cartNome }}</span>
@@ -252,8 +308,12 @@ const voltar = () => router.push("/menu/carteira");
                   v-model="quantidadeAcao"
                 />
               </div>
-              <button class="btn-action blue-btn" @click="cadastroAcao">
-                Salvar Ativo
+              <button
+                class="btn-action blue-btn"
+                :disabled="saving"
+                @click="cadastroAcao"
+              >
+                {{ saving ? "Salvando..." : "Salvar Ativo" }}
               </button>
             </div>
           </div>
@@ -355,6 +415,7 @@ const voltar = () => router.push("/menu/carteira");
           </div>
         </section>
       </div>
+
     </main>
 
     <teleport to="body">
@@ -453,16 +514,16 @@ const voltar = () => router.push("/menu/carteira");
 }
 
 .assets-grid {
-  display: flex;
-  flex-direction: row;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1.5rem;
-  align-items: stretch;
+  width: 100%;
 }
 
 .asset-section {
-  flex: 1;
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
 .section-info {
@@ -501,6 +562,8 @@ const voltar = () => router.push("/menu/carteira");
 }
 
 .glass-card {
+  width: 100%;
+  min-width: 0;
   background: rgba(30, 41, 59, 0.3);
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 20px;
@@ -528,6 +591,8 @@ label {
 
 input,
 select {
+  width: 100%;
+  min-width: 0;
   background: rgba(15, 23, 42, 0.5);
   border: 1px solid rgba(255, 255, 255, 0.08);
   padding: 10px 12px;
@@ -572,21 +637,22 @@ select:focus {
 
 @media (max-width: 1024px) {
   .assets-grid {
-    flex-wrap: wrap;
-  }
-  .asset-section {
-    flex: 1 1 calc(50% - 1.5rem);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 768px) {
-  .ativos-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
+  .ativos-page {
+    padding: 1rem;
   }
-  .asset-section {
-    flex: 1 1 100%;
+
+  .assets-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .glass-card {
+    padding: 1rem;
   }
 }
 </style>
+

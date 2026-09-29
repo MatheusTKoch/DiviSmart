@@ -2,15 +2,16 @@
 import Modal from "../UI/ModalCarteira.vue";
 import Ativos from "../Forms/Ativos.vue";
 import api from "../../api/main";
-import { ref, onMounted, nextTick } from "vue";
-import { useRouter } from "vue-router";
+import { ref, onMounted, nextTick, computed } from "vue";
+import { useRouter, useRoute } from "vue-router";
 import Spinner from "../UI/Spinner.vue";
 import ConfirmationModal from "../UI/ConfirmationModal.vue";
 
 const router = useRouter();
+const route = useRoute();
 let showCarteira = ref(false);
 let carteiras = ref<any[]>([]);
-let editCarteira = ref(false);
+let editCarteira = computed(() => Boolean(route.params.cID));
 let idCarteira = ref();
 let loading = ref(true);
 
@@ -95,11 +96,18 @@ function deleteCarteira(num: number) {
   showDeleteConfirmation.value = true;
 }
 
-function sendID(num: number) {
+async function sendID(num: number) {
   idCarteira.value = num;
-  api.post("/set_active_carteira", { cID: num }).then(() => {
-    router.push(`/menu/carteira/${num}`);
-  });
+
+  try {
+    await api.post("/set_active_carteira", { cID: num });
+    await router.push({
+      name: "carteiraAtivos",
+      params: { cID: num },
+    });
+  } catch (error) {
+    console.error("Erro ao abrir carteira:", error);
+  }
 }
 </script>
 
@@ -130,10 +138,7 @@ function sendID(num: number) {
               <span class="nome">{{ cart.Nome }}</span>
               <div class="acoes">
                 <svg
-                  @click="
-                    ((editCarteira = true), $emit('editarCarteira'));
-                    sendID(cart.CarteiraID);
-                  "
+                  @click="sendID(cart.CarteiraID)"
                   class="icon edit-icon"
                   xmlns="http://www.w3.org/2000/svg"
                   height="24px"
@@ -179,10 +184,7 @@ function sendID(num: number) {
       />
     </div>
     <div class="ativos">
-      <Ativos
-        @editarCarteira="editCarteira = false"
-        v-if="editCarteira"
-      ></Ativos>
+      <Ativos v-if="editCarteira" />
     </div>
   </div>
 </template>
