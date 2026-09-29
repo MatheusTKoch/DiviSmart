@@ -28,6 +28,11 @@ interface DadosCarteira {
 const router = useRouter();
 const route = useRoute();
 
+const props = defineProps<{
+  cID?: number | string;
+  isDemo?: boolean;
+}>();
+
 const cID_route = computed(() => route.params.cID);
 
 const acoes = ref<Acao[]>([]);
@@ -261,11 +266,11 @@ const voltar = () => router.push("/menu/carteira");
           Gerenciar Ativos: <span>{{ cartNome }}</span>
         </h1>
         <p class="page-subtitle">
-          Adicione novas posições à sua carteira de investimentos.
+          {{ props.isDemo ? "Visualize os dados da sua carteira de investimentos." : "Adicione novas posições à sua carteira de investimentos." }}
         </p>
       </div>
 
-      <div class="assets-grid">
+      <div v-if="!props.isDemo" class="assets-grid">
         <section class="asset-section">
           <div class="section-info">
             <div class="icon-box blue">

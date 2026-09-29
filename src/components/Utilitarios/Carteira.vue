@@ -14,6 +14,7 @@ let carteiras = ref<any[]>([]);
 let editCarteira = computed(() => Boolean(route.params.cID));
 let idCarteira = ref();
 let loading = ref(true);
+let isDemo = ref(false);
 
 let showDeleteConfirmation = ref(false);
 let carteiraIdToDelete = ref<number | null>(null);
@@ -71,7 +72,8 @@ onMounted(async () => {
 
 async function verifyUser() {
   try {
-    await api.get("/verify_session");
+    const res = await api.get("/verify_session");
+    isDemo.value = res.data.isDemo === true;
   } catch (err: any) {
     console.log(err);
     localStorage.removeItem("exp");
@@ -120,9 +122,9 @@ async function sendID(num: number) {
       <div class="header-section">
         <div class="titulo">Carteiras</div>
         <div class="subtitulo">
-          Visualize, edite ou exclua suas carteiras cadastradas!
+          {{ isDemo ? "Visualize suas carteiras cadastradas." : "Visualize, edite ou exclua suas carteiras cadastradas!" }}
         </div>
-        <button class="btn-add" @click="abrirModal()" :disabled="showCarteira">
+        <button v-if="!isDemo" class="btn-add" @click="abrirModal()" :disabled="showCarteira">
           Adicionar Carteira
         </button>
       </div>
@@ -151,6 +153,7 @@ async function sendID(num: number) {
                   />
                 </svg>
                 <svg
+                  v-if="!isDemo"
                   @click="deleteCarteira(cart.CarteiraID)"
                   class="icon delete-icon"
                   xmlns="http://www.w3.org/2000/svg"
@@ -168,7 +171,7 @@ async function sendID(num: number) {
           </div>
         </div>
       </div>
-      <div class="modal">
+      <div v-if="!isDemo" class="modal">
         <Modal
           v-if="showCarteira"
           @fecharModal="fecharModal"
@@ -176,7 +179,7 @@ async function sendID(num: number) {
         />
       </div>
       <ConfirmationModal
-        v-if="showDeleteConfirmation"
+        v-if="!isDemo && showDeleteConfirmation"
         title="Confirmar Exclusão"
         message="Tem certeza que deseja apagar esta carteira? Esta ação não pode ser desfeita."
         @confirm="confirmDeleteCarteira"
@@ -184,7 +187,7 @@ async function sendID(num: number) {
       />
     </div>
     <div class="ativos">
-      <Ativos v-if="editCarteira" />
+      <Ativos v-if="editCarteira" :is-demo="isDemo" />
     </div>
   </div>
 </template>

@@ -348,7 +348,7 @@ app.get("/profile_load", authMiddleware, async (req, res) => {
   }
 });
 
-app.put("/users_update", authMiddleware, async (req, res) => {
+app.put("/users_update", authMiddleware, demoReadOnlyMiddleware, async (req, res) => {
   try {
     const email = String(req.body.email || "").trim();
     const nome = String(req.body.nome || "").trim();
@@ -473,7 +473,7 @@ app.post("/carteira", authMiddleware, demoReadOnlyMiddleware, async (req, res) =
   }
 });
 
-app.post("/carteira_load", authMiddleware, demoReadOnlyMiddleware, async (req, res) => {
+app.post("/carteira_load", authMiddleware, async (req, res) => {
   try {
     const sql =
       "SELECT * FROM carteiras where userId = $1 and deletedAt IS NULL";
@@ -491,7 +491,7 @@ app.post("/carteira_load", authMiddleware, demoReadOnlyMiddleware, async (req, r
   }
 });
 
-app.post("/carteira_name", authMiddleware, demoReadOnlyMiddleware, async (req, res) => {
+app.post("/carteira_name", authMiddleware, async (req, res) => {
   try {
     const sql =
       "SELECT * FROM carteiras where userId = $1 and CarteiraID = $2 and deletedAt IS NULL";
@@ -502,7 +502,7 @@ app.post("/carteira_name", authMiddleware, demoReadOnlyMiddleware, async (req, r
   }
 });
 
-app.post("/carteira_dados", authMiddleware, demoReadOnlyMiddleware, async (req, res) => {
+app.post("/carteira_dados", authMiddleware, async (req, res) => {
   try {
     const cID = req.body.cID;
     
@@ -647,7 +647,7 @@ app.post("/tesouro_cadastro", authMiddleware, demoReadOnlyMiddleware, async (req
   }
 });
 
-app.post("/cotacoes_load", authMiddleware, demoReadOnlyMiddleware, async (req, res) => {
+app.post("/cotacoes_load", authMiddleware, async (req, res) => {
   try {
     const sql = "SELECT ativo, valoratual FROM cotacoes ORDER BY ativo";
     const result = await queryDatabase(sql);
@@ -657,7 +657,7 @@ app.post("/cotacoes_load", authMiddleware, demoReadOnlyMiddleware, async (req, r
   }
 });
 
-app.post("/dividendos_load", authMiddleware, demoReadOnlyMiddleware, async (req, res) => {
+app.post("/dividendos_load", authMiddleware, async (req, res) => {
   try {
     const { cID, dataInicial, dataFinal } = req.body;
 
@@ -707,7 +707,7 @@ app.post("/dividendos_load", authMiddleware, demoReadOnlyMiddleware, async (req,
   }
 });
 
-app.post("/chart_dividendos", authMiddleware, demoReadOnlyMiddleware, async (req, res) => {
+app.post("/chart_dividendos", authMiddleware, async (req, res) => {
   try {
     const { cID, dataInicial, dataFinal } = req.body;
 
@@ -761,7 +761,7 @@ app.post("/chart_dividendos", authMiddleware, demoReadOnlyMiddleware, async (req
     res.status(500).send("Erro interno no servidor");
   }
 });
-app.post("/ativos_load", authMiddleware, demoReadOnlyMiddleware, async (req, res) => {
+app.post("/ativos_load", authMiddleware, async (req, res) => {
   try {
     const acoes = await queryDatabase(
       "SELECT acaoid, ticker, descricao FROM acoes ORDER BY ticker ASC",
@@ -788,7 +788,7 @@ app.post("/ativos_load", authMiddleware, demoReadOnlyMiddleware, async (req, res
 
 //Analise de ativos
 
-app.post("/carteira_ativos", authMiddleware, demoReadOnlyMiddleware, async (req, res) => {
+app.post("/carteira_ativos", authMiddleware, async (req, res) => {
   try {
     const { cID } = req.body;
 
@@ -968,7 +968,7 @@ const fetchReportData = async (cID, dataInicial, dataFinal) => {
   return { acoes, fiis, tesouro };
 };
 
-app.post("/relatorios_load", authMiddleware, demoReadOnlyMiddleware, async (req, res) => {
+app.post("/relatorios_load", authMiddleware, async (req, res) => {
   try {
     const { cID, tipo, dataInicial, dataFinal } = req.body;
 
