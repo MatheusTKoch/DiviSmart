@@ -25,6 +25,15 @@ interface DadosCarteira {
   quantidade: number;
 }
 
+interface AtivoCarteira {
+  id: string | number;
+  ticker?: string | null;
+  descricao: string;
+  quantidade: number | string;
+  valorinvestido: number | string;
+  tipo: "Ações" | "FIIs" | "Tesouro Direto";
+}
+
 const router = useRouter();
 const route = useRoute();
 
@@ -43,6 +52,7 @@ const dadosCarteira = ref<DadosCarteira>({
   valores: 0,
   quantidade: 0,
 });
+const ativosCarteira = ref<AtivoCarteira[]>([]);
 
 const idAcao = ref("");
 const quantidadeAcao = ref();
@@ -77,6 +87,7 @@ onMounted(async () => {
       loadAtivos(),
       loadDados(),
       loadDadosCarteira(),
+      loadAtivosCarteira(),
     ]);
   } catch (err) {
     console.error("Erro ao carregar dados da carteira:", err);
@@ -128,6 +139,29 @@ const loadDados = async () => {
   }
 };
 
+const loadAtivosCarteira = async () => {
+  try {
+    const res = await api.post("/carteira_ativos", {
+      cID: cID_route.value,
+    });
+    ativosCarteira.value = res.data;
+  } catch (err) {
+    console.error("Erro ao carregar ativos da carteira:", err);
+  }
+};
+
+const ativosAcoes = computed(() =>
+  ativosCarteira.value.filter((ativo) => ativo.tipo === "Ações"),
+);
+
+const ativosFiis = computed(() =>
+  ativosCarteira.value.filter((ativo) => ativo.tipo === "FIIs"),
+);
+
+const ativosTesouro = computed(() =>
+  ativosCarteira.value.filter((ativo) => ativo.tipo === "Tesouro Direto"),
+);
+
 function exibirToast(mensagem: string, sucesso: boolean) {
   toastMessage.value = mensagem;
   isSuccess.value = sucesso;
@@ -150,7 +184,7 @@ const cadastroAcao = async () => {
       cID: cID_route.value,
       acaoID: idAcao.value,
     });
-    await loadDadosCarteira();
+    await Promise.all([loadDadosCarteira(), loadAtivosCarteira()]);
     exibirToast("Ativo cadastrado com sucesso!", true);
     idAcao.value = "";
     quantidadeAcao.value = null;
@@ -175,7 +209,7 @@ const cadastroFii = async () => {
       cID: cID_route.value,
       fiiID: idFii.value,
     });
-    await loadDadosCarteira();
+    await Promise.all([loadDadosCarteira(), loadAtivosCarteira()]);
     exibirToast("FII cadastrado com sucesso!", true);
     idFii.value = "";
     quantidadeFii.value = null;
@@ -204,7 +238,7 @@ const cadastroTesouro = async () => {
       cID: cID_route.value,
       tesID: idTesouro.value,
     });
-    await loadDadosCarteira();
+    await Promise.all([loadDadosCarteira(), loadAtivosCarteira()]);
     exibirToast("Título cadastrado com sucesso!", true);
     idTesouro.value = "";
     quantidadeTesouro.value = null;
@@ -421,6 +455,75 @@ const voltar = () => router.push("/menu/carteira");
         </section>
       </div>
 
+      <section class="portfolio-assets">
+        <div class="section-heading">
+          <h2>Ativos cadastrados</h2>
+          <span>{{ ativosCarteira.length }} posições</span>
+        </div>
+
+        <div class="asset-lists">
+          <section class="asset-list">
+            <div class="list-heading blue-heading">
+              <h3>Ações</h3>
+              <span>{{ ativosAcoes.length }}</span>
+            </div>
+            <div v-if="ativosAcoes.length" class="list-items">
+              <div v-for="ativo in ativosAcoes" :key="`acao-${ativo.id}`" class="asset-row">
+                <div>
+                  <strong>{{ ativo.ticker }}</strong>
+                  <span>{{ ativo.descricao }}</span>
+                </div>
+                <div class="asset-values">
+                  <strong>{{ ativo.quantidade }} un.</strong>
+                  <span>{{ formatCurrency(ativo.valorinvestido) }}</span>
+                </div>
+              </div>
+            </div>
+            <p v-else class="empty-list">Nenhuma ação cadastrada.</p>
+          </section>
+
+          <section class="asset-list">
+            <div class="list-heading green-heading">
+              <h3>FIIs</h3>
+              <span>{{ ativosFiis.length }}</span>
+            </div>
+            <div v-if="ativosFiis.length" class="list-items">
+              <div v-for="ativo in ativosFiis" :key="`fii-${ativo.id}`" class="asset-row">
+                <div>
+                  <strong>{{ ativo.ticker }}</strong>
+                  <span>{{ ativo.descricao }}</span>
+                </div>
+                <div class="asset-values">
+                  <strong>{{ ativo.quantidade }} un.</strong>
+                  <span>{{ formatCurrency(ativo.valorinvestido) }}</span>
+                </div>
+              </div>
+            </div>
+            <p v-else class="empty-list">Nenhum FII cadastrado.</p>
+          </section>
+
+          <section class="asset-list">
+            <div class="list-heading orange-heading">
+              <h3>Tesouro Direto</h3>
+              <span>{{ ativosTesouro.length }}</span>
+            </div>
+            <div v-if="ativosTesouro.length" class="list-items">
+              <div v-for="ativo in ativosTesouro" :key="`tesouro-${ativo.id}`" class="asset-row">
+                <div>
+                  <strong>{{ ativo.descricao }}</strong>
+                  <span>Título público</span>
+                </div>
+                <div class="asset-values">
+                  <strong>{{ ativo.quantidade }} un.</strong>
+                  <span>{{ formatCurrency(ativo.valorinvestido) }}</span>
+                </div>
+              </div>
+            </div>
+            <p v-else class="empty-list">Nenhum título cadastrado.</p>
+          </section>
+        </div>
+      </section>
+
     </main>
 
     <teleport to="body">
@@ -523,6 +626,116 @@ const voltar = () => router.push("/menu/carteira");
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1.5rem;
   width: 100%;
+}
+
+.portfolio-assets {
+  margin-top: 3rem;
+}
+
+.section-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.section-heading h2 {
+  margin: 0;
+  font-size: 1.35rem;
+  color: #e2e8f0;
+}
+
+.section-heading > span,
+.list-heading > span {
+  color: #94a3b8;
+  font-size: 0.8rem;
+}
+
+.asset-lists {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+
+.asset-list {
+  min-width: 0;
+  overflow: hidden;
+  background: rgba(30, 41, 59, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+}
+
+.list-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.list-heading h3 {
+  margin: 0;
+  font-size: 1rem;
+  color: #e2e8f0;
+}
+
+.blue-heading { border-top: 3px solid #3b82f6; }
+.green-heading { border-top: 3px solid #10b981; }
+.orange-heading { border-top: 3px solid #f59e0b; }
+
+.list-items {
+  display: flex;
+  flex-direction: column;
+}
+
+.asset-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.asset-row:last-child {
+  border-bottom: none;
+}
+
+.asset-row > div:first-child,
+.asset-values {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.asset-row strong {
+  overflow: hidden;
+  color: #f8fafc;
+  font-size: 0.9rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.asset-row span {
+  overflow: hidden;
+  color: #94a3b8;
+  font-size: 0.75rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.asset-values {
+  align-items: flex-end;
+  flex-shrink: 0;
+}
+
+.empty-list {
+  margin: 0;
+  padding: 1.25rem;
+  color: #64748b;
+  font-size: 0.85rem;
 }
 
 .asset-section {
@@ -641,7 +854,8 @@ select:focus {
 }
 
 @media (max-width: 1024px) {
-  .assets-grid {
+  .assets-grid,
+  .asset-lists {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
@@ -651,7 +865,8 @@ select:focus {
     padding: 1rem;
   }
 
-  .assets-grid {
+  .assets-grid,
+  .asset-lists {
     grid-template-columns: 1fr;
   }
 

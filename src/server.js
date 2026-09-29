@@ -833,10 +833,30 @@ app.post("/carteira_ativos", authMiddleware, async (req, res) => {
       WHERE af.carteiraid = $1 AND af.deletedat IS NULL
     `;
 
+    const sqlTesouro = `
+      SELECT
+        t.tesouroid AS id,
+        NULL AS ticker,
+        t.descricao,
+        NULL AS precoatual,
+        NULL AS pl,
+        NULL AS pvp,
+        NULL AS dividendyield,
+        NULL AS beta,
+        NULL AS dataatualizacao,
+        at.quantidade,
+        at.valorinvestido,
+        'Tesouro Direto' AS tipo
+      FROM ativos_tesouro at
+      JOIN tesouro_direto t ON at.tesouroid = t.tesouroid
+      WHERE at.carteiraid = $1 AND at.deletedat IS NULL
+    `;
+
     const acoes = await queryDatabase(sqlAcoes, [cID]);
     const fiis = await queryDatabase(sqlFiis, [cID]);
+    const tesouro = await queryDatabase(sqlTesouro, [cID]);
 
-    const result = [...acoes, ...fiis];
+    const result = [...acoes, ...fiis, ...tesouro];
 
     res.status(200).send(result);
   } catch (err) {
