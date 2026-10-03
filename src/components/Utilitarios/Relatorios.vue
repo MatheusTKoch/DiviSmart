@@ -5,7 +5,10 @@ import { useRouter } from "vue-router";
 import Spinner from "../UI/Spinner.vue";
 import * as echarts from "echarts";
 import type { ECharts } from "echarts";
-import { generateClientPdf } from "../../scripts/utils/reportGenerator";
+import {
+  generateClientPdf,
+  type DividendReportItem,
+} from "../../scripts/utils/reportGenerator";
 import Toast from "../UI/Toast.vue";
 
 const router = useRouter();
@@ -164,7 +167,18 @@ async function generateReport() {
     await updateChart();
 
     const carteiraSelecionada = carteiras.value.find((c) => c.CarteiraID === idCarteira.value);
-    
+    let dividendosAcoes: DividendReportItem[] = [];
+    let dividendosFii: DividendReportItem[] = [];
+    if (tipoRelatorio.value === "chart_dividendos") {
+      const dividendosRes = await api.post("/dividendos_load", {
+        cID: idCarteira.value,
+        dataInicial: dataInicial.value,
+        dataFinal: dataFinal.value,
+      });
+      dividendosAcoes = dividendosRes.data.acao || [];
+      dividendosFii = dividendosRes.data.fii || [];
+    }
+
     if (pdfReportUrl.value) URL.revokeObjectURL(pdfReportUrl.value);
     pdfReportUrl.value = generateClientPdf({
       carteiraNome: carteiraSelecionada?.Nome || "Não identificada",
@@ -172,6 +186,8 @@ async function generateReport() {
       dataInicial: dataInicial.value,
       dataFinal: dataFinal.value,
       chartInstance: chartInstance,
+      dividendosAcoes,
+      dividendosFii,
     });
     showPdfReport.value = true;
     return;

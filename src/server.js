@@ -140,7 +140,7 @@ const demoReadOnlyMiddleware = async (req, res, next) => {
     [req.session.userId]
   );
 
-  if (userResult[0]?.is_demo) {
+  if (req.session.isDemo === true || userResult[0]?.is_demo === true) {
     return res.status(403).send("Conta demonstrativa: somente leitura.");
   }
 
@@ -418,7 +418,8 @@ app.get("/verify_session", async (req, res) => {
       [req.session.userId],
     );
 
-    const isDemo = userResult[0]?.is_demo === true;
+    const isDemo =
+      req.session.isDemo === true || userResult[0]?.is_demo === true;
     const canLogout = userResult[0]?.can_logout !== false;
 
     return res.status(200).send({

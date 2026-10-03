@@ -75,6 +75,14 @@ const erro = ref("");
 
 const saving = ref(false);
 
+function bloquearEdicaoDemo() {
+  if (props.isDemo) {
+    exibirToast("Conta demonstrativa: somente leitura.", false);
+    return true;
+  }
+  return false;
+}
+
 onMounted(async () => {
   if (!cID_route.value) {
     erro.value = "Carteira inválida.";
@@ -172,6 +180,7 @@ function exibirToast(mensagem: string, sucesso: boolean) {
 }
 
 const cadastroAcao = async () => {
+  if (bloquearEdicaoDemo()) return;
   if (!idAcao.value || !quantidadeAcao.value || !valorInvestidoAcao.value) {
     return exibirToast("Preencha todos os campos!", false);
   }
@@ -197,6 +206,7 @@ const cadastroAcao = async () => {
 };
 
 const cadastroFii = async () => {
+  if (bloquearEdicaoDemo()) return;
   if (!idFii.value || !quantidadeFii.value || !valoInvestidoFii.value) {
     return exibirToast("Preencha todos os campos!", false);
   }
@@ -222,6 +232,7 @@ const cadastroFii = async () => {
 };
 
 const cadastroTesouro = async () => {
+  if (bloquearEdicaoDemo()) return;
   if (
     !idTesouro.value ||
     !quantidadeTesouro.value ||
@@ -875,4 +886,3 @@ select:focus {
   }
 }
 </style>
-

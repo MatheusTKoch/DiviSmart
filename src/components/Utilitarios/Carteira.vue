@@ -15,6 +15,7 @@ let editCarteira = computed(() => Boolean(route.params.cID));
 let idCarteira = ref();
 let loading = ref(true);
 let isDemo = ref(false);
+let userVerified = ref(false);
 
 let showDeleteConfirmation = ref(false);
 let carteiraIdToDelete = ref<number | null>(null);
@@ -74,6 +75,7 @@ async function verifyUser() {
   try {
     const res = await api.get("/verify_session");
     isDemo.value = res.data.isDemo === true;
+    userVerified.value = true;
   } catch (err: any) {
     console.log(err);
     localStorage.removeItem("exp");
@@ -187,7 +189,7 @@ async function sendID(num: number) {
       />
     </div>
     <div class="ativos">
-      <Ativos v-if="editCarteira" :is-demo="isDemo" />
+      <Ativos v-if="editCarteira && userVerified" :is-demo="isDemo" />
     </div>
   </div>
 </template>
