@@ -1,36 +1,61 @@
 <script>
-import axios from "axios";
+import api from "../../api/main";
 
 export default {
   name: "DemoLogin",
-  async mounted() {
-    try {
-      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
-
-      const res = await axios.post(
-        `${API_URL}/users_demo_login`,
-        {},
-        { withCredentials: true }
-      );
-
-      if (res.status === 200) {
-        this.$router.push("/menu");
-      }
-    } catch (err) {
-      console.error("Erro ao acessar modo demonstração:", err);
-      alert("Não foi possível carregar a demonstração. Redirecionando para a página inicial.");
-      this.$router.push("/");
-    }
+  data() {
+    return {
+      errorMessage: "",
+      isLoading: true,
+    };
   },
-};
+  mounted() {
+    this.accessDemo();
+  },
+  methods: {
+    async     accessDemo() {
+      this.isLoading = true;
+      this.errorMessage = "";
+
+      try {
+        const res = await api.post("/users_demo_login");
+
+        if (res.status === 200) {
+          await this.$router.replace({ name: "menuHome" });
+        }
+      } catch (err) {
+        console.error("Erro ao acessar modo demonstração:", err);
+        this.isLoading = false;
+        this.errorMessage =
+          err.response?.data?.message ||
+          "Não foi possível carregar a demonstração. Tente novamente.";
+      }
+    }
+    },
+    async retry() {
+      await this.accessDemo();
+    },
+  };
 </script>
 
 <template>
   <div class="demo-container">
     <div class="demo-card">
-      <div class="spinner"></div>
-      <h2>Carregando demonstração...</h2>
-      <p>Aguarde um instante enquanto preparamos seu acesso ao DiviSmart.</p>
+      <template v-if="isLoading">
+        <div class="spinner"></div>
+        <h2>Carregando demonstração...</h2>
+        <p>Aguarde um instante enquanto preparamos seu acesso ao DiviSmart.</p>
+      </template>
+      <template v-else>
+        <h2>Não foi possível abrir a demonstração</h2>
+        <p>{{ errorMessage }}</p>
+        <div class="demo-actions">
+          <button class="retry-button" type="button" @click="retry">
+            Tentar novamente
+          </button>
+          <RouterLink class="home-link" to="/">Voltar para a página inicial</RouterLink>
+        </div>
+      </template>
     </div>
   </div>
 </template>
@@ -66,6 +91,28 @@ export default {
   margin-top: 0.5rem;
   font-size: 0.9rem;
   color: #64748b;
+}
+
+.demo-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.retry-button {
+  border: 0;
+  border-radius: 6px;
+  padding: 0.7rem 1rem;
+  color: #ffffff;
+  background: #3b82f6;
+  cursor: pointer;
+  font: inherit;
+}
+
+.home-link {
+  color: #3b82f6;
+  font-size: 0.9rem;
 }
 
 .spinner {

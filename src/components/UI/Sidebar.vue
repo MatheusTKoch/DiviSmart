@@ -240,6 +240,7 @@ li.active .nav-icon {
 @media screen and (max-width: 768px) {
   .sidebar {
     width: 80px;
+    min-height: auto;
   }
 
   .nav-link span,
@@ -254,6 +255,44 @@ li.active .nav-icon {
 
   .footer-sidebar {
     justify-content: center;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .sidebar {
+    width: 100%;
+    padding: 8px 0;
+    border-right: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .sidebar-content {
+    gap: 8px;
+  }
+
+  .nav-list {
+    flex-direction: row;
+    gap: 4px;
+    padding: 0 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .nav-list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .nav-list li {
+    flex: 0 0 auto;
+  }
+
+  .nav-link {
+    min-width: 48px;
+    padding: 10px;
+  }
+
+  .footer-sidebar {
+    display: none;
   }
 }
 </style>

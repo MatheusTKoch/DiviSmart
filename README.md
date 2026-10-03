@@ -21,6 +21,7 @@ DiviSmart oferece uma interface moderna e responsiva para:
 - **Cadastro e Gestão de Ativos:** Controle de ações, fundos imobiliários, tesouro direto e dividendos.
 - **Web Scraping:** Coleta automatizada de cotações e dados financeiros de fontes confiáveis.
 - **Relatórios de Valorização:** Geração de relatórios detalhados para análise do desempenho dos ativos.
+- **Conta demonstrativa:** Acesse uma demonstração somente leitura em https://matheustkoch.github.io/DiviSmart/demo.
 
 ## Arquitetura
 

@@ -92,6 +92,7 @@ services:
     env_file:
       - .env
     environment:
+      - NODE_ENV=production
       - REDIS_URL=redis://redis:6379
       - NODE_OPTIONS=--max-http-header-size=65536
     volumes:

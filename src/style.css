@@ -479,4 +479,32 @@ button.carteira:hover {
   .page-panel {
     padding: 1.2rem;
   }
+
+  .page-panel,
+  .dashboard-card,
+  .summary-card,
+  .info-card {
+    min-width: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-shell {
+    padding: 0.75rem;
+  }
+
+  .page-panel {
+    padding: 1rem;
+    border-radius: var(--radius-lg);
+  }
+
+  .page-title {
+    font-size: 1.75rem;
+  }
+
+  .button-primary,
+  .button-secondary,
+  .btn-search {
+    width: 100%;
+  }
 }

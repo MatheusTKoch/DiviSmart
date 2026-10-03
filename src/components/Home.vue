@@ -277,6 +277,7 @@ async function login() {
 .actions {
   display: flex;
   gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .btn-primary {
@@ -473,22 +474,66 @@ input:focus {
 }
 
 @media (max-width: 640px) {
+  .hero-grid {
+    height: auto;
+    min-height: 0;
+    padding: 2rem 1rem 2.5rem;
+    gap: 2rem;
+  }
+
+  .hero-content {
+    width: 100%;
+  }
+
+  .hero-visual {
+    order: -1;
+  }
+
+  .main-chart {
+    max-width: min(260px, 75vw);
+  }
+
+  .main-title {
+    font-size: 1.75rem;
+  }
+
+  .description {
+    margin-bottom: 1.5rem;
+  }
+
+  .actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    width: 100%;
+  }
+
   .login-card {
     padding: 30px 24px;
-    max-width: 90%;
+    max-width: 100%;
+    margin: 0;
     background: rgba(30, 41, 59, 0.6);
   }
   .hero-grid {
     grid-template-columns: 1fr;
-    padding: 60px 5% 40px 5%;
-    gap: 2.4rem;
+    padding: 2rem 1rem 2.5rem;
+    gap: 2rem;
   }
   .app-container::before {
     background: #020617;
   }
+
+  .pass-options {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
 }
 
-@media (max-width: 1024px) {
+@media (min-width: 641px) and (max-width: 1024px) {
   .hero-grid {
     grid-template-columns: 1fr;
     text-align: center;

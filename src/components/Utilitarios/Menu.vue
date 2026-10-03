@@ -223,6 +223,7 @@ watch(
 
 .main-card {
   width: 100%;
+  min-width: 0;
   max-width: 1100px;
   background-color: #121824;
   border-radius: 16px;
@@ -236,6 +237,7 @@ watch(
   display: flex;
   justify-content: space-between;
   gap: 2rem;
+  min-width: 0;
 }
 
 .greeting-section {
@@ -339,6 +341,7 @@ watch(
   color: #94a3b8;
   font-size: 0.9rem;
   margin: 0.5rem 0 1rem 0;
+  overflow-wrap: anywhere;
 }
 
 .news-footer {
@@ -353,5 +356,61 @@ watch(
   color: #64748b;
   font-size: 0.9rem;
   padding: 1rem 0;
+}
+
+@media (max-width: 768px) {
+  .main-card-wrapper {
+    padding: 0.75rem 0;
+  }
+
+  .main-card {
+    padding: 1.25rem;
+  }
+
+  .card-header {
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .quotes-section {
+    width: 100%;
+  }
+
+  .divider {
+    margin: 1.5rem 0;
+  }
+
+  .news-header {
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .news-header h3 {
+    font-size: 1rem;
+  }
+
+  .news-footer {
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-card {
+    padding: 1rem;
+    border-radius: 12px;
+  }
+
+  .texto-titulo {
+    font-size: 1.45rem;
+  }
+
+  .text {
+    font-size: 0.9rem;
+  }
+
+  .carteira {
+    width: 100%;
+  }
 }
 </style>

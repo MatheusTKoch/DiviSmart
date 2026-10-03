@@ -112,6 +112,12 @@ function clearUser() {
   height: 60px;
 }
 
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
 .logo-link {
   text-decoration: none;
   color: #f8fafc;
@@ -266,6 +272,10 @@ function clearUser() {
   .btn-logout {
     padding: 6px 14px;
     font-size: 0.8rem;
+  }
+
+  .actions {
+    gap: 0.5rem;
   }
 }
 </style>
