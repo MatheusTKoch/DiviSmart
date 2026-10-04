@@ -59,27 +59,6 @@ async function createFiiSchema() {
         );
     `;
 
-  //Dividendos FII View
-  const sql_view = `
-        CREATE OR REPLACE VIEW dividendos_fii_view AS 
-        SELECT 
-            df.datapagamento, 
-            df.valorpagamento, 
-            df.fiid, 
-            fi.ticker, 
-            fi.segmento, 
-            af.quantidade, 
-            af.carteiraid 
-        FROM 
-            dividendos_fii df 
-        INNER JOIN 
-            fundo_imobiliario fi ON fi.fundoimobiliarioid = df.fiid 
-        INNER JOIN 
-            ativos_fii af ON af.fiid = df.fiid 
-        WHERE 
-            af.deletedat IS NULL;
-    `;
-
   try {
     console.log("--- Iniciando Criação de FIIs Schema ---");
 
@@ -91,9 +70,6 @@ async function createFiiSchema() {
 
     await db.query(sql_dividendos_fii);
     console.log("Tabela dividendos_fii criada.");
-
-    await db.query(sql_view);
-    console.log("View dividendos_fii_view criada ou substituída!");
 
     console.log("--- Criação de FIIs Schema Concluída ---");
   } catch (err) {
