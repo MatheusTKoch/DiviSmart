@@ -5,18 +5,21 @@ import api from "../../api/main";
 import Spinner from "../UI/Spinner.vue";
 
 interface Asset {
-  id: number;
-  ticker: string;
+  id: number | string;
+  ticker: string | null;
   descricao: string;
-  precoatual: number | string;
+  precoatual: number | string | null;
   pl: number | string | null;
-  pvp: number | string;
+  pvp: number | string | null;
   beta: number | string | null;
-  dividendyield: number | string;
-  dataatualizacao: string;
+  dividendyield: number | string | null;
+  dataatualizacao: string | null;
   quantidade: number;
   valorinvestido: number | string;
-  tipo: "Ações" | "FIIs";
+  tipo: "Ações" | "FIIs" | "Tesouro Direto";
+  investimentominimo: number | string | null;
+  vencimento: string | null;
+  codigotitulo: string | null;
 }
 
 interface Wallet {
@@ -31,11 +34,11 @@ const loadingAssets = ref(false);
 const carteiras = ref<Wallet[]>([]);
 const selectedCarteira = ref<number | string>("");
 const assets = ref<Asset[]>([]);
-const selectedAssetTicker = ref<string | null>(null);
+const selectedAssetId = ref<number | string | null>(null);
 
 const selectedAsset = computed(() => {
-  if (!selectedAssetTicker.value) return null;
-  return assets.value.find((a) => a.ticker === selectedAssetTicker.value) || null;
+  if (selectedAssetId.value === null) return null;
+  return assets.value.find((a) => String(a.id) === String(selectedAssetId.value)) || null;
 });
 
 function formatCurrency(val: number | string | null) {
@@ -46,7 +49,7 @@ function formatCurrency(val: number | string | null) {
   }).format(Number(val));
 }
 
-function formatDate(dateStr: string) {
+function formatDate(dateStr: string | null) {
   if (!dateStr) return "N/A";
   return new Date(dateStr).toLocaleString("pt-BR", {
     day: "2-digit",
@@ -55,6 +58,27 @@ function formatDate(dateStr: string) {
     hour: "2-digit",
     minute: "2-digit",
   });
+}
+
+function formatDateOnly(dateStr: string | null) {
+  if (!dateStr) return "N/A";
+  return new Date(`${dateStr.slice(0, 10)}T00:00:00`).toLocaleDateString("pt-BR");
+}
+
+function daysUntil(dateStr: string | null) {
+  if (!dateStr) return null;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const maturity = new Date(`${dateStr.slice(0, 10)}T00:00:00`);
+  return Math.ceil((maturity.getTime() - today.getTime()) / 86400000);
+}
+
+function maturityLabel(dateStr: string | null) {
+  const days = daysUntil(dateStr);
+  if (days === null) return "Prazo não informado";
+  if (days < 0) return "Título vencido";
+  if (days === 0) return "Vence hoje";
+  return `${days.toLocaleString("pt-BR")} dias restantes`;
 }
 
 function formatNumber(val: number | string | null, decimals = 2) {
@@ -74,7 +98,7 @@ async function loadCarteiras() {
 async function loadAssets() {
   if (!selectedCarteira.value) {
     assets.value = [];
-    selectedAssetTicker.value = null;
+    selectedAssetId.value = null;
     return;
   }
 
@@ -84,11 +108,11 @@ async function loadAssets() {
       cID: selectedCarteira.value,
     });
     assets.value = res.data || [];
-    selectedAssetTicker.value = assets.value.length > 0 ? assets.value[0].ticker : null;
+    selectedAssetId.value = assets.value.length > 0 ? assets.value[0].id : null;
   } catch (error) {
     console.error("Erro ao buscar ativos:", error);
     assets.value = [];
-    selectedAssetTicker.value = null;
+    selectedAssetId.value = null;
   } finally {
     loadingAssets.value = false;
   }
@@ -162,13 +186,13 @@ onMounted(async () => {
           <ul v-else class="asset-list">
             <li
               v-for="asset in assets"
-              :key="asset.ticker"
+              :key="asset.id"
               class="asset-item"
-              :class="{ active: selectedAssetTicker === asset.ticker }"
-              @click="selectedAssetTicker = asset.ticker"
+              :class="{ active: selectedAssetId === asset.id }"
+              @click="selectedAssetId = asset.id"
             >
               <div class="asset-info">
-                <span class="ticker">{{ asset.ticker }}</span>
+                <span class="ticker">{{ asset.ticker || asset.codigotitulo || "Tesouro Direto" }}</span>
                 <span class="name">{{ asset.descricao }}</span>
               </div>
               <span class="badge">{{ asset.tipo }}</span>
@@ -178,22 +202,62 @@ onMounted(async () => {
 
         <main class="details-card">
           <Transition name="fade-slide" mode="out-in">
-            <div v-if="selectedAsset" :key="selectedAsset.ticker" class="asset-details">
+            <div v-if="selectedAsset" :key="selectedAsset.id" class="asset-details">
               <div class="details-header">
                 <div>
                   <span class="asset-type-tag">{{ selectedAsset.tipo }}</span>
-                  <h2 class="asset-ticker-title">{{ selectedAsset.ticker }}</h2>
+                  <h2 class="asset-ticker-title">
+                    {{ selectedAsset.ticker || selectedAsset.codigotitulo || "Tesouro Direto" }}
+                  </h2>
                   <p class="company-name">{{ selectedAsset.descricao }}</p>
                 </div>
                 <div class="price-container">
-                  <span class="price-label">Preço Atual</span>
-                  <strong class="price-value">{{ formatCurrency(selectedAsset.precoatual) }}</strong>
+                  <span class="price-label">
+                    {{ selectedAsset.tipo === "Tesouro Direto" ? "Valor Investido" : "Preço Atual" }}
+                  </span>
+                  <strong class="price-value">
+                    {{ formatCurrency(
+                      selectedAsset.tipo === "Tesouro Direto"
+                        ? selectedAsset.valorinvestido
+                        : selectedAsset.precoatual,
+                    ) }}
+                  </strong>
                 </div>
               </div>
 
               <hr class="divider" />
 
-              <div class="metrics-grid">
+              <div v-if="selectedAsset.tipo === 'Tesouro Direto'" class="fixed-income-summary">
+                <div class="fixed-income-heading">
+                  <div>
+                    <span class="section-kicker">Detalhes do título</span>
+                    <h3>Informações do Tesouro Direto</h3>
+                  </div>
+                  <span class="maturity-status">{{ maturityLabel(selectedAsset.vencimento) }}</span>
+                </div>
+
+                <div class="metrics-grid">
+                  <div class="metric-card highlight">
+                    <span class="metric-label">Código do título</span>
+                    <strong class="metric-value font-md">{{ selectedAsset.codigotitulo || "N/A" }}</strong>
+                    <span class="metric-sub">Identificação oficial</span>
+                  </div>
+
+                  <div class="metric-card highlight">
+                    <span class="metric-label">Investimento mínimo</span>
+                    <strong class="metric-value">{{ formatCurrency(selectedAsset.investimentominimo) }}</strong>
+                    <span class="metric-sub">Valor mínimo informado</span>
+                  </div>
+
+                  <div class="metric-card highlight">
+                    <span class="metric-label">Vencimento</span>
+                    <strong class="metric-value font-md">{{ formatDateOnly(selectedAsset.vencimento) }}</strong>
+                    <span class="metric-sub">Data final do título</span>
+                  </div>
+                </div>
+              </div>
+
+              <div v-else class="metrics-grid">
                 <div class="metric-card highlight">
                   <span class="metric-label">P/VP</span>
                   <strong class="metric-value">{{ formatNumber(selectedAsset.pvp) }}</strong>
@@ -236,6 +300,20 @@ onMounted(async () => {
                   <span class="metric-label">Última Atualização</span>
                   <strong class="metric-value font-sm">{{ formatDate(selectedAsset.dataatualizacao) }}</strong>
                   <span class="metric-sub">Data de Cotação</span>
+                </div>
+              </div>
+
+              <div v-if="selectedAsset.tipo === 'Tesouro Direto'" class="metrics-grid investment-summary">
+                <div class="metric-card">
+                  <span class="metric-label">Quantidade</span>
+                  <strong class="metric-value">{{ selectedAsset.quantidade }}</strong>
+                  <span class="metric-sub">Em Carteira</span>
+                </div>
+
+                <div class="metric-card">
+                  <span class="metric-label">Valor Investido</span>
+                  <strong class="metric-value font-md">{{ formatCurrency(selectedAsset.valorinvestido) }}</strong>
+                  <span class="metric-sub">Custo Total</span>
                 </div>
               </div>
             </div>
@@ -405,6 +483,50 @@ onMounted(async () => {
   color: #f8fafc;
 }
 
+.fixed-income-summary {
+  padding: 1.1rem;
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  border-radius: 18px;
+  background: rgba(120, 53, 15, 0.12);
+}
+
+.fixed-income-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.section-kicker {
+  display: block;
+  color: #fbbf24;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.fixed-income-heading h3 {
+  margin: 0.25rem 0 0;
+  color: #f8fafc;
+  font-size: 1.1rem;
+}
+
+.maturity-status {
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  color: #fef3c7;
+  background: rgba(245, 158, 11, 0.18);
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.investment-summary {
+  margin-top: 1rem;
+}
+
 .divider {
   border: none;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
@@ -506,6 +628,10 @@ onMounted(async () => {
 
   .price-container {
     text-align: left;
+  }
+
+  .fixed-income-heading {
+    flex-direction: column;
   }
 }
 </style>
