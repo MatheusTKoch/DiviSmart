@@ -77,13 +77,8 @@ async function insertDados() {
     const dadosFinal = await consultaDadosFundamentusDetalhes();
 
     for (const stock of dadosFinal) {
-      await client.query(sql, [stock.ticker, stock.descricao]);
-    }
-
-    //Calculo do beta
-    for (const stock of dadosFinal) {
       console.log(`Calculando Beta para ${stock.ticker}...`);
-      
+
       const betaCalculado = await obterBetaAtivo(stock.ticker);
 
       await client.query(sql, [stock.ticker, stock.descricao, betaCalculado]);

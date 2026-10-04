@@ -25,6 +25,7 @@ function clearUser() {
     .post("/logout")
     .then((res) => {
       if (res.status == 200) {
+        localStorage.removeItem("auth_token");
         router.push("/");
       }
     })

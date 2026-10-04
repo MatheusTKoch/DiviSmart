@@ -78,6 +78,9 @@ async function register() {
       });
 
       if (res.status == 200) {
+        if (res.data.token) {
+          localStorage.setItem("auth_token", res.data.token);
+        }
         router.push("menu");
       }
     } catch (err: any) {

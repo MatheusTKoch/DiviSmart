@@ -35,6 +35,9 @@ async function verifyUser() {
   try {
     const res = await api.get("/verify_session");
     if (res.status === 200) {
+      if (res.data.token) {
+        localStorage.setItem("auth_token", res.data.token);
+      }
       router.push("menu");
     }
   } catch (err) {

@@ -104,7 +104,10 @@ async function sendID(num: number) {
   idCarteira.value = num;
 
   try {
-    await api.post("/set_active_carteira", { cID: num });
+    const res = await api.post("/set_active_carteira", { cID: num });
+    if (res.data.token) {
+      localStorage.setItem("auth_token", res.data.token);
+    }
     await router.push({
       name: "carteiraAtivos",
       params: { cID: num },

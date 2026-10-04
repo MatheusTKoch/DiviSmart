@@ -21,6 +21,9 @@ export default {
         const res = await api.post("/users_demo_login");
 
         if (res.status === 200) {
+          if (res.data.token) {
+            localStorage.setItem("auth_token", res.data.token);
+          }
           await this.$router.replace({ name: "menuHome" });
         }
       } catch (err) {

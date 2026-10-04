@@ -10,7 +10,7 @@ function calcularRetornosDiarios(precos) {
 
 function calcularBeta(retornosAcao, retornosIndice) {
   const n = Math.min(retornosAcao.length, retornosIndice.length);
-  if (n === 0) return null;
+  if (n < 2) return null;
 
   const mediaAcao = retornosAcao.slice(0, n).reduce((a, b) => a + b, 0) / n;
   const mediaIndice = retornosIndice.slice(0, n).reduce((a, b) => a + b, 0) / n;
@@ -26,7 +26,8 @@ function calcularBeta(retornosAcao, retornosIndice) {
     varianciaIndice += diffIndice * diffIndice;
   }
 
-  return varianciaIndice === 0 ? null : covariancia / varianciaIndice;
+  const beta = varianciaIndice === 0 ? null : covariancia / varianciaIndice;
+  return Number.isFinite(beta) ? beta : null;
 }
 
 
@@ -54,29 +55,36 @@ export async function obterBetaAtivo(ticker, periodoAnos = 1) {
       return null;
     }
 
-    const mapaBenchmark = new Map(
-      historicoBenchmark.map((item) => [
-        item.date.toISOString().split("T")[0],
-        item.close,
-      ])
+    const precosAcaoPorData = new Map(
+      historicoAcao
+        .filter((item) => Number.isFinite(item.close) && item.close > 0)
+        .map((item) => [
+          item.date.toISOString().split("T")[0],
+          item.close,
+        ])
+    );
+    const precosBenchmarkPorData = new Map(
+      historicoBenchmark
+        .filter((item) => Number.isFinite(item.close) && item.close > 0)
+        .map((item) => [
+          item.date.toISOString().split("T")[0],
+          item.close,
+        ])
     );
 
-    const precosAcao = [];
-    const precosBenchmark = [];
-
-    historicoAcao.forEach((item) => {
-      const dataStr = item.date.toISOString().split("T")[0];
-      if (mapaBenchmark.has(dataStr) && item.close) {
-        precosAcao.push(item.close);
-        precosBenchmark.push(mapaBenchmark.get(dataStr));
-      }
-    });
+    const datasComuns = [...precosAcaoPorData.keys()]
+      .filter((data) => precosBenchmarkPorData.has(data))
+      .sort();
+    const precosAcao = datasComuns.map((data) => precosAcaoPorData.get(data));
+    const precosBenchmark = datasComuns.map((data) =>
+      precosBenchmarkPorData.get(data)
+    );
 
     const retornosAcao = calcularRetornosDiarios(precosAcao);
     const retornosBenchmark = calcularRetornosDiarios(precosBenchmark);
 
     const beta = calcularBeta(retornosAcao, retornosBenchmark);
-    return beta ? parseFloat(beta.toFixed(4)) : null;
+    return beta === null ? null : parseFloat(beta.toFixed(4));
   } catch (err) {
     console.error(`Erro ao obter Beta para ${ticker}:`, err.message);
     return null;

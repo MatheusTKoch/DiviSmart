@@ -78,6 +78,67 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const isProduction = process.env.NODE_ENV === 'production';
+const authTokenMaxAge = 10 * 3600000;
+
+const encodeTokenPart = (value) =>
+  Buffer.from(JSON.stringify(value)).toString("base64url");
+
+const createAuthToken = ({ userId, isDemo = false, canLogout = true, carteiraId = null }) => {
+  const payload = encodeTokenPart({
+    userId,
+    isDemo,
+    canLogout,
+    carteiraId,
+    exp: Date.now() + authTokenMaxAge,
+  });
+  const signature = crypto
+    .createHmac("sha256", process.env.SESSION_SECRET)
+    .update(payload)
+    .digest("base64url");
+
+  return `${payload}.${signature}`;
+};
+
+const readAuthToken = (req) => {
+  const authorization = req.get("Authorization") || "";
+  if (!authorization.startsWith("Bearer ")) return null;
+
+  const token = authorization.slice(7);
+  const [payload, signature] = token.split(".");
+  if (!payload || !signature) return null;
+
+  const expectedSignature = crypto
+    .createHmac("sha256", process.env.SESSION_SECRET)
+    .update(payload)
+    .digest("base64url");
+  const providedBuffer = Buffer.from(signature);
+  const expectedBuffer = Buffer.from(expectedSignature);
+
+  if (
+    providedBuffer.length !== expectedBuffer.length ||
+    !crypto.timingSafeEqual(providedBuffer, expectedBuffer)
+  ) {
+    return null;
+  }
+
+  try {
+    const data = JSON.parse(Buffer.from(payload, "base64url").toString("utf8"));
+    return data.exp > Date.now() ? data : null;
+  } catch {
+    return null;
+  }
+};
+
+const applyAuthToken = (req) => {
+  const tokenData = readAuthToken(req);
+  if (!tokenData) return false;
+
+  req.session.userId = tokenData.userId;
+  req.session.isDemo = tokenData.isDemo === true;
+  req.session.canLogout = tokenData.canLogout !== false;
+  req.session.carteiraId = tokenData.carteiraId || undefined;
+  return true;
+};
 
 app.use(
   session({
@@ -123,6 +184,7 @@ const sendEmail = async ({ to, subject, html, text }) => {
 // --- MIDDLEWARE ---
 
 const authMiddleware = (req, res, next) => {
+  applyAuthToken(req);
   if (req.session.userId) {
     next();
   } else {
@@ -175,7 +237,10 @@ app.post("/users_register", async (req, res) => {
     if (registroResult.length > 0) {
       const userID = registroResult[0].userid;
       req.session.userId = userID;
-      res.status(200).send({ message: "Registro realizado com sucesso" });
+      res.status(200).send({
+        message: "Registro realizado com sucesso",
+        token: createAuthToken({ userId: userID }),
+      });
     }
   } catch (err) {
     console.error("Erro no registro:", err);
@@ -203,7 +268,10 @@ app.post("/users_login", async (req, res) => {
 
     req.session.userId = user.userid;
 
-    res.status(200).send({ message: "Login successful" });
+    res.status(200).send({
+      message: "Login successful",
+      token: createAuthToken({ userId: user.userid }),
+    });
   } catch (err) {
     console.error("Erro no login:", err);
     res.status(500).send("Erro interno no servidor");
@@ -408,6 +476,7 @@ app.get("/get_user_name", authMiddleware, async (req, res) => {
 });
 
 app.get("/verify_session", async (req, res) => {
+  applyAuthToken(req);
   if (!req.session.userId) {
     return res.status(401).send("Sessão expirada");
   }
@@ -438,7 +507,16 @@ app.post("/set_active_carteira", authMiddleware, (req, res) => {
   const { cID } = req.body;
   if (!cID) return res.status(400).send("CarteiraID não informado");
   req.session.carteiraId = cID;
-  res.status(200).send({ message: "Carteira ativa definida", carteiraId: cID });
+  res.status(200).send({
+    message: "Carteira ativa definida",
+    carteiraId: cID,
+    token: createAuthToken({
+      userId: req.session.userId,
+      isDemo: req.session.isDemo === true,
+      canLogout: req.session.canLogout !== false,
+      carteiraId: cID,
+    }),
+  });
 });
 
 app.post("/logout", (req, res) => {
@@ -930,7 +1008,13 @@ app.post("/users_demo_login", async (req, res) => {
         message: "Login de demonstração realizado com sucesso.",
         carteiraId: req.session.carteiraId || null,
         isDemo: true,
-        canLogout: false
+        canLogout: false,
+        token: createAuthToken({
+          userId: demoUser.userid,
+          isDemo: true,
+          canLogout: false,
+          carteiraId: req.session.carteiraId || null,
+        }),
       });
     });
   } catch (err) {
