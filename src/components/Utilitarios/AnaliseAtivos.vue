@@ -14,7 +14,7 @@ interface Asset {
   beta: number | string | null;
   dividendyield: number | string | null;
   dataatualizacao: string | null;
-  quantidade: number;
+  quantidade: number | string;
   valorinvestido: number | string;
   tipo: "Ações" | "FIIs" | "Tesouro Direto";
   investimentominimo: number | string | null;
@@ -84,6 +84,14 @@ function maturityLabel(dateStr: string | null) {
 function formatNumber(val: number | string | null, decimals = 2) {
   if (val === null || val === undefined) return "N/A";
   return Number(val).toFixed(decimals);
+}
+
+function formatQuantity(val: number | string | null) {
+  if (val === null || val === undefined) return "N/A";
+  return Number(val).toLocaleString("pt-BR", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 3,
+  });
 }
 
 async function loadCarteiras() {
@@ -239,7 +247,9 @@ onMounted(async () => {
                 <div class="metrics-grid">
                   <div class="metric-card highlight">
                     <span class="metric-label">Código do título</span>
-                    <strong class="metric-value font-md">{{ selectedAsset.codigotitulo || "N/A" }}</strong>
+                    <strong class="metric-value font-md">
+                      {{ selectedAsset.codigotitulo || "Não informado" }}
+                    </strong>
                     <span class="metric-sub">Identificação oficial</span>
                   </div>
 
@@ -286,7 +296,7 @@ onMounted(async () => {
 
                 <div class="metric-card">
                   <span class="metric-label">Quantidade</span>
-                  <strong class="metric-value">{{ selectedAsset.quantidade }}</strong>
+                  <strong class="metric-value">{{ formatQuantity(selectedAsset.quantidade) }}</strong>
                   <span class="metric-sub">Em Carteira</span>
                 </div>
 
@@ -306,7 +316,7 @@ onMounted(async () => {
               <div v-if="selectedAsset.tipo === 'Tesouro Direto'" class="metrics-grid investment-summary">
                 <div class="metric-card">
                   <span class="metric-label">Quantidade</span>
-                  <strong class="metric-value">{{ selectedAsset.quantidade }}</strong>
+                  <strong class="metric-value">{{ formatQuantity(selectedAsset.quantidade) }}</strong>
                   <span class="metric-sub">Em Carteira</span>
                 </div>
 

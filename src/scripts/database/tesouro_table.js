@@ -31,7 +31,7 @@ async function createTesouroSchema() {
   const sql_ativos_tesouro = `
         CREATE TABLE IF NOT EXISTS ativos_tesouro (
             ativotesouroid SERIAL PRIMARY KEY,
-            quantidade INT NOT NULL,
+            quantidade NUMERIC(15, 3) NOT NULL,
             valorinvestido NUMERIC(15, 2),
             datacadastro TIMESTAMP WITHOUT TIME ZONE NOT NULL,
             carteiraid INT NOT NULL,
@@ -65,6 +65,12 @@ async function createTesouroSchema() {
 
     await db.query(sql_ativos_tesouro);
     console.log('Tabela "ativos_tesouro" criada.');
+    await db.query(`
+      ALTER TABLE ativos_tesouro
+      ALTER COLUMN quantidade TYPE NUMERIC(15, 3)
+      USING quantidade::NUMERIC(15, 3);
+    `);
+    console.log('Coluna "quantidade" do Tesouro ajustada para frações.');
 
     await db.query(sql_dividendos_tesouro);
     console.log('Tabela "dividendos_tesouro" criada.');

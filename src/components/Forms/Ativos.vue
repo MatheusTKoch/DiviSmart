@@ -454,7 +454,9 @@ const voltar = () => router.push("/menu/carteira");
                 <label>Quantidade</label>
                 <input
                   type="number"
-                  placeholder="Ex: 1.5"
+                  step="0.001"
+                  min="0"
+                  placeholder="Ex: 0.012"
                   v-model="quantidadeTesouro"
                 />
               </div>

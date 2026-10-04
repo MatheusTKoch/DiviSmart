@@ -50,12 +50,13 @@ async function importarCsvLocal() {
     console.log(`Processando ${registros.length} títulos da planilha...`);
 
     const sql = `
-            INSERT INTO tesouro_direto (descricao, investimentominimo, vencimento) 
-            VALUES ($1, $2, $3)
+            INSERT INTO tesouro_direto (descricao, investimentominimo, vencimento, codigotitulo)
+            VALUES ($1, $2, $3, $4)
             ON CONFLICT (descricao) 
             DO UPDATE SET 
                 investimentominimo = EXCLUDED.investimentominimo,
-                vencimento = EXCLUDED.vencimento;
+                vencimento = EXCLUDED.vencimento,
+                codigotitulo = COALESCE(EXCLUDED.codigotitulo, tesouro_direto.codigotitulo);
         `;
 
     for (const linha of registros) {
@@ -65,8 +66,9 @@ async function importarCsvLocal() {
         const titulo = colunas[0].trim();
         const invMin = limparMoeda(colunas[2]);
         const dataVen = formatarData(colunas[4]);
+        const codigoTitulo = colunas[5]?.trim() || null;
 
-        await client.query(sql, [titulo, invMin, dataVen]);
+        await client.query(sql, [titulo, invMin, dataVen, codigoTitulo]);
       }
     }
 
