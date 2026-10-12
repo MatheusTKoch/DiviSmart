@@ -286,14 +286,72 @@ function triggerToast(message: string, success: boolean = false) {
       <a :href="pdfReportUrl" :download="'relatorio.pdf'" class="btn-search" style="margin-left: 1rem">Baixar</a>
     </div>
 
-    <div v-if="tipoRelatorio.startsWith('chart_')" class="chart-section" style="margin-top: 2rem;">
+    <div v-if="tipoRelatorio.startsWith('chart_')" class="chart-section">
       <div v-if="tipoRelatorio === 'chart_cotacoes'" class="chart-message">
         Desculpe, dados históricos de cotações não estão disponíveis no momento.
       </div>
-      <div v-else ref="chartDom" id="echarts-container" style="width: 100%; height: 400px;"></div>
+      <div v-else ref="chartDom" id="echarts-container" class="echarts-container"></div>
     </div>
   </div>
   <Toast v-if="showToast" :sucesso="toastSucesso">
       {{ toastMsg }}
   </Toast>
 </template>
+
+<style scoped>
+.input-field {
+  background: var(--bg-surface-strong);
+  color: var(--text-main);
+  color-scheme: dark;
+}
+
+select.input-field,
+.input-field option {
+  background-color: #020617;
+  color: #f8fafc;
+}
+
+.chart-section {
+  margin-top: 2rem;
+}
+
+.echarts-container {
+  width: 100%;
+  height: 400px;
+}
+
+.result-section {
+  flex-wrap: wrap;
+}
+
+.result-section .btn-search {
+  margin-left: 0;
+}
+
+@media (max-width: 768px) {
+  .form-group {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .echarts-container {
+    height: 280px;
+  }
+
+  .result-section {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .result-section .btn-search {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .echarts-container {
+    height: 240px;
+  }
+}
+</style>

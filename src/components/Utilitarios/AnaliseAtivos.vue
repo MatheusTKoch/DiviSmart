@@ -437,9 +437,9 @@ onMounted(async () => {
   color: #94a3b8;
   display: block;
   max-width: 150px;
-  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .badge {
@@ -642,6 +642,20 @@ onMounted(async () => {
 
   .fixed-income-heading {
     flex-direction: column;
+  }
+
+  .name {
+    max-width: 180px;
+  }
+
+  .maturity-status {
+    white-space: normal;
+  }
+
+  .sidebar-card,
+  .details-card {
+    border-radius: var(--radius-lg);
+    padding: 1rem;
   }
 }
 </style>

@@ -321,17 +321,24 @@ async function sendID(num: number) {
 
 @media (max-width: 768px) {
   .conteudo {
-    left: 5%;
-    max-width: 90vw;
+    width: 100%;
+    margin-top: 1rem;
   }
+
   .titulo {
     font-size: 2rem;
   }
+
   .subtitulo {
     font-size: 1rem;
   }
+
   .carteiras-grid {
     grid-template-columns: 1fr;
+  }
+
+  .btn-add {
+    width: 100%;
   }
 }
 </style>

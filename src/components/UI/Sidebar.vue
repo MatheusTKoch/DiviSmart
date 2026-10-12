@@ -4,6 +4,7 @@ import { useRoute } from "vue-router";
 
 let activeItem = ref("menu");
 const route = useRoute();
+const logoUrl = `${import.meta.env.BASE_URL}favicon.svg`;
 
 onMounted(() => {
   activeItem.value =
@@ -146,7 +147,10 @@ onMounted(() => {
 
       <div class="footer-sidebar">
         <span class="version">V 1.0.0</span>
-        <span class="brand">DiviSmart</span>
+        <div class="brand-lockup sidebar-brand">
+          <img :src="logoUrl" alt="" class="brand-mark brand-mark--sm" width="20" height="20" />
+          <span class="brand">DiviSmart</span>
+        </div>
       </div>
     </div>
   </aside>
@@ -155,9 +159,9 @@ onMounted(() => {
 <style scoped>
 .sidebar {
   width: 260px;
-  min-height: 100vh;
-  background: #020617;
-  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  min-height: 100%;
+  background: var(--bg-deep);
+  border-right: 1px solid var(--border-subtle);
   display: flex;
   flex-direction: column;
   padding: 20px 0;
@@ -182,12 +186,12 @@ onMounted(() => {
 
 .nav-link {
   text-decoration: none;
-  color: #94a3b8;
+  color: var(--text-muted);
   display: flex;
   align-items: center;
   gap: 12px;
   padding: 12px 16px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 0.95rem;
   font-weight: 500;
   transition: all 0.2s ease;
@@ -200,41 +204,52 @@ onMounted(() => {
 }
 
 .nav-link:hover {
-  color: #f8fafc;
+  color: var(--text-main);
   background: rgba(255, 255, 255, 0.03);
 }
 
 .nav-link:hover .nav-icon {
-  color: #3b82f6;
+  color: var(--accent);
 }
 
 li.active .nav-link {
-  color: #f8fafc;
-  background: rgba(59, 130, 246, 0.1);
+  color: var(--text-main);
+  background: rgba(59, 130, 246, 0.12);
 }
 
 li.active .nav-icon {
-  color: #3b82f6;
+  color: var(--accent);
 }
 
 .footer-sidebar {
   padding: 20px;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-top: 1px solid var(--border-subtle);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 0.75rem;
 }
 
 .version {
   font-size: 0.75rem;
-  color: #475569;
+  color: #64748b;
+}
+
+.sidebar-brand {
+  gap: 0.4rem;
+}
+
+.brand-mark--sm {
+  width: 20px;
+  height: 20px;
+  border-radius: 5px;
 }
 
 .brand {
   font-size: 0.75rem;
   font-weight: 700;
-  color: #1e293b;
-  letter-spacing: 1px;
+  color: var(--text-soft);
+  letter-spacing: 0.04em;
 }
 
 @media screen and (max-width: 768px) {
@@ -244,7 +259,8 @@ li.active .nav-icon {
   }
 
   .nav-link span,
-  .footer-sidebar .brand {
+  .footer-sidebar .brand,
+  .footer-sidebar .version {
     display: none;
   }
 
@@ -255,6 +271,7 @@ li.active .nav-icon {
 
   .footer-sidebar {
     justify-content: center;
+    padding: 12px;
   }
 }
 
@@ -263,7 +280,7 @@ li.active .nav-icon {
     width: 100%;
     padding: 8px 0;
     border-right: 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid var(--border-subtle);
   }
 
   .sidebar-content {
@@ -276,6 +293,7 @@ li.active .nav-icon {
     padding: 0 8px;
     overflow-x: auto;
     scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
   }
 
   .nav-list::-webkit-scrollbar {
@@ -288,6 +306,7 @@ li.active .nav-icon {
 
   .nav-link {
     min-width: 48px;
+    min-height: 44px;
     padding: 10px;
   }
 

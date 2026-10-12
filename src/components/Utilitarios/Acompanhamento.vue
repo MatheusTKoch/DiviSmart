@@ -568,7 +568,26 @@ onBeforeUnmount(() => {
   }
 
   .chart-card {
-    min-height: 380px;
+    min-height: 320px;
+  }
+
+  .chart-dom {
+    min-height: 260px;
+  }
+}
+
+@media (max-width: 480px) {
+  .chart-card {
+    min-height: 280px;
+    padding: 1rem;
+  }
+
+  .chart-dom {
+    min-height: 220px;
+  }
+
+  .summary-value {
+    font-size: 1.5rem;
   }
 }
 </style>

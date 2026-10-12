@@ -17,6 +17,9 @@
   --accent: #3b82f6;
   --accent-strong: #2563eb;
   --accent-alt: #1e40af;
+  --accent-soft: #60a5fa;
+  --gradient-brand: linear-gradient(135deg, #60a5fa, #1e40af);
+  --gradient-accent: linear-gradient(135deg, #3b82f6, #1e40af);
   --radius-xl: 24px;
   --radius-lg: 18px;
   --radius-md: 12px;
@@ -69,8 +72,8 @@ img {
   width: 100%;
   position: relative;
   background:
-    radial-gradient(circle at 0% 0%, rgba(59, 130, 246, 0.1) 0%, transparent 34%),
-    radial-gradient(circle at 100% 100%, rgba(103, 85, 209, 0.08) 0%, transparent 34%),
+    radial-gradient(circle at 0% 0%, rgba(59, 130, 246, 0.12) 0%, transparent 34%),
+    radial-gradient(circle at 100% 100%, rgba(14, 165, 233, 0.08) 0%, transparent 34%),
     var(--bg-deep);
 }
 
@@ -110,7 +113,7 @@ img {
   font-size: xx-large;
   padding-bottom: 0.75rem;
   font-weight: 800;
-  background: linear-gradient(135deg, #3b82f6, #1e40af);
+  background: var(--gradient-accent);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -139,7 +142,7 @@ button.carteira:hover {
 .titulo {
   font-size: 2.5rem;
   font-weight: 800;
-  background: linear-gradient(135deg, #3b82f6, #1e40af);
+  background: var(--gradient-accent);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -180,13 +183,30 @@ button.carteira:hover {
   padding: 0.75rem;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.02);
-  color: #f8fafc;
+  background: var(--bg-surface-strong);
+  color: var(--text-main);
   font-size: 1rem;
+  color-scheme: dark;
+}
+
+select.input-field,
+select.field-input,
+.input-field option,
+.field-input option {
+  background-color: #020617;
+  color: #f8fafc;
+}
+
+select.input-field option:checked,
+select.field-input option:checked,
+select.input-field option:hover,
+select.field-input option:hover {
+  background-color: #1e293b;
+  color: #f8fafc;
 }
 
 .btn-search {
-  background: linear-gradient(135deg, #3b82f6, #1e40af);
+  background: var(--gradient-accent);
   border: none;
   color: #f8fafc;
   padding: 0.75rem 1.5rem;
@@ -240,6 +260,11 @@ button.carteira:hover {
 
   .form-section {
     flex-direction: column;
+  }
+
+  .form-group {
+    min-width: 0;
+    width: 100%;
   }
 }
 
@@ -306,7 +331,7 @@ button.carteira:hover {
   font-weight: 800;
   line-height: 1.1;
   margin-bottom: 0.5rem;
-  background: linear-gradient(135deg, #60a5fa, #1e40af);
+  background: var(--gradient-brand);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -426,10 +451,26 @@ button.carteira:hover {
 }
 
 .gradient-text {
-  background: linear-gradient(135deg, #60a5fa, #a855f7);
+  background: var(--gradient-brand);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+}
+
+.brand-mark {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  flex-shrink: 0;
+  object-fit: cover;
+}
+
+.brand-lockup {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  text-decoration: none;
+  color: var(--text-main);
 }
 
 .fade-enter-active,

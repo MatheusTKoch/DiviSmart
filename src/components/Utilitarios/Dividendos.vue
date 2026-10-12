@@ -318,9 +318,16 @@ label {
   padding: 0.75rem;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.02);
-  color: #f8fafc;
+  background: var(--bg-surface-strong);
+  color: var(--text-main);
   font-size: 1rem;
+  color-scheme: dark;
+}
+
+select.input-field,
+.input-field option {
+  background-color: #020617;
+  color: #f8fafc;
 }
 
 .btn-search {
@@ -423,15 +430,28 @@ label {
 
 @media (max-width: 768px) {
   .conteudo {
-    left: 5%;
-    max-width: 90vw;
+    width: 100%;
+    margin-top: 1rem;
   }
+
   .titulo {
     font-size: 2rem;
   }
+
   .form-section {
     flex-direction: column;
   }
+
+  .form-group {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .btn-search {
+    width: 100%;
+    align-self: stretch;
+  }
+
   .details-grid {
     grid-template-columns: 1fr;
   }

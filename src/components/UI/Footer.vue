@@ -2,7 +2,7 @@
   <footer class="footer">
     <div class="footer-container">
       <div class="footer-left">
-        <p>&copy; 2024 DiviSmart. Todos os direitos reservados.</p>
+        <p>&copy; 2026 DiviSmart. Todos os direitos reservados.</p>
       </div>
 
       <div class="footer-right">
@@ -82,6 +82,13 @@
 @media (max-width: 640px) {
   .footer-container {
     padding: 0 5%;
+    flex-direction: column;
+    gap: 0.75rem;
+    text-align: center;
+  }
+
+  .footer-left p {
+    margin: 0;
   }
 }
 </style>

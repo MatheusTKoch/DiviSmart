@@ -4,6 +4,7 @@ import { ref } from "vue";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
+const logoUrl = `${import.meta.env.BASE_URL}favicon.svg`;
 
 const dropdownOpen = ref(false);
 
@@ -39,7 +40,10 @@ function clearUser() {
   <header class="header-container">
     <nav class="nav-content">
       <div class="logo">
-        <RouterLink class="logo-link" to="/">DiviSmart</RouterLink>
+        <RouterLink class="logo-link brand-lockup" to="/">
+          <img :src="logoUrl" alt="" class="brand-mark" width="32" height="32" />
+          <span>DiviSmart</span>
+        </RouterLink>
       </div>
 
       <div class="actions">
@@ -121,7 +125,7 @@ function clearUser() {
 
 .logo-link {
   text-decoration: none;
-  color: #f8fafc;
+  color: var(--text-main);
   font-size: 1.5rem;
   font-weight: 800;
   letter-spacing: -0.5px;
@@ -129,7 +133,13 @@ function clearUser() {
 }
 
 .logo-link:hover {
-  opacity: 0.8;
+  opacity: 0.85;
+}
+
+.logo-link .brand-mark {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
 }
 
 .btn-action,
@@ -212,10 +222,10 @@ function clearUser() {
   position: absolute;
   top: 100%;
   right: 0;
-  background: #1e293b;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--bg-surface-strong);
+  border: 1px solid var(--border-subtle);
   border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-soft);
   min-width: 180px;
   z-index: 1000;
   padding: 10px 0;
@@ -266,7 +276,22 @@ function clearUser() {
   }
 
   .logo-link {
-    font-size: 1.2rem;
+    font-size: 1.15rem;
+    gap: 0.45rem;
+  }
+
+  .logo-link .brand-mark {
+    width: 28px;
+    height: 28px;
+  }
+
+  .profile-button {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+  }
+
+  .dropdown-menu {
+    min-width: 160px;
   }
 
   .btn-action,

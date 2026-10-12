@@ -217,7 +217,7 @@ watch(
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding: 1.5rem;
+  padding: 0.5rem 0 1.5rem;
   width: 100%;
 }
 
@@ -225,66 +225,58 @@ watch(
   width: 100%;
   min-width: 0;
   max-width: 1100px;
-  background-color: #121824;
-  border-radius: 16px;
+  background: var(--bg-surface);
+  border-radius: var(--radius-xl);
   padding: 2rem;
-  border: 1px solid #1e293b;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-  color: #ffffff;
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-soft);
+  color: var(--text-main);
+  backdrop-filter: blur(14px);
 }
 
 .card-header {
   display: flex;
   justify-content: space-between;
-  gap: 2rem;
+  gap: 1.5rem;
   min-width: 0;
 }
 
 .greeting-section {
   flex: 1;
+  min-width: 0;
 }
 
 .texto-titulo {
   font-size: 1.8rem;
-  font-weight: bold;
-  color: #3b82f6;
+  font-weight: 800;
+  background: var(--gradient-accent);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
   margin-bottom: 0.75rem;
 }
 
 .text {
-  color: #94a3b8;
+  color: var(--text-muted);
   font-size: 0.95rem;
   margin-bottom: 1.5rem;
   line-height: 1.5;
 }
 
-.carteira {
-  background-color: #2563eb;
-  color: #fff;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.carteira:hover {
-  background-color: #1d4ed8;
-}
-
 .quotes-section {
-  width: 300px;
-  background-color: #1a2234;
+  flex: 0 1 300px;
+  max-width: 320px;
+  width: 100%;
+  background: var(--bg-surface-strong);
   padding: 1rem;
-  border-radius: 12px;
-  border: 1px solid #2a364f;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
 }
 
 .divider {
   border: 0;
   height: 1px;
-  background: #1e293b;
+  background: var(--border-subtle);
   margin: 2rem 0;
 }
 
@@ -297,14 +289,14 @@ watch(
 
 .news-header h3 {
   font-size: 1.2rem;
-  color: #f8fafc;
+  color: var(--text-main);
   margin: 0;
 }
 
 .carousel-controls button {
-  background: #1a2234;
-  border: 1px solid #2a364f;
-  color: #fff;
+  background: var(--bg-surface-strong);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-main);
   width: 32px;
   height: 32px;
   border-radius: 6px;
@@ -318,10 +310,10 @@ watch(
 }
 
 .news-card {
-  background-color: #1a2234;
-  border-radius: 10px;
+  background: var(--bg-surface-strong);
+  border-radius: var(--radius-md);
   padding: 1.2rem;
-  border: 1px solid #2a364f;
+  border: 1px solid var(--border-subtle);
 }
 
 .news-content h4 {
@@ -329,7 +321,7 @@ watch(
 }
 
 .news-content h4 a {
-  color: #60a5fa;
+  color: var(--accent-soft);
   text-decoration: none;
 }
 
@@ -338,7 +330,7 @@ watch(
 }
 
 .news-content p {
-  color: #94a3b8;
+  color: var(--text-muted);
   font-size: 0.9rem;
   margin: 0.5rem 0 1rem 0;
   overflow-wrap: anywhere;
@@ -349,6 +341,7 @@ watch(
   justify-content: space-between;
   font-size: 0.75rem;
   color: #64748b;
+  gap: 0.5rem;
 }
 
 .news-loading,
@@ -356,6 +349,17 @@ watch(
   color: #64748b;
   font-size: 0.9rem;
   padding: 1rem 0;
+}
+
+@media (max-width: 1024px) {
+  .card-header {
+    flex-wrap: wrap;
+  }
+
+  .quotes-section {
+    flex: 1 1 100%;
+    max-width: none;
+  }
 }
 
 @media (max-width: 768px) {
@@ -374,6 +378,7 @@ watch(
 
   .quotes-section {
     width: 100%;
+    max-width: none;
   }
 
   .divider {
@@ -398,7 +403,7 @@ watch(
 @media (max-width: 480px) {
   .main-card {
     padding: 1rem;
-    border-radius: 12px;
+    border-radius: var(--radius-lg);
   }
 
   .texto-titulo {
