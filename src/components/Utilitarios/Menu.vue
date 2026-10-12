@@ -27,12 +27,14 @@ const noticias = ref<Noticia[]>([]);
 const carregandoNoticias = ref(true);
 const currentNewsIndex = ref(0);
 const canLogout = ref(true);
+const isDemo = ref(false);
 
 async function verifyUser() {
   try {
     const res = await api.get("/verify_session");
     if (res.status === 200 && res.data.authenticated) {
       canLogout.value = res.data.canLogout !== false;
+      isDemo.value = res.data.isDemo === true;
       await getUserName();
       loadHorario();
       if (route.path === '/menu') {
@@ -138,7 +140,7 @@ watch(
   <div class="menu-shell">
     <Header :showPerfil="true" :showLogout="canLogout" />
     <div class="menu-layout">
-      <Sidebar />
+      <Sidebar :is-demo="isDemo" />
       <main class="menu-main">
         <div v-if="loading" class="menu-state">
           <Spinner />

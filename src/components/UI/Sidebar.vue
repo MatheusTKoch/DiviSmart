@@ -1,15 +1,38 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
+import api from "../../api/main";
+
+defineProps({
+  isDemo: {
+    type: Boolean,
+    default: false,
+  },
+});
 
 let activeItem = ref("menu");
 const route = useRoute();
+const router = useRouter();
 const logoUrl = `${import.meta.env.BASE_URL}favicon.svg`;
 
 onMounted(() => {
   activeItem.value =
     route.path === "/menu" ? "menu" : route.path.replace("/menu/", "");
 });
+
+function goToAccount() {
+  api
+    .post("/logout")
+    .then((res) => {
+      if (res.status == 200) {
+        localStorage.removeItem("auth_token");
+        router.push("/");
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}
 </script>
 
 <template>
@@ -145,11 +168,19 @@ onMounted(() => {
         </li>
       </ul>
 
-      <div class="footer-sidebar">
-        <span class="version">V 1.0.0</span>
-        <div class="brand-lockup sidebar-brand">
-          <img :src="logoUrl" alt="" class="brand-mark brand-mark--sm" width="20" height="20" />
-          <span class="brand">DiviSmart</span>
+      <div class="footer-sidebar" :class="{ 'footer-sidebar--demo': isDemo }">
+        <p v-if="isDemo" class="demo-cta">
+          Gostou da experiência?
+          <button type="button" class="demo-cta-link" @click="goToAccount">
+            Crie sua conta ou faça login
+          </button>
+        </p>
+        <div class="footer-meta">
+          <span class="version">V 1.0.0</span>
+          <div class="brand-lockup sidebar-brand">
+            <img :src="logoUrl" alt="" class="brand-mark brand-mark--sm" width="20" height="20" />
+            <span class="brand">DiviSmart</span>
+          </div>
         </div>
       </div>
     </div>
@@ -225,9 +256,44 @@ li.active .nav-icon {
   padding: 20px;
   border-top: 1px solid var(--border-subtle);
   display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.footer-meta {
+  display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 0.75rem;
+}
+
+.demo-cta {
+  margin: 0;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: #64748b;
+}
+
+.demo-cta-link {
+  display: inline;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: none;
+  color: var(--accent);
+  font-size: inherit;
+  font-weight: 600;
+  line-height: inherit;
+  cursor: pointer;
+  text-align: left;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 0.2s ease, opacity 0.2s ease;
+}
+
+.demo-cta-link:hover {
+  color: var(--text-main);
+  opacity: 0.9;
 }
 
 .version {
@@ -273,6 +339,21 @@ li.active .nav-icon {
     justify-content: center;
     padding: 12px;
   }
+
+  .footer-sidebar--demo {
+    align-items: center;
+  }
+
+  .footer-sidebar--demo .demo-cta {
+    display: block;
+    text-align: center;
+    font-size: 0.65rem;
+    line-height: 1.3;
+  }
+
+  .footer-sidebar--demo .footer-meta {
+    justify-content: center;
+  }
 }
 
 @media screen and (max-width: 480px) {
@@ -310,8 +391,24 @@ li.active .nav-icon {
     padding: 10px;
   }
 
-  .footer-sidebar {
+  .footer-sidebar:not(.footer-sidebar--demo) {
     display: none;
+  }
+
+  .footer-sidebar--demo {
+    display: flex;
+    padding: 8px 12px 10px;
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  .footer-sidebar--demo .footer-meta {
+    display: none;
+  }
+
+  .footer-sidebar--demo .demo-cta {
+    font-size: 0.7rem;
+    text-align: center;
+    width: 100%;
   }
 }
 </style>
