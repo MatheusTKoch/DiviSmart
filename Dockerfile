@@ -10,6 +10,7 @@ RUN npm ci --omit=dev \
 
 COPY src/server.js ./src/server.js
 COPY src/api ./src/api
+COPY src/auth ./src/auth
 COPY src/scripts ./src/scripts
 
 EXPOSE 3001

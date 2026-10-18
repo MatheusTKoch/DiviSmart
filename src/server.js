@@ -56,22 +56,26 @@ const redisStore = new RedisStore({
 app.set('trust proxy', 1);
 
 //CORS
-const allowedOrigins = [
-  "http://localhost:5173",
-  "https://matheustkoch.github.io"
-];
+const allowedOrigins = (
+  process.env.ALLOWED_ORIGINS ||
+  "http://localhost:5173,https://matheustkoch.github.io"
+)
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
 
-app.use(cors({ 
+app.use(cors({
   origin: function (origin, callback) {
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error('Bloqueado pelo CORS'));
+      callback(null, false);
     }
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'] 
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  optionsSuccessStatus: 204,
 }));
 
 //Express
@@ -473,7 +477,11 @@ app.post("/set_active_carteira", authMiddleware, (req, res) => {
 app.post("/logout", (req, res) => {
   req.session.destroy((err) => {
     if (err) return res.status(500).send("Erro ao sair");
-    res.clearCookie('connect.sid', { httpOnly: true, sameSite: 'lax' });
+    res.clearCookie('connect.sid', {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? 'none' : 'lax',
+    });
     res.status(200).send("sucesso");
   });
 });
@@ -1147,7 +1155,7 @@ app.post("/relatorios_load", authMiddleware, async (req, res) => {
   }
 });
 
-const PORT = process.env.V_PORT || 3001;
+const PORT = Number(process.env.PORT || 3001);
 app.listen(PORT, () => {
   console.log(`Server rodando na porta ${PORT}.`);
 });

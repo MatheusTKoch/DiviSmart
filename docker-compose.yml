@@ -78,6 +78,7 @@ services:
     command: npm run scrape:frequente
 
   # Serviço do Servidor Express
+  # V_PORT = porta no host (nginx); container escuta sempre em 3001
   app:
     build: .
     container_name: express_server
@@ -93,6 +94,7 @@ services:
       - .env
     environment:
       - NODE_ENV=production
+      - PORT=3001
       - REDIS_URL=redis://redis:6379
       - NODE_OPTIONS=--max-http-header-size=65536
     volumes:
