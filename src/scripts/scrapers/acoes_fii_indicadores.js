@@ -2,8 +2,8 @@ import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
 import { Pool } from "pg";
-import axios from "axios";
 import * as cheerio from "cheerio";
+import { fetchHtmlLatin1 } from "../utils/fetchHtml.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -64,17 +64,8 @@ function extrairValorPorRotulo($, rotuloAlvo) {
 async function rasparDetalhesTicker(ticker) {
   const url = `https://www.fundamentus.com.br/detalhes.php?papel=${ticker}`;
   try {
-    const res = await axios.get(url, {
-      headers: {
-        "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        "Accept-Language": "pt-BR,pt;q=0.9",
-      },
-      responseType: "text",
-      timeout: 10000,
-    });
-
-    const $ = cheerio.load(res.data);
+    const html = await fetchHtmlLatin1(url, { timeout: 10000 });
+    const $ = cheerio.load(html);
 
     let cotacaoRaw = extrairValorPorRotulo($, "cotacao");
     if (!cotacaoRaw) {

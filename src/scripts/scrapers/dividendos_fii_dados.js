@@ -1,9 +1,9 @@
-import axios from "axios";
 import * as cheerio from "cheerio";
 import { Pool } from "pg";
 import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
+import { fetchHtmlLatin1 } from "../utils/fetchHtml.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -43,14 +43,8 @@ async function getDividendos(ticker) {
     const tickerUpper = ticker.toUpperCase();
     const url = `${DIVIDENDOS_URL}${tickerUpper}`;
 
-    const response = await axios.get(url, {
-      headers: {
-        "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
-      },
-    });
-
-    const $ = cheerio.load(response.data);
+    const html = await fetchHtmlLatin1(url);
+    const $ = cheerio.load(html);
     const dividendos = [];
 
     const tableSelector = "table:first tbody tr";

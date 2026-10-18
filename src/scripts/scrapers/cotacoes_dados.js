@@ -2,8 +2,7 @@ import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
 import { Pool } from "pg";
-import axios from "axios";
-import * as cheerio from "cheerio";
+import YahooFinance from "yahoo-finance2";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -17,23 +16,13 @@ const db = new Pool({
   port: process.env.POSTGRES_PORT || 5432,
 });
 
-const BASE_URL_COTACOES = process.env.URL_COTACOES;
+const yahooFinance = new YahooFinance({ suppressNotices: ["yahooSurvey"] });
 
 const ATIVOS_YAHOO = {
   "Ouro/USD": "GC=F",
   "S&P 500": "^GSPC",
-  "DowJones": "^DJI",
+  DowJones: "^DJI",
 };
-
-function parseFormattedNumber(input) {
-  let cleaned = input.replace(/[^\d.,]/g, "");
-  cleaned = cleaned.replace(/,/g, "");
-  const parts = cleaned.split(".");
-  if (parts.length > 2) {
-    cleaned = parts.slice(0, -1).join("") + "." + parts.pop();
-  }
-  return parseFloat(cleaned);
-}
 
 async function upsertQuote(client, ativo, valor, dataAtualizacao) {
   const sql = `
@@ -55,73 +44,23 @@ async function upsertQuote(client, ativo, valor, dataAtualizacao) {
   }
 }
 
-async function scrapeAndUpsertYahooQuote(client, ativo, ticker) {
-  if (!BASE_URL_COTACOES) {
-    console.error("Erro: URL_COTACOES não configurada.");
-    return;
-  }
-
-  const url = `${BASE_URL_COTACOES}${encodeURIComponent(ticker)}`;
-
+async function fetchAndUpsertYahooQuote(client, ativo, ticker) {
   try {
-    console.log(`Buscando ${ativo} (${ticker}) em: ${url}`);
-    const response = await axios.get(url, { headers: { "User-Agent": "Mozilla/5.0" } });
-    const $ = cheerio.load(response.data);
+    console.log(`Buscando ${ativo} (${ticker}) via yahoo-finance2...`);
+    const quote = await yahooFinance.quote(ticker);
+    const valor = quote?.regularMarketPrice;
 
-    const header = $("#quote-header-info").first();
-    const headerTitle = header.find("h1").first().text().trim() || header.text().trim().slice(0, 120);
-    console.log(`Página carregada (header): "${headerTitle}"`);
-
-    const selectors = [
-      'fin-streamer[data-field="regularMarketPrice"]',
-      'span[data-test="qsp-price"]',
-      'span.price',
-      'div[data-test="instrument-price-last"]'
-    ];
-
-    let priceText = "";
-
-    // Tenta cada seletor dentro do header (preferência)
-    for (const sel of selectors) {
-      const el = header.find(sel).first();
-      if (el && el.length) {
-        priceText = el.attr("value") || el.text().trim();
-        console.log(`Seletor usado: ${sel}`);
-        break;
-      }
-    }
-
-    // Se não achou no header, tenta fin-streamer por símbolo na página (tratando ^)
-    if (!priceText) {
-      const normalized = ticker.replace(/^\^/, "");
-      const bySymbol = $(`fin-streamer[data-symbol="${ticker}"], fin-streamer[data-symbol="${normalized}"]`).filter((i, el) => $(el).text().trim()).first();
-      if (bySymbol && bySymbol.length) {
-        priceText = bySymbol.attr("value") || bySymbol.text().trim();
-        console.log("Seletor usado: fin-streamer por símbolo");
-      }
-    }
-
-    // Último recurso: primeiro fin-streamer visível na página
-    if (!priceText) {
-      const anyPriceElem = $('fin-streamer[data-field="regularMarketPrice"]').filter((i, el) => $(el).text().trim()).first();
-      priceText = (anyPriceElem && anyPriceElem.length) ? (anyPriceElem.attr("value") || anyPriceElem.text().trim()) : "";
-      if (priceText) console.log("Seletor usado: fin-streamer (any)");
-    }
-
-    console.log(`Valor bruto extraído para ${ativo}: "${priceText}"`);
-
-    const valor = priceText ? parseFormattedNumber(priceText) : NaN;
-
-    if (valor && !isNaN(valor)) {
-      const now = new Date();
-      await upsertQuote(client, ativo, valor, now);
+    if (valor != null && Number.isFinite(Number(valor))) {
+      await upsertQuote(client, ativo, Number(valor), new Date());
     } else {
-      console.error(`Não foi possível extrair a cotação correta para ${ativo}. Valor extraído: "${priceText}"`);
+      console.error(
+        `Não foi possível obter a cotação para ${ativo} (${ticker}). Valor: ${valor}`,
+      );
     }
   } catch (error) {
     console.error(
-      `Erro ao fazer scraping do Yahoo para ${ativo}:`,
-      error.response ? `${error.response.status} ${error.response.statusText}` : error.message,
+      `Erro ao buscar cotação do Yahoo para ${ativo} (${ticker}):`,
+      error.message,
     );
   }
 }
@@ -131,10 +70,10 @@ async function main() {
   try {
     client = await db.connect();
 
-    console.log("\n--- 📈 Iniciando Scraping Unificado do Yahoo Finance ---");
+    console.log("\n--- Iniciando atualização de cotações (yahoo-finance2) ---");
 
     for (const [ativo, ticker] of Object.entries(ATIVOS_YAHOO)) {
-      await scrapeAndUpsertYahooQuote(client, ativo, ticker);
+      await fetchAndUpsertYahooQuote(client, ativo, ticker);
     }
   } catch (error) {
     console.error("Erro geral na execução:", error.message);

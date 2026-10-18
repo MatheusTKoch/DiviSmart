@@ -2,16 +2,16 @@ import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
 import { Pool } from "pg";
-import axios from "axios";
 import * as cheerio from "cheerio";
 import { obterBetaAtivo } from "../utils/betaCalculator.js";
+import { fetchHtmlLatin1 } from "../utils/fetchHtml.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const FUNDAMENTUS_URL = process.env.URL_ACOES;
-
 dotenv.config({ path: path.resolve(process.cwd(), ".env") });
+
+const FUNDAMENTUS_URL = process.env.URL_ACOES;
 
 const db = new Pool({
   database: process.env.POSTGRES_DB,
@@ -26,11 +26,8 @@ async function consultaDadosFundamentusDetalhes() {
     const dados = [];
     console.log(`Buscando dados em: ${FUNDAMENTUS_URL}`);
 
-    const res = await axios.get(FUNDAMENTUS_URL, {
-      headers: { "User-Agent": "Mozilla/5.0" },
-    });
-
-    const dataScrape = cheerio.load(res.data);
+    const html = await fetchHtmlLatin1(FUNDAMENTUS_URL);
+    const dataScrape = cheerio.load(html);
 
     const tableRowSelector = "table:first tbody tr";
 
