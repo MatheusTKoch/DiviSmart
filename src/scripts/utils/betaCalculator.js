@@ -2,7 +2,7 @@ import YahooFinance from "yahoo-finance2";
 
 const yahooFinance = new YahooFinance();
 
-function calcularRetornosDiarios(precos) {
+export function calcularRetornosDiarios(precos) {
   const retornos = [];
   for (let i = 1; i < precos.length; i++) {
     retornos.push((precos[i] - precos[i - 1]) / precos[i - 1]);
@@ -10,7 +10,7 @@ function calcularRetornosDiarios(precos) {
   return retornos;
 }
 
-function calcularBeta(retornosAcao, retornosIndice) {
+export function calcularBeta(retornosAcao, retornosIndice) {
   const n = Math.min(retornosAcao.length, retornosIndice.length);
   if (n < 2) return null;
 

@@ -8,6 +8,9 @@
     "build": "vue-tsc -b && vite build",
     "preview": "vite preview",
     "start": "node src/server.js",
+    "test": "vitest run",
+    "test:unit": "vitest run tests/unit",
+    "test:watch": "vitest",
     "db:setup": "node src/scripts/run-db-setup.js",
     "scrape:diario": "node ./src/scripts/run-scrapers.js --mode=diario",
     "scrape:frequente": "node ./src/scripts/run-scrapers.js --mode=frequente"
@@ -41,8 +44,12 @@
   "devDependencies": {
     "@types/mysql": "^2.15.26",
     "@vitejs/plugin-vue": "^6.0.7",
+    "@vitest/coverage-v8": "^5.0.5",
+    "@vue/test-utils": "^2.5.1",
+    "jsdom": "^29.1.1",
     "typescript": "^5.5.3",
     "vite": "^8.0.16",
+    "vitest": "^5.0.5",
     "vue-tsc": "^3.2.5"
   },
   "allowScripts": {

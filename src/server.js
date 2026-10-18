@@ -15,6 +15,7 @@ import PDFDocument from "pdfkit";
 import helmet from "helmet";
 import nodemailer from "nodemailer";
 import TemplatePasswordResetEmail from "./api/template_mail.js";
+import { createAuthToken, readAuthToken } from "./auth/token.js";
 
 //Configuração do .env e express
 const __filename = fileURLToPath(import.meta.url);
@@ -78,56 +79,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const isProduction = process.env.NODE_ENV === 'production';
-const authTokenMaxAge = 10 * 3600000;
-
-const encodeTokenPart = (value) =>
-  Buffer.from(JSON.stringify(value)).toString("base64url");
-
-const createAuthToken = ({ userId, isDemo = false, canLogout = true, carteiraId = null }) => {
-  const payload = encodeTokenPart({
-    userId,
-    isDemo,
-    canLogout,
-    carteiraId,
-    exp: Date.now() + authTokenMaxAge,
-  });
-  const signature = crypto
-    .createHmac("sha256", process.env.SESSION_SECRET)
-    .update(payload)
-    .digest("base64url");
-
-  return `${payload}.${signature}`;
-};
-
-const readAuthToken = (req) => {
-  const authorization = req.get("Authorization") || "";
-  if (!authorization.startsWith("Bearer ")) return null;
-
-  const token = authorization.slice(7);
-  const [payload, signature] = token.split(".");
-  if (!payload || !signature) return null;
-
-  const expectedSignature = crypto
-    .createHmac("sha256", process.env.SESSION_SECRET)
-    .update(payload)
-    .digest("base64url");
-  const providedBuffer = Buffer.from(signature);
-  const expectedBuffer = Buffer.from(expectedSignature);
-
-  if (
-    providedBuffer.length !== expectedBuffer.length ||
-    !crypto.timingSafeEqual(providedBuffer, expectedBuffer)
-  ) {
-    return null;
-  }
-
-  try {
-    const data = JSON.parse(Buffer.from(payload, "base64url").toString("utf8"));
-    return data.exp > Date.now() ? data : null;
-  } catch {
-    return null;
-  }
-};
 
 const applyAuthToken = (req) => {
   const tokenData = readAuthToken(req);

@@ -192,19 +192,19 @@ function drawTableHeader(doc: jsPDF, y: number) {
   doc.text("TOTAL", 193, y, { align: "right" });
 }
 
-function itemValue(item: DividendReportItem) {
+export function itemValue(item: DividendReportItem) {
   return Number(item.ValorPagamento || 0) * Number(item.Quantidade || 0);
 }
 
-function totalValue(items: DividendReportItem[]) {
+export function totalValue(items: DividendReportItem[]) {
   return items.reduce((total, item) => total + itemValue(item), 0);
 }
 
-function formatCurrency(value: number) {
+export function formatCurrency(value: number) {
   return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
-function formatDate(value: string) {
+export function formatDate(value: string) {
   if (!value) return "-";
   const [year, month, day] = value.slice(0, 10).split("-");
   return year && month && day ? `${day}/${month}/${year}` : value;
