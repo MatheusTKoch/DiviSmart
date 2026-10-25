@@ -19,7 +19,7 @@
     "@motionone/vue": "^10.16.4",
     "axios": "^1.20.0",
     "bcrypt": "^6.0.0",
-    "body-parser": "^2.3.0",
+    "body-parser": "^2.4.0",
     "cheerio": "^1.0.0",
     "connect-redis": "^9.0.0",
     "cors": "^2.8.5",
